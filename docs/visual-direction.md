@@ -48,5 +48,4 @@ Evite transformar toda a interface em um tema dourado/marrom. O dourado deve des
 
 As imagens em `docs/assets/diagrams/` são materiais visuais de apoio. Os arquivos Mermaid em `docs/diagrams/` continuam sendo a fonte técnica editável.
 
-Para diagramas com texto, prefira imagens renderizadas a partir de Mermaid. Isso preserva labels em português e relações técnicas corretas. Use `$imagegen` depois para moodboards, imagens de apresentação ou elementos visuais onde fidelidade textual não seja crítica.
-
+Para diagramas com texto técnico, use Mermaid como referência exata. Para slides e narrativa visual, use as versões em `docs/assets/diagrams/gpt-image/`, geradas com GPT image em estilo mais polido e premium.
