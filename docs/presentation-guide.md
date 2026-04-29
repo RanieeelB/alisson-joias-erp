@@ -1,36 +1,37 @@
-# Presentation Guide
+# Guia de Apresentação
 
-## Goal
+## Objetivo
 
-The final presentation should show a working finance module and explain how the developer used AI as an engineering accelerator while still owning the code and decisions.
+A apresentação final deve mostrar o módulo financeiro funcionando e explicar como a IA foi usada como acelerador de engenharia, sem substituir a compreensão do código e das decisões.
 
-## Suggested Demo Flow
+## Fluxo Sugerido de Demo
 
-1. Start with the dashboard and explain the finance KPIs.
-2. Open invoice listing and show filters/search.
-3. Open invoice detail and explain line items, subtotal, tax, total, paid, balance, and QuickBooks sync indicator.
-4. Show payments and explain partial payments/overpayments.
-5. Show Accounts Receivable aging and Accounts Payable vendor obligations.
-6. Show statements and reports.
-7. Close with bonus automations, deployment link, and tradeoffs.
+1. Comece pelo dashboard e explique os KPIs financeiros.
+2. Abra a listagem de faturas e mostre filtros/busca.
+3. Abra o detalhe de uma fatura e explique line items, subtotal, tax, total, paid, balance e indicador QuickBooks.
+4. Mostre payments e explique pagamentos parciais/overpayments.
+5. Mostre Accounts Receivable aging e Accounts Payable.
+6. Mostre statements e reports.
+7. Termine com automações bônus, link de deploy e tradeoffs.
 
-## Technical Questions to Prepare
+## Perguntas Técnicas Prováveis
 
-- Why App Router and which components are server/client?
-- How does Supabase fit into auth, database, storage, and realtime?
-- How would RLS protect customer portal data?
-- How are invoice balances and aging buckets calculated?
-- How are overpayments represented?
-- What would a real QuickBooks bridge need?
-- Where did AI help, and what did you change after reviewing AI output?
-- What would you improve with more time?
+- Por que usar App Router?
+- Quais componentes são Server Components e quais são Client Components?
+- Como o Supabase entra em auth, banco, storage e realtime?
+- Como RLS protegeria dados do portal do cliente?
+- Como os saldos de invoice e aging buckets são calculados?
+- Como overpayments são representados?
+- O que uma integração real com QuickBooks exigiria?
+- Onde a IA ajudou e o que foi alterado após revisão humana?
+- O que seria melhorado com mais tempo?
 
-## Evidence to Keep Ready
+## Evidências Para Ter à Mão
 
-- Git history with semantic commits.
-- README with setup and AI usage.
-- Screenshots or generated visual assets.
-- Short architecture explanation.
-- Data model explanation.
-- Known limitations and next steps.
+- Histórico Git com commits semânticos.
+- README com setup e uso de IA.
+- Screenshots ou imagens dos diagramas.
+- Explicação curta da arquitetura.
+- Explicação do modelo de dados.
+- Limitações conhecidas e próximos passos.
 

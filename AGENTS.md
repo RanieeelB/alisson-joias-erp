@@ -20,6 +20,18 @@ Before implementing or reviewing any feature, read:
 
 If a requirement conflicts with an implementation idea, follow the test requirements first.
 
+## Documentation Language Policy
+
+- AI-facing and implementation-control information must be written in English.
+- User-facing, presenter-facing, and audience-facing information must be written in Portuguese.
+- Keep domain terms in English when they are product labels or finance concepts from the test, such as Invoice, Accounts Receivable, Accounts Payable, Statements, QuickBooks, Supabase, and App Router.
+- Do not translate code identifiers, branch names, file paths, package names, or commands.
+
+Current split:
+
+- English for agents: `AGENTS.md`, `docs/architecture.md`, `docs/data-model.md`, `docs/tasks.md`, `docs/skills.md`.
+- Portuguese for humans/presentation: `docs/README.md`, `docs/pre-development.md`, `docs/requirements.md`, `docs/roadmap.md`, `docs/presentation-guide.md`, `docs/visual-direction.md`, `docs/ai-usage-log.md`, `docs/diagrams/README.md`, and diagram labels.
+
 ## Required Stack
 
 - Next.js 14+ with App Router.
@@ -97,4 +109,3 @@ Before committing a branch:
 - Confirm no PDFs or secrets are staged.
 - Confirm docs still match the implemented scope.
 - Update `docs/ai-usage-log.md` when AI materially influenced a feature.
-

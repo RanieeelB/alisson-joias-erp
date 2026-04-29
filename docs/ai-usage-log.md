@@ -1,26 +1,26 @@
-# AI Usage Log
+# Registro de Uso de IA
 
-Use this log to document meaningful AI assistance during the project. This helps with the final presentation and shows responsible AI usage.
+Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso será útil para a apresentação final e mostra maturidade no processo.
 
-## Entry Template
+## Modelo de Entrada
 
 ```md
-## YYYY-MM-DD - <branch or feature>
+## AAAA-MM-DD - <branch ou feature>
 
-- Tools/skills used:
-- Prompt or task summary:
-- Output accepted:
-- Human review/adaptation:
-- What changed after review:
-- Risks or follow-up:
+- Ferramentas/skills usadas:
+- Resumo do prompt ou tarefa:
+- Saída aceita:
+- Revisão/adaptação humana:
+- O que mudou após revisão:
+- Riscos ou follow-up:
 ```
 
 ## 2026-04-29 - docs/pre-development
 
-- Tools/skills used: Codex, `find-skills`, `skill-installer`, `skill-creator`, `imagegen`.
-- Prompt or task summary: Convert the technical test and research PDFs into a pre-development repository structure.
-- Output accepted: AGENTS.md, docs, Mermaid diagram sources, skill recommendations, and custom domain skill.
-- Human review/adaptation: User requested no `codex/` branch prefix, multiple commits per branch, existing skills research, and more attractive image assets for diagrams.
-- What changed after review: Plan updated to install public skills, create one local custom skill, and keep Mermaid as source while generating visual diagram images.
-- Risks or follow-up: Restart Codex after installing skills so new skills are discovered in future sessions.
+- Ferramentas/skills usadas: Codex, `find-skills`, `skill-installer`, `skill-creator`, `imagegen`.
+- Resumo do prompt ou tarefa: transformar o teste técnico e os PDFs de pesquisa em uma estrutura de pré-desenvolvimento para o repositório.
+- Saída aceita: `AGENTS.md`, documentação, fontes Mermaid, imagens simples dos diagramas, recomendações de skills e skill local de domínio.
+- Revisão/adaptação humana: o usuário pediu branches sem prefixo `codex/`, múltiplos commits por branch, pesquisa de skills existentes, diagramas em português e visual mais simples.
+- O que mudou após revisão: o plano passou a instalar skills públicas, criar apenas uma skill local customizada e renderizar diagramas simples em português a partir de Mermaid.
+- Riscos ou follow-up: reiniciar o Codex para carregar as skills recém-instaladas em sessões futuras.
 

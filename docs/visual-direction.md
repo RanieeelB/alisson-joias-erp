@@ -1,51 +1,52 @@
-# Visual Direction
+# Direção Visual
 
-## Product Feel
+## Sensação do Produto
 
-The app should feel like an operational finance console for a jewelry ERP. It should be polished, dense, and professional, not like a marketing landing page.
+A aplicação deve parecer um console financeiro operacional para um ERP de joalheria. Ela precisa ser polida, densa e profissional, não uma landing page.
 
-The visual language should suggest luxury jewelry through restraint: dark surfaces, warm gold accents, cream backgrounds, crisp typography, and precise spacing.
+A linguagem visual deve sugerir joalheria de luxo com moderação: superfícies escuras, acentos dourados, fundos creme, tipografia nítida e espaçamento preciso.
 
-## Palette
+## Paleta
 
-Use a restrained palette:
+Use uma paleta contida:
 
-- Deep black/charcoal for headers and navigation.
-- Warm gold for primary emphasis and premium accents.
-- Cream/off-white for page backgrounds.
-- Neutral grays for borders, secondary text, and table structure.
-- Semantic colors for statuses.
+- preto profundo ou charcoal para headers e navegação;
+- dourado quente para destaques e hierarquia premium;
+- creme/off-white para fundos;
+- cinzas neutros para bordas, textos secundários e tabelas;
+- cores semânticas para status.
 
-Avoid making the whole interface one gold/brown theme. Gold should highlight value and hierarchy, not flood the UI.
+Evite transformar toda a interface em um tema dourado/marrom. O dourado deve destacar valor e hierarquia, não dominar tudo.
 
-## Typography
+## Tipografia
 
-- Use a professional sans-serif for body and UI.
-- Use a refined display style sparingly for brand moments or page titles.
-- Use tabular or monospace numeric styling for money columns when useful.
-- Keep dashboard/card headings compact.
+- Use uma fonte sans-serif profissional para corpo e UI.
+- Use fonte de display apenas em momentos de marca ou títulos maiores.
+- Use números tabulares ou estilo monospace para valores monetários quando ajudar a leitura.
+- Mantenha títulos de cards e painéis compactos.
 
 ## Layout
 
-- Prioritize scannability.
-- Keep KPIs and tables aligned.
-- Use cards for repeated items and dashboard widgets, not for every page section.
-- Keep table density practical for finance workflows.
-- Make filters and search easy to reach.
+- Priorize leitura rápida.
+- Alinhe KPIs, tabelas e gráficos com rigor.
+- Use cards para itens repetidos e widgets de dashboard, não para toda seção da página.
+- Mantenha densidade adequada para fluxo financeiro.
+- Deixe filtros e busca fáceis de acessar.
 
-## Status Badges
+## Badges de Status
 
-- Paid: green.
-- Pending: amber/yellow.
-- Partial: blue.
-- Overdue: red.
-- Credit/overpayment: teal or emerald.
-- QuickBooks synced: green.
-- QuickBooks pending: amber.
-- QuickBooks failed: red.
+- Paid: verde.
+- Pending: âmbar/amarelo.
+- Partial: azul.
+- Overdue: vermelho.
+- Credit/overpayment: teal ou esmeralda.
+- QuickBooks synced: verde.
+- QuickBooks pending: âmbar.
+- QuickBooks failed: vermelho.
 
-## Image Assets
+## Diagramas e Imagens
 
-Presentation images in `docs/assets/diagrams/` should be treated as visual companions. The Mermaid files in `docs/diagrams/` remain the editable technical source of truth.
+As imagens em `docs/assets/diagrams/` são materiais visuais de apoio. Os arquivos Mermaid em `docs/diagrams/` continuam sendo a fonte técnica editável.
 
-For diagrams with text, prefer simple Mermaid-rendered images over AI-generated raster diagrams so Portuguese labels and technical relationships remain accurate. Use `$imagegen` later for moodboards, hero visuals, or decorative presentation assets where exact text fidelity is less critical.
+Para diagramas com texto, prefira imagens renderizadas a partir de Mermaid. Isso preserva labels em português e relações técnicas corretas. Use `$imagegen` depois para moodboards, imagens de apresentação ou elementos visuais onde fidelidade textual não seja crítica.
+
