@@ -1,0 +1,16 @@
+flowchart LR
+  Cliente["Cliente"]
+  Fatura["Fatura"]
+  Item["Itens da fatura"]
+  Pagamento["Pagamento"]
+  Fornecedor["Fornecedor"]
+  AP["Conta a pagar"]
+
+  Cliente -->|"possui"| Fatura
+  Fatura -->|"contem"| Item
+  Cliente -->|"realiza"| Pagamento
+  Fatura -->|"recebe"| Pagamento
+  Fornecedor -->|"cobra"| AP
+
+  Fatura -.->|"saldo, status e aging"| Cliente
+  AP -.->|"categoria e vencimento"| Fornecedor

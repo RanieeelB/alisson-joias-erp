@@ -1,0 +1,32 @@
+flowchart LR
+  Admin["Gestor financeiro"]
+  Customer["Cliente no portal"]
+  Vendor["Fornecedor"]
+
+  UI["Módulo financeiro"]
+  Client["Interação: filtros, gráficos e formulários"]
+  Server["Next.js: rotas, dados e ações"]
+
+  Auth["Supabase Auth"]
+  DB["Postgres financeiro"]
+  Storage["Storage: PDFs e exports"]
+  Realtime["Realtime"]
+
+  QB["QuickBooks"]
+  Gateway["Pagamentos"]
+  Email["E-mail"]
+  Gold["Cotação do ouro"]
+
+  Admin --> UI
+  Customer --> UI
+  Vendor --> UI
+  UI --> Client
+  UI --> Server
+  Server --> Auth
+  Server --> DB
+  Server --> Storage
+  DB --> Realtime
+  Server --> QB
+  Server --> Gateway
+  Server --> Email
+  Server --> Gold
