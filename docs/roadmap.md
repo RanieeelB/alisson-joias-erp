@@ -1,55 +1,55 @@
 # Roadmap
 
-## Branch Strategy
+## Estratégia de Branches
 
-Use semantic branches without `codex/`:
+Usar branches semânticas, sem prefixo `codex/`:
 
-| Phase | Branch | Purpose |
+| Fase | Branch | Objetivo |
 | --- | --- | --- |
-| Pre-development | `docs/pre-development` | Documentation, AGENTS.md, skills, diagrams |
-| Etapa 1 | `feat/dashboard-financeiro` | Setup and financial dashboard |
-| Etapa 2 | `feat/invoicing` | Invoice list, filters, detail, actions |
-| Etapa 3 | `feat/payments-accounts` | Payments, AR, AP |
-| Etapa 4 | `feat/statements-reports` | Statements and analytics reports |
-| Etapa 5 | `feat/automations` | Bonus automations and polish |
+| Pré-desenvolvimento | `docs/pre-development` | Documentação, AGENTS.md, skills e diagramas |
+| Etapa 1 | `feat/dashboard-financeiro` | Setup e dashboard financeiro |
+| Etapa 2 | `feat/invoicing` | Lista de faturas, filtros, detalhe e ações |
+| Etapa 3 | `feat/payments-accounts` | Payments, Accounts Receivable e Accounts Payable |
+| Etapa 4 | `feat/statements-reports` | Statements e relatórios analíticos |
+| Etapa 5 | `feat/automations` | Automações bônus e polimento final |
 
-Multiple commits are allowed per branch. Use Conventional Commits and keep each commit focused.
+Múltiplos commits são permitidos por branch. Use Conventional Commits e mantenha cada commit com intenção clara.
 
-## Suggested Timeline
+## Sequência Sugerida
 
-### Day 1 - Setup and Dashboard
+### Dia 1 - Setup e Dashboard
 
-- Scaffold Next.js with TypeScript and Tailwind.
-- Set base layout, theme tokens, and navigation.
-- Build dashboard KPIs, charts, AR aging, top customers, and activity feed.
-- Use realistic mock data if Supabase is not ready yet.
+- Criar o projeto Next.js com TypeScript e Tailwind.
+- Definir layout base, tokens de tema e navegação.
+- Construir KPIs, gráficos, AR Aging, top clientes e feed de atividades.
+- Usar dados mockados realistas se o Supabase ainda não estiver pronto.
 
-### Day 2 - Invoicing List
+### Dia 2 - Invoicing: Lista
 
-- Define invoice and line item data model.
-- Build invoice list, search, status filters, summary cards, and invoice table.
-- Create semantic status badges.
+- Definir modelo de invoice e line items.
+- Criar lista de faturas, busca, filtros, cards de resumo e tabela.
+- Criar badges semânticos de status.
 
-### Day 3 - Invoice Detail and Payments
+### Dia 3 - Invoicing: Detalhe e Payments
 
-- Build invoice detail route.
-- Add line items, totals, payment history, QuickBooks sync indicator, and action panel.
-- Build payments list and register payment flow.
+- Criar rota de detalhe da fatura.
+- Exibir line items, totais, histórico de pagamentos, indicador QuickBooks e painel de ações.
+- Criar listagem de pagamentos e fluxo de registro de pagamento.
 
-### Day 4 - AR and AP
+### Dia 4 - AR e AP
 
-- Build aging analysis, customer balance bars, open invoice reminders.
-- Build vendor AP table and summary cards.
-- Confirm categories match jewelry operations.
+- Criar aging analysis, barras por cliente e reminders para faturas abertas.
+- Criar tabela de contas a pagar e cards de resumo.
+- Garantir que categorias e exemplos façam sentido para joalheria.
 
-### Day 5 - Statements, Reports, Automations, Deploy
+### Dia 5 - Statements, Reports, Automações e Deploy
 
-- Build statement date range flow and customer statement cards.
-- Build report selector and analytics views.
-- Add selected automation bonuses.
-- Prepare README, screenshots, deploy, and presentation notes.
+- Criar geração de statements por período.
+- Criar seletor de relatórios e telas analíticas.
+- Adicionar automações bônus escolhidas.
+- Preparar README, screenshots, deploy e roteiro da apresentação.
 
-## Commit Examples
+## Exemplos de Commits
 
 - `docs: add pre-development structure`
 - `docs: map technical test requirements`
@@ -60,22 +60,22 @@ Multiple commits are allowed per branch. Use Conventional Commits and keep each 
 - `test: cover invoice filtering`
 - `fix: correct overdue balance calculation`
 
-## Definition of Ready
+## Pronto Para Começar
 
-A feature branch is ready to start when:
+Uma branch de feature está pronta para começar quando:
 
-- Its requirements are mapped in `docs/requirements.md`.
-- Its tasks are listed in `docs/tasks.md`.
-- Needed skills are known from `AGENTS.md`.
-- The branch name follows the roadmap.
+- seus requisitos estão mapeados em `docs/requirements.md`;
+- suas tarefas estão listadas em `docs/tasks.md`;
+- as skills necessárias estão identificadas no `AGENTS.md`;
+- o nome da branch segue o roadmap.
 
-## Definition of Done
+## Pronto Para Entregar
 
-A feature branch is done when:
+Uma branch de feature está pronta quando:
 
-- The feature meets the acceptance criteria.
-- Tests/checks for that feature pass.
-- AI usage is recorded when material.
-- Documentation is updated for any changed decision.
-- No secrets or confidential PDFs are staged.
+- os critérios de aceite foram cumpridos;
+- testes e verificações relevantes passaram;
+- o uso relevante de IA foi registrado;
+- a documentação foi atualizada quando houve mudança de decisão;
+- nenhum segredo ou PDF confidencial foi staged.
 

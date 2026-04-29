@@ -1,13 +1,13 @@
 # Diagramas
 
-Os arquivos `.mmd` sao a fonte tecnica editavel dos diagramas. Os PNGs em `docs/assets/diagrams/` sao renderizacoes simples em portugues, pensadas para README, revisao e apresentacao.
+Os arquivos `.mmd` são a fonte técnica editável dos diagramas. Os PNGs em `docs/assets/diagrams/` são renderizações simples em português, pensadas para README, revisão e apresentação.
 
 ## Fontes
 
-- `architecture.mmd`: arquitetura geral do modulo financeiro.
+- `architecture.mmd`: arquitetura geral do módulo financeiro.
 - `erd.mmd`: mapa simplificado das entidades financeiras.
-- `invoice-flow.mmd`: fluxo de fatura, pagamento, aging e relatorios.
-- `roadmap.mmd`: sequencia de branches e entregaveis.
+- `invoice-flow.mmd`: fluxo de fatura, pagamento, aging e relatórios.
+- `roadmap.mmd`: sequência de branches e entregáveis.
 
 ## Imagens
 
@@ -17,4 +17,3 @@ Os arquivos `.mmd` sao a fonte tecnica editavel dos diagramas. Os PNGs em `docs/
 - `../assets/diagrams/roadmap.png`
 
 Renderize novamente com Mermaid CLI sempre que alterar uma fonte `.mmd`.
-

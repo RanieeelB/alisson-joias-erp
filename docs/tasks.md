@@ -11,9 +11,9 @@
 - [x] Validate documentation and git state.
 - [x] Commit pre-development work.
 
-## Etapa 1 - Dashboard Financeiro
+## Step 1 - Financial Dashboard
 
-- [ ] Scaffold Next.js 14+ App Router project with TypeScript and Tailwind.
+- [ ] Scaffold the Next.js 14+ App Router project with TypeScript and Tailwind.
 - [ ] Configure base theme, layout, navigation, and finance shell.
 - [ ] Create realistic jewelry finance mock data.
 - [ ] Build KPI cards.
@@ -24,7 +24,7 @@
 - [ ] Build recent activity feed.
 - [ ] Add responsive, hover, focus, loading, and empty states.
 
-## Etapa 2 - Invoicing Completo
+## Step 2 - Complete Invoicing
 
 - [ ] Define invoice and invoice line item types/schema.
 - [ ] Build invoice status filters.
@@ -37,7 +37,7 @@
 - [ ] Build payment history block.
 - [ ] Build QuickBooks sync indicator.
 
-## Etapa 3 - Payments and Accounts
+## Step 3 - Payments and Accounts
 
 - [ ] Define payment model and methods.
 - [ ] Build payment list.
@@ -49,7 +49,7 @@
 - [ ] Define vendor/AP model.
 - [ ] Build AP table and summary cards.
 
-## Etapa 4 - Statements and Reports
+## Step 4 - Statements and Reports
 
 - [ ] Build statement date range selector.
 - [ ] Build customer statement cards.
@@ -63,7 +63,7 @@
 - [ ] Build Tax Summary view.
 - [ ] Build Export Report action.
 
-## Etapa 5 - Bonus and Automations
+## Step 5 - Bonus and Automations
 
 - [ ] Choose bonus features based on remaining time.
 - [ ] Add automatic invoice generation from finalized order.
@@ -73,3 +73,4 @@
 - [ ] Add scheduled statement email concept.
 - [ ] Add PDF/CSV export concept.
 - [ ] Add gold price API concept if useful.
+
