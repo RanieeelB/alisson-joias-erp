@@ -1,0 +1,13 @@
+.superpowers/
+node_modules/
+.next/
+out/
+dist/
+coverage/
+.env
+.env.*
+!.env.example
+docs/private/
+docs/references/*.pdf
+*.local.pdf
+
