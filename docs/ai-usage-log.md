@@ -32,3 +32,12 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - Revisão/adaptação humana: o usuário pediu que as skills não ficassem globais e que os diagramas tivessem aparência mais polida.
 - O que mudou após revisão: as skills globais instaladas anteriormente foram removidas, a skill customizada foi copiada para o projeto e os diagramas ganharam versões visuais geradas por GPT image.
 - Riscos ou follow-up: para precisão técnica e labels com acentos, manter os Mermaid como fonte de verdade.
+
+## 2026-04-29 - banco e supabase extras
+
+- Ferramentas/skills usadas: Codex, `image_gen`.
+- Resumo do prompt ou tarefa: gerar imagens extras para o banco de dados com tabelas/colunas/relações e para as features do Supabase.
+- Saída aceita: `docs/assets/diagrams/gpt-image/database-schema-gpt.png` e `docs/assets/diagrams/gpt-image/supabase-features-gpt.png`.
+- Revisão/adaptação humana: os visuais foram mantidos simples, em português, e com foco em apresentação.
+- O que mudou após revisão: os assets foram adicionados ao repositório e referenciados na documentação de diagramas.
+- Riscos ou follow-up: manter Mermaid como referência exata de estrutura, já que os visuais GPT priorizam apresentação.

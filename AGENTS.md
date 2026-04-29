@@ -71,7 +71,7 @@ When a skill is unavailable or stale, document the fallback in the affected doc 
 
 ## Development Workflow
 
-Use semantic branch names without the `codex/` prefix:
+Use semantic branch names:
 
 - `docs/pre-development`
 - `feat/dashboard-financeiro`
