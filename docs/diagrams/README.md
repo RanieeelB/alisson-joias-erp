@@ -19,9 +19,11 @@ Os arquivos `.mmd` são a fonte técnica editável dos diagramas. Os PNGs em `do
 ## Versões GPT Image
 
 - `../assets/diagrams/gpt-image/architecture-gpt.png`
+- `../assets/diagrams/gpt-image/database-schema-gpt.png`
 - `../assets/diagrams/gpt-image/erd-gpt.png`
 - `../assets/diagrams/gpt-image/invoice-flow-gpt.png`
 - `../assets/diagrams/gpt-image/roadmap-gpt.png`
+- `../assets/diagrams/gpt-image/supabase-features-gpt.png`
 
 Use as imagens GPT para slides e materiais visuais. Use as imagens Mermaid quando a precisão textual dos labels for mais importante.
 
