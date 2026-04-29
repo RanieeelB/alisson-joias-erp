@@ -1,6 +1,6 @@
 # Diagramas
 
-Os arquivos `.mmd` são a fonte técnica editável dos diagramas. Os PNGs em `docs/assets/diagrams/` são renderizações simples em português, pensadas para README, revisão e apresentação.
+Os arquivos `.mmd` são a fonte técnica editável dos diagramas. Os PNGs em `docs/assets/diagrams/` são renderizações simples em português para revisão técnica. As versões em `docs/assets/diagrams/gpt-image/` são imagens geradas com GPT image para apresentação visual.
 
 ## Fontes
 
@@ -15,5 +15,14 @@ Os arquivos `.mmd` são a fonte técnica editável dos diagramas. Os PNGs em `do
 - `../assets/diagrams/erd.png`
 - `../assets/diagrams/invoice-flow.png`
 - `../assets/diagrams/roadmap.png`
+
+## Versões GPT Image
+
+- `../assets/diagrams/gpt-image/architecture-gpt.png`
+- `../assets/diagrams/gpt-image/erd-gpt.png`
+- `../assets/diagrams/gpt-image/invoice-flow-gpt.png`
+- `../assets/diagrams/gpt-image/roadmap-gpt.png`
+
+Use as imagens GPT para slides e materiais visuais. Use as imagens Mermaid quando a precisão textual dos labels for mais importante.
 
 Renderize novamente com Mermaid CLI sempre que alterar uma fonte `.mmd`.
