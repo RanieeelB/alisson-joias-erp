@@ -45,6 +45,8 @@ No full app scaffold belongs in this pre-development branch. Start implementatio
 
 ## Skill Usage Rules
 
+Project skills live in `.agents/skills` and are versioned with this repository. Prefer these project-local skills over global/user-level skills so future sessions use the same rules and references.
+
 Use installed/researched skills when they match the task:
 
 - `supabase`: Supabase clients, auth, SSR, storage, realtime, migrations, RLS, and platform decisions.

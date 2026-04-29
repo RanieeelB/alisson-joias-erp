@@ -24,3 +24,11 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - O que mudou após revisão: o plano passou a instalar skills públicas, criar apenas uma skill local customizada e renderizar diagramas simples em português a partir de Mermaid.
 - Riscos ou follow-up: reiniciar o Codex para carregar as skills recém-instaladas em sessões futuras.
 
+## 2026-04-29 - ajuste de skills e diagramas
+
+- Ferramentas/skills usadas: Codex, `skill-installer`, `imagegen`.
+- Resumo do prompt ou tarefa: mover as skills para o escopo do projeto e melhorar os diagramas usando GPT image.
+- Saída aceita: skills project-local em `.agents/skills`, `skills-lock.json`, imagens GPT em `docs/assets/diagrams/gpt-image/`.
+- Revisão/adaptação humana: o usuário pediu que as skills não ficassem globais e que os diagramas tivessem aparência mais polida.
+- O que mudou após revisão: as skills globais instaladas anteriormente foram removidas, a skill customizada foi copiada para o projeto e os diagramas ganharam versões visuais geradas por GPT image.
+- Riscos ou follow-up: para precisão técnica e labels com acentos, manter os Mermaid como fonte de verdade.

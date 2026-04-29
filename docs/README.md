@@ -24,8 +24,8 @@ Os termos técnicos do desafio podem continuar em inglês quando forem nomes do 
 - `data-model.md`: modelo de dados e observações de Supabase/Postgres.
 - `tasks.md`: backlog operacional para execução por agentes.
 - `skills.md`: skills instaladas, pesquisadas e quando acionar cada uma.
+- `.agents/skills`: skills locais do projeto, versionadas junto ao repositório.
 
 ## Observação de Confidencialidade
 
 Os PDFs originais do teste não devem ser versionados. Esta documentação resume as decisões e requisitos necessários sem copiar o material confidencial.
-
