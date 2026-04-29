@@ -1,0 +1,13 @@
+flowchart TD
+  A["Ordem finalizada"] --> B["Gerar fatura"]
+  B --> C["Calcular total e saldo"]
+  C --> D["Enviar por e-mail"]
+  C --> E["Enviar para QuickBooks"]
+  D --> F["Cliente revisa"]
+  F --> G["Registrar pagamento"]
+  G --> H["Atualizar saldo e status"]
+  H --> I{"Ainda há saldo?"}
+  I -->|Sim| J["Aging e lembrete"]
+  I -->|Não| K["Fatura paga"]
+  H --> L["Statements e relatórios"]
+  E --> M["Status da sincronização"]

@@ -1,0 +1,11 @@
+flowchart TD
+  D0["docs/pre-development\nDocs, AGENTS, skills e diagramas"] --> D1["feat/dashboard-financeiro\nSetup e dashboard"]
+  D1 --> D2["feat/invoicing\nFaturas: lista e detalhe"]
+  D2 --> D3["feat/payments-accounts\nPagamentos, AR e AP"]
+  D3 --> D4["feat/statements-reports\nStatements e relatórios"]
+  D4 --> D5["feat/automations\nAutomações e deploy"]
+
+  D1 -. base .-> S1["Visual e mock data"]
+  D2 -. base .-> S2["Schema e cálculos"]
+  D3 -. base .-> S3["Saldos e aging"]
+  D4 -. base .-> S4["Exports e apresentação"]
