@@ -8,8 +8,8 @@
 - [x] Add `AGENTS.md`.
 - [x] Add documentation structure.
 - [x] Generate simple Portuguese diagram images.
-- [ ] Validate documentation and git state.
-- [ ] Commit pre-development work.
+- [x] Validate documentation and git state.
+- [x] Commit pre-development work.
 
 ## Etapa 1 - Dashboard Financeiro
 
