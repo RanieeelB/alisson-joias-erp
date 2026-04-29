@@ -1,4 +1,5 @@
 .superpowers/
+.junie/
 node_modules/
 .next/
 out/
@@ -10,4 +11,3 @@ coverage/
 docs/private/
 docs/references/*.pdf
 *.local.pdf
-

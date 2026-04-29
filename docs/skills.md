@@ -1,8 +1,8 @@
 # Skills Research and Installation
 
-## Installed Skills
+## Project-Local Installed Skills
 
-The following public skills were installed globally for this development environment through `npx skills add ... -g -y`:
+The following public skills were installed into this project through `npx skills add ... -y`. They live in `.agents/skills` and are tracked with `skills-lock.json` so future sessions can restore the same skill set. They were intentionally installed project-locally, not globally.
 
 | Skill | Source | Purpose |
 | --- | --- | --- |
@@ -23,7 +23,7 @@ The first attempted source for `building-components` under `vercel-labs/agent-sk
 Created local skill:
 
 - `jewelry-erp-finance-domain`
-- Location: `C:\Users\ranie\.agents\skills\jewelry-erp-finance-domain`
+- Location: `.agents/skills/jewelry-erp-finance-domain`
 - Validation: `quick_validate.py` returned `Skill is valid!`
 
 Use it when the work involves jewelry finance domain decisions, mock data, AR/AP, statements, QuickBooks context, status vocabulary, reports, or visual identity.
@@ -34,3 +34,4 @@ Use skills as guardrails, not as a substitute for understanding. The final app m
 
 When using a skill during a branch, record the relevant usage in `docs/ai-usage-log.md` if it materially shaped code, schema, UX, or architecture.
 
+Avoid relying on global/user-level skills for this project. If a useful skill is needed, install it project-locally and update this document.
