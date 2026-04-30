@@ -36,6 +36,10 @@ test("login page presents the approved internal finance auth screen", () => {
   assert.doesNotMatch(page, /Painel Financeiro/);
   assert.doesNotMatch(page, /AR Outstanding/);
   assert.doesNotMatch(page, /Overdue/);
+  assert.doesNotMatch(page, /AccessMetric/);
+  assert.doesNotMatch(page, /Autenticação/);
+  assert.doesNotMatch(page, /Permissão/);
+  assert.doesNotMatch(page, /Sessão/);
   assert.doesNotMatch(page, /backdrop-blur/);
   assert.match(page, /login-hero\.png/);
   assert.match(page, /bg-\[var\(--color-graphite-950\)\]/);
