@@ -13,25 +13,17 @@ import {
   type CustomerBalance,
   type RevenuePoint,
 } from "@/features/dashboard/data";
+import { FinanceShell } from "@/features/finance-shell/components/finance-shell";
 import {
   formatCompactMoney,
   formatMoney,
   summarizeDashboard,
 } from "@/lib/finance";
+import { signOut } from "@/app/login/actions";
 
 export type DashboardViewState = "ready" | "loading" | "error" | "empty";
 
 type WidgetState = Exclude<DashboardViewState, "empty">;
-
-const navItems = [
-  { label: "Painel Financeiro", href: "/dashboard", current: true },
-  { label: "Faturas", href: "#", current: false },
-  { label: "Pagamentos", href: "#", current: false },
-  { label: "Contas a Receber", href: "#", current: false },
-  { label: "Contas a Pagar", href: "#", current: false },
-  { label: "Extratos", href: "#", current: false },
-  { label: "Relatórios", href: "#", current: false },
-];
 
 const toneClass = {
   success: "bg-emerald-50 text-emerald-700 ring-emerald-200",
@@ -41,8 +33,10 @@ const toneClass = {
 };
 
 export function FinancialDashboard({
+  userEmail,
   viewState = "ready",
 }: {
+  userEmail?: string;
   viewState?: DashboardViewState;
 }) {
   const isLoading = viewState === "loading";
@@ -62,139 +56,107 @@ export function FinancialDashboard({
   const summary = summarizeDashboard(visibleInvoices, dashboardAsOf);
 
   return (
-    <div className="min-h-screen bg-[var(--color-app-canvas)] text-[var(--color-graphite-950)]">
-      <Sidebar />
-      <main className="min-w-0 lg:pl-[var(--sidebar-width)]">
-        <Topbar />
-          <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-5 px-4 py-4 sm:px-6 lg:px-8 lg:py-6">
-            <HeaderActions viewState={viewState} />
-            <section
-              aria-label="Resumo de KPIs financeiros"
-              className="grid gap-3 md:grid-cols-2 xl:grid-cols-4"
-            >
-              {isLoading ? (
-                <>
-                  <KpiSkeleton />
-                  <KpiSkeleton />
-                  <KpiSkeleton />
-                  <KpiSkeleton />
-                </>
-              ) : hasError ? (
-                <>
-                  <KpiErrorCard label="Receita Total" />
-                  <KpiErrorCard label="Contas a Receber" />
-                  <KpiErrorCard label="Faturas do Mês" />
-                  <KpiErrorCard label="Faturas em Atraso" />
-                </>
-              ) : (
-                <>
-                  <KpiCard
-                    label="Receita Total"
-                    value={formatMoney(summary.totalRevenueCents)}
-                    detail={isEmpty ? "Sem faturamento no período" : "+14,8% vs mês anterior"}
-                    tone="positive"
-                  />
-                  <KpiCard
-                    label="Contas a Receber"
-                    value={formatMoney(summary.arOutstandingCents)}
-                    detail={isEmpty ? "Nenhuma fatura em aberto" : "5 faturas em aberto"}
-                    tone="warning"
-                  />
-                  <KpiCard
-                    label="Faturas do Mês"
-                    value={summary.invoicesThisMonth.toString()}
-                    detail={isEmpty ? "Nenhuma fatura emitida" : "Pedidos personalizados lideram o volume"}
-                    tone="neutral"
-                  />
-                  <KpiCard
-                    label="Faturas em Atraso"
-                    value={summary.overdueInvoices.toString()}
-                    detail={formatMoney(
-                      (visibleAgingSummary[1]?.balanceCents ?? 0) +
-                        (visibleAgingSummary[2]?.balanceCents ?? 0) +
-                        (visibleAgingSummary[3]?.balanceCents ?? 0),
-                    )}
-                    tone="danger"
-                  />
-                </>
-              )}
-            </section>
-
-            <section className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_22rem]">
-              <div className="grid min-w-0 gap-5">
-                <div className="grid gap-5 2xl:grid-cols-[minmax(0,1.45fr)_minmax(20rem,0.75fr)]">
-                  <RevenueProfitChart data={visibleRevenueSeries} state={widgetState} />
-                  <CategoryDonut data={visibleCategoryRevenue} state={widgetState} />
-                </div>
-                <AgingTable data={visibleAgingSummary} state={widgetState} />
-              </div>
-              <aside className="grid content-start gap-5">
-                <TopCustomers data={visibleTopCustomers} state={widgetState} />
-                <QuickBooksPanel state={widgetState} />
-                <ActivityFeed items={visibleActivity} state={widgetState} />
-              </aside>
-            </section>
-          </div>
-        </main>
-    </div>
-  );
-}
-
-function Sidebar() {
-  return (
-    <aside className="hidden border-r border-white/10 bg-[var(--color-graphite-900)] text-white lg:fixed lg:inset-y-0 lg:left-0 lg:z-30 lg:flex lg:w-[var(--sidebar-width)] lg:flex-col">
-      <div className="border-b border-white/10 px-5 py-5">
-        <div className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--color-gold-300)]">
-          Alisson Joias
-        </div>
-        <div className="mt-1 text-lg font-semibold">Financeiro</div>
-      </div>
-      <nav aria-label="Navegação financeira" className="flex-1 space-y-1 px-3 py-4">
-        {navItems.map((item) => (
-          <a
-            key={item.label}
-            href={item.href}
-            aria-current={item.current ? "page" : undefined}
-            className="flex min-h-10 items-center rounded-md px-3 text-sm font-medium text-white/70 transition hover:bg-white/8 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-300)] aria-[current=page]:bg-white/10 aria-[current=page]:text-white"
-          >
-            {item.label}
-          </a>
-        ))}
-      </nav>
-      <div className="border-t border-white/10 p-4">
+    <FinanceShell
+      currentPath="/dashboard"
+      eyebrow="Financeiro Alisson Joias"
+      title="Painel Financeiro"
+      userEmail={userEmail}
+      secondaryAction={
+        <button className="hidden min-h-10 rounded-md border border-[var(--color-border)] bg-white px-3 text-sm font-medium text-[var(--color-graphite-800)] shadow-sm transition hover:border-[var(--color-gold-400)] hover:text-[var(--color-graphite-950)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)] sm:inline-flex sm:items-center">
+          Exportar
+        </button>
+      }
+      primaryAction={
+        <>
+          <button className="min-h-10 rounded-md bg-[var(--color-graphite-900)] px-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--color-graphite-800)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]">
+            Nova Fatura
+          </button>
+          <form action={signOut}>
+            <button className="min-h-10 rounded-md border border-[var(--color-border)] bg-white px-3 text-sm font-medium text-[var(--color-graphite-800)] shadow-sm transition hover:border-red-300 hover:text-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-400">
+              Sair
+            </button>
+          </form>
+        </>
+      }
+      footer={
         <div className="rounded-md bg-white/8 p-3 text-xs leading-5 text-white/72">
           Dados simulados do Supabase ativos
           <div className="mt-2 font-medium text-[var(--color-gold-200)]">
             Limite da integração QuickBooks visível
           </div>
         </div>
-      </div>
-    </aside>
-  );
-}
+      }
+    >
+      <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-5 px-4 py-4 sm:px-6 lg:px-8 lg:py-6">
+        <HeaderActions viewState={viewState} />
+        <section
+          aria-label="Resumo de KPIs financeiros"
+          className="grid gap-3 md:grid-cols-2 xl:grid-cols-4"
+        >
+          {isLoading ? (
+            <>
+              <KpiSkeleton />
+              <KpiSkeleton />
+              <KpiSkeleton />
+              <KpiSkeleton />
+            </>
+          ) : hasError ? (
+            <>
+              <KpiErrorCard label="Receita Total" />
+              <KpiErrorCard label="Contas a Receber" />
+              <KpiErrorCard label="Faturas do Mês" />
+              <KpiErrorCard label="Faturas em Atraso" />
+            </>
+          ) : (
+            <>
+              <KpiCard
+                label="Receita Total"
+                value={formatMoney(summary.totalRevenueCents)}
+                detail={isEmpty ? "Sem faturamento no período" : "+14,8% vs mês anterior"}
+                tone="positive"
+              />
+              <KpiCard
+                label="Contas a Receber"
+                value={formatMoney(summary.arOutstandingCents)}
+                detail={isEmpty ? "Nenhuma fatura em aberto" : "5 faturas em aberto"}
+                tone="warning"
+              />
+              <KpiCard
+                label="Faturas do Mês"
+                value={summary.invoicesThisMonth.toString()}
+                detail={isEmpty ? "Nenhuma fatura emitida" : "Pedidos personalizados lideram o volume"}
+                tone="neutral"
+              />
+              <KpiCard
+                label="Faturas em Atraso"
+                value={summary.overdueInvoices.toString()}
+                detail={formatMoney(
+                  (visibleAgingSummary[1]?.balanceCents ?? 0) +
+                    (visibleAgingSummary[2]?.balanceCents ?? 0) +
+                    (visibleAgingSummary[3]?.balanceCents ?? 0),
+                )}
+                tone="danger"
+              />
+            </>
+          )}
+        </section>
 
-function Topbar() {
-  return (
-    <div className="sticky top-0 z-20 border-b border-[var(--color-border)] bg-[var(--color-surface)]/92 px-4 py-3 backdrop-blur sm:px-6 lg:px-8">
-      <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-gold-700)]">
-            Financeiro Alisson Joias
-          </p>
-          <h1 className="truncate text-xl font-semibold tracking-normal text-[var(--color-graphite-950)] sm:text-2xl">
-            Painel Financeiro
-          </h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <button className="hidden min-h-10 rounded-md border border-[var(--color-border)] bg-white px-3 text-sm font-medium text-[var(--color-graphite-800)] shadow-sm transition hover:border-[var(--color-gold-400)] hover:text-[var(--color-graphite-950)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)] sm:inline-flex sm:items-center">
-            Exportar
-          </button>
-          <button className="min-h-10 rounded-md bg-[var(--color-graphite-900)] px-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--color-graphite-800)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]">
-            Nova Fatura
-          </button>
-        </div>
+        <section className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_22rem]">
+          <div className="grid min-w-0 gap-5">
+            <div className="grid gap-5 2xl:grid-cols-[minmax(0,1.45fr)_minmax(20rem,0.75fr)]">
+              <RevenueProfitChart data={visibleRevenueSeries} state={widgetState} />
+              <CategoryDonut data={visibleCategoryRevenue} state={widgetState} />
+            </div>
+            <AgingTable data={visibleAgingSummary} state={widgetState} />
+          </div>
+          <aside className="grid content-start gap-5">
+            <TopCustomers data={visibleTopCustomers} state={widgetState} />
+            <QuickBooksPanel state={widgetState} />
+            <ActivityFeed items={visibleActivity} state={widgetState} />
+          </aside>
+        </section>
       </div>
-    </div>
+    </FinanceShell>
   );
 }
 

@@ -59,3 +59,84 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - Revisão/adaptação humana: o usuário escolheu a direção híbrida executiva, aprovou a variação `Graphite Ledger`, selecionou o layout `Finance Command Center`, pediu a interface em português, solicitou moeda em reais, estados reais de carregamento/erro/vazio e ajustes nos gráficos após revisar no navegador.
 - O que mudou após revisão: a implementação passou a usar uma barra lateral escura fixa, área de trabalho clara, acento dourado contido, cartões de indicadores financeiros, gráficos de receita e lucro, gráfico de receita por categoria, tabela de vencimentos, principais clientes e atividades recentes. Os valores passaram de dólar para real brasileiro, o texto central do gráfico circular foi compactado e o gráfico de receita/lucro ganhou escala de valores.
 - Riscos ou follow-up: revisar a legibilidade final no navegador antes de considerar a branch aprovada; manter o dourado apenas como destaque para evitar uma interface bege ou marrom; não implementar integrações reais de QuickBooks, envio de e-mail ou pagamentos nesta etapa.
+
+## 2026-04-30 - chore/supabase-setup
+
+- Ferramentas/skills usadas: Codex, `supabase`, `supabase-postgres-best-practices`, `next-best-practices`, `jewelry-erp-finance-domain`, `test-driven-development`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: preparar o projeto antes do Dia 2 com migração inicial do Supabase, autenticação sem confirmação de e-mail, RLS e conexão SSR com a aplicação.
+- Saída aceita: migração inicial para tabelas financeiras, políticas RLS, config local de Auth, helpers `@supabase/ssr`, proxy do Next.js 16 e testes de contrato para o setup.
+- Revisão/adaptação humana: o usuário pediu branch sem prefixo `codex/`, commits curtos e semânticos, uso das regras de agente e atualização contínua deste registro.
+- O que mudou após revisão: a branch foi criada como `chore/supabase-setup`; a CLI `supabase` não estava disponível no PATH, então foi usado `npx supabase@2.97.0` com cache local isolado para consultar a CLI. A migração foi criada manualmente com timestamp e validada por testes automatizados.
+- Riscos ou follow-up: o `supabase db reset --no-seed` não pôde aplicar a migração porque o Docker Desktop não estava ativo no Windows; aplicar a migração quando o Docker estiver rodando, definir usuários reais com `app_metadata.role` em um projeto Supabase seguro e manter secrets fora do repositório.
+
+## 2026-04-30 - login interno com Supabase Auth
+
+- Ferramentas/skills usadas: Codex, `imagegen`, `supabase`, `next-best-practices`, `test-driven-development`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: criar o primeiro fluxo visual e funcional de autenticação interna antes de iniciar Invoicing.
+- Saída aceita: protótipo visual aprovado pelo usuário, tela `/login` em português, fundo de dashboard escuro e desfocado, server actions de entrar/sair e proteção de `/dashboard` para usuários `admin` ou `staff`.
+- Revisão/adaptação humana: o usuário aprovou o protótipo e pediu que o fundo atrás do login ficasse mais escuro e desfocado.
+- O que mudou após revisão: o fundo da tela usa um preview de dashboard com overlay escuro e blur; o painel de login ficou integrado ao console financeiro, sem aparência de landing page.
+- Riscos ou follow-up: validar o fluxo manualmente no navegador com o usuário local; para produção, usar senha forte e aplicar a mesma migration no Supabase remoto.
+
+## 2026-04-30 - revisão visual da tela de login
+
+- Ferramentas/skills usadas: Codex, `brainstorming`, `imagegen`, `next-best-practices`, `test-driven-development`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: refazer o login como tela separada, sem aparecer no meio do dashboard, com novo protótipo gerado por imagem antes da implementação.
+- Saída aceita: protótipo standalone aprovado pelo usuário e implementação de `/login` com painel de marca escuro, superfície de formulário clara e sinais discretos de acesso financeiro interno.
+- Revisão/adaptação humana: o usuário avaliou que a primeira versão parecia sobreposta ao dashboard e pediu uma tela própria.
+- O que mudou após revisão: removido o fundo com preview/blur do dashboard; a tela passou a ter composição independente, com identidade Alisson Joias, área informativa de acesso interno e formulário em superfície clara.
+- Riscos ou follow-up: validar visualmente no navegador em desktop/mobile e manter a tela sem elementos de dashboard quando a navegação do app crescer.
+
+## 2026-04-30 - fundo hero do login
+
+- Ferramentas/skills usadas: Codex, `imagegen`, `test-driven-development`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: remover o texto "Supabase Auth" da tela de login e usar uma imagem gerada como fundo da hero para ficar mais fiel ao protótipo aprovado.
+- Saída aceita: asset `public/images/login-hero.png`, uso com `next/image` na hero escura e remoção do texto visível "Supabase Auth".
+- Revisão/adaptação humana: o usuário pediu um fundo visual gerado em vez de um painel puramente CSS.
+- O que mudou após revisão: o lado esquerdo do login ganhou uma imagem escura com atmosfera de joalheria/financeiro e overlays para manter legibilidade.
+- Riscos ou follow-up: validar contraste final no navegador e substituir o asset se o usuário preferir uma versão mais clara ou mais abstrata.
+
+## 2026-04-30 - ajuste visual da hero do login
+
+- Ferramentas/skills usadas: Codex, `systematic-debugging`, `next-best-practices`, `test-driven-development`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: corrigir a parte esquerda da tela de login que ficou visualmente desconfigurada com elementos decorativos e cards de status competindo com o fundo.
+- Saída aceita: hero simplificada com imagem gerada, overlay escuro, marca, título, texto curto e aviso de ambiente interno em um único bloco visual.
+- Revisão/adaptação humana: o usuário apontou a desorganização visual diretamente pelo navegador com screenshot.
+- O que mudou após revisão: foram removidos os cards de status e a tabela decorativa do rodapé da hero, reduzindo ruído e mantendo o login como tela separada.
+- Riscos ou follow-up: revisar no navegador em larguras diferentes para ajustar posicionamento fino caso a imagem gere áreas muito escuras ou vazias.
+
+## 2026-04-30 - refinamento de marca na tela de login
+
+- Ferramentas/skills usadas: Codex, `brainstorming`, `building-components`, `test-driven-development`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: adicionar um ícone de diamante amarelo acima de "Alisson Joias" e usar linhas refinadas para deixar a tela de login mais profissional.
+- Saída aceita: selo de diamante dourado aplicado na área de marca e linhas finas decorativas para organizar o cabeçalho da hero e a versão mobile.
+- Revisão/adaptação humana: o pedido foi de refinamento visual sem alterar o fluxo de autenticação nem reintroduzir ruído na composição.
+- O que mudou após revisão: a marca ganhou um ícone geométrico discreto e um sistema de linhas leves em tons dourado/grafite para reforçar a identidade visual.
+- Riscos ou follow-up: validar visualmente no navegador se o ícone precisa crescer um pouco mais no desktop ou reduzir no mobile.
+
+## 2026-04-30 - etapa 2 lista de faturas
+
+- Ferramentas/skills usadas: Codex, `brainstorming`, `imagegen`, `jewelry-erp-finance-domain`, `next-best-practices`, `test-driven-development`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: avançar na Etapa 2 após o setup do Supabase com a primeira entrega de Invoicing: tipos, dados mockados realistas, rota protegida `/invoices`, filtros, busca, cards, tabela e indicador QuickBooks.
+- Saída aceita: branch `feat/invoicing`, protótipo visual aprovado e implementação inicial da listagem de faturas alinhada ao dashboard financeiro existente.
+- Revisão/adaptação humana: o usuário aprovou seguir com os próximos passos da Step 2 após confirmar que o protótipo correspondia à etapa de Invoicing.
+- O que mudou após revisão: foi criado um shell financeiro compartilhado para sidebar/topbar, a navegação passou a incluir `/invoices`, e a listagem usa busca por invoice/customer e filtros por status via query string.
+- Riscos ou follow-up: concluir a segunda metade da Etapa 2 com rota de detalhe, line items detalhados, painel lateral de ações e histórico de pagamentos.
+
+## 2026-04-30 - refinamento da tabela de faturas
+
+- Ferramentas/skills usadas: Codex, `test-driven-development`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: corrigir a sobreposição visual entre colunas da tabela de invoices, especialmente entre datas, totais, status e ações.
+- Saída aceita: tabela com colunas mais estáveis, largura mínima maior, espaçamento horizontal melhor e badges sem colisão entre si.
+- Revisão/adaptação humana: o usuário apontou a sobreposição diretamente por screenshot da tela de `/invoices`.
+- O que mudou após revisão: a tabela passou a usar `table-fixed`, `colgroup` com proporções explícitas, `whitespace-nowrap` para datas e valores, além de larguras mínimas para status e actions.
+- Riscos ou follow-up: validar no navegador em breakpoints menores se vale reduzir texto de colunas ou trocar algumas ações por ícones no futuro.
+
+## 2026-04-30 - detalhe da fatura e painel lateral
+
+- Ferramentas/skills usadas: Codex, `imagegen`, `jewelry-erp-finance-domain`, `next-best-practices`, `test-driven-development`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: concluir os passos restantes da Etapa 2 com a tela de detalhe da fatura, cálculos dos line items, painel lateral de ações e histórico de pagamentos.
+- Saída aceita: rota protegida `/invoices/[id]`, navegação a partir da lista, header escuro, dados do cliente, tabela de joias faturadas, subtotal/tax/total/paid/balance, cards de QuickBooks e payment history.
+- Revisão/adaptação humana: o usuário aprovou o protótipo visual do detalhe antes da implementação.
+- O que mudou após revisão: os mocks de invoices passaram a incluir contato, billing, payments e line items consistentes com os totais; o detalhe usa esses dados para exibir o workspace completo da fatura.
+- Riscos ou follow-up: o próximo avanço natural é tornar as ações funcionais com side panel interativo e persistência real no Supabase.

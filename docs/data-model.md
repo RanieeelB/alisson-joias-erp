@@ -154,5 +154,15 @@ Add indexes for frequent filters:
 - payment customer/date
 - accounts payable vendor/status/due date
 
-Enable RLS when auth is introduced.
+The initial Supabase migration lives in `supabase/migrations/20260430120000_init_finance_schema.sql` and creates:
 
+- `profiles`
+- `customers`
+- `vendors`
+- `invoices`
+- `invoice_line_items`
+- `payments`
+- `accounts_payable`
+- `financial_activities`
+
+Money values are stored as integer cents. RLS is enabled on every public table. Internal finance access is granted through `app_metadata.role` values of `admin` or `staff`; customer-facing reads are scoped through `customers.auth_user_id`.
