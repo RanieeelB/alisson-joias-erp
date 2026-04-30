@@ -13,16 +13,16 @@
 
 ## Step 1 - Financial Dashboard
 
-- [ ] Scaffold the Next.js 14+ App Router project with TypeScript and Tailwind.
-- [ ] Configure base theme, layout, navigation, and finance shell.
-- [ ] Create realistic jewelry finance mock data.
-- [ ] Build KPI cards.
-- [ ] Build revenue/profit chart.
-- [ ] Build revenue by category donut chart.
-- [ ] Build AR aging summary table.
-- [ ] Build top customers list.
-- [ ] Build recent activity feed.
-- [ ] Add responsive, hover, focus, loading, and empty states.
+- [x] Scaffold the Next.js 14+ App Router project with TypeScript and Tailwind.
+- [x] Configure base theme, layout, navigation, and finance shell.
+- [x] Create realistic jewelry finance mock data.
+- [x] Build KPI cards.
+- [x] Build revenue/profit chart.
+- [x] Build revenue by category donut chart.
+- [x] Build AR aging summary table.
+- [x] Build top customers list.
+- [x] Build recent activity feed.
+- [x] Add responsive, hover, focus, loading, and empty states.
 
 ## Step 2 - Complete Invoicing
 
@@ -73,4 +73,3 @@
 - [ ] Add scheduled statement email concept.
 - [ ] Add PDF/CSV export concept.
 - [ ] Add gold price API concept if useful.
-
