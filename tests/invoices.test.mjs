@@ -111,3 +111,59 @@ test("invoice route wires the protected finance list experience", () => {
     assert.match(data, new RegExp(text), `expected invoice labels to include ${text}`);
   }
 });
+
+test("retrieves invoice detail data and calculates jewelry totals", () => {
+  const {
+    getInvoiceById,
+    summarizeInvoiceDetail,
+  } = loadTsModule("src/features/invoices/data.ts");
+
+  const invoice = getInvoiceById("inv-2049");
+
+  assert.ok(invoice, "expected invoice detail record to exist");
+  assert.equal(invoice.invoiceNumber, "INV-2049");
+  assert.equal(invoice.payments.length, 2);
+
+  const summary = summarizeInvoiceDetail(invoice);
+
+  assert.equal(summary.subtotalCents, 4080000);
+  assert.equal(summary.taxCents, 205000);
+  assert.equal(summary.totalCents, 4285000);
+  assert.equal(summary.paidCents, 2100000);
+  assert.equal(summary.balanceCents, 2185000);
+});
+
+test("invoice detail route wires the protected finance detail workspace", () => {
+  const page = readProjectFile("src/app/invoices/[id]/page.tsx");
+  const view = readProjectFile(
+    "src/features/invoices/components/invoice-detail-page.tsx",
+  );
+
+  for (const text of [
+    "Detalhe da Fatura",
+    "Dados do cliente",
+    "Line items",
+    "Subtotal",
+    "Tax",
+    "Total",
+    "Paid",
+    "Balance",
+    "Send",
+    "Record Payment",
+    "Print",
+    "Download PDF",
+    "Edit",
+    "Payment history",
+    "QuickBooks",
+  ]) {
+    assert.match(view, new RegExp(text), `expected invoice detail page to include ${text}`);
+  }
+
+  assert.match(page, /createClient/);
+  assert.match(page, /auth\.getUser/);
+  assert.match(page, /redirect\("\/login/);
+  assert.match(page, /notFound/);
+  assert.match(page, /InvoiceDetailPage/);
+  assert.match(view, /getInvoiceById/);
+  assert.match(view, /summarizeInvoiceDetail/);
+});
