@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 
 import { signIn } from "@/app/login/actions";
@@ -39,9 +40,20 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     <main className="min-h-screen overflow-hidden bg-[var(--color-graphite-950)] text-white">
       <div className="grid min-h-screen lg:grid-cols-[minmax(0,0.92fr)_minmax(28rem,0.68fr)]">
         <section className="relative hidden overflow-hidden border-r border-white/10 bg-[var(--color-graphite-900)] px-8 py-8 lg:flex lg:flex-col lg:justify-between xl:px-12">
+          <Image
+            alt=""
+            aria-hidden="true"
+            className="object-cover opacity-52"
+            fill
+            priority
+            sizes="(min-width: 1024px) 58vw, 0px"
+            src="/images/login-hero.png"
+          />
+          <div className="absolute inset-0 bg-[var(--color-graphite-950)]/62" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-graphite-950)]/92 via-[var(--color-graphite-900)]/66 to-black/46" />
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 opacity-55"
+            className="pointer-events-none absolute inset-0 opacity-42"
           >
             <div className="absolute inset-x-12 top-24 h-px bg-[var(--color-gold-300)]/28" />
             <div className="absolute inset-y-20 left-20 w-px bg-white/8" />
@@ -75,7 +87,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
           <div className="relative grid max-w-xl gap-3">
             <div className="grid grid-cols-3 gap-3">
-              <AccessMetric label="Autenticação" value="Supabase Auth" />
+              <AccessMetric label="Autenticação" value="Ativa" />
               <AccessMetric label="Permissão" value="Admin" />
               <AccessMetric label="Sessão" value="Segura" />
             </div>
@@ -117,7 +129,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               </div>
 
               <div className="mt-5 rounded-md border border-[var(--color-border)] bg-[var(--color-graphite-50)] px-3 py-2 text-xs font-medium text-[var(--color-graphite-800)]">
-                Supabase Auth
+                Acesso protegido
               </div>
 
               {params.erro ? (

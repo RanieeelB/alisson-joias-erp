@@ -20,7 +20,6 @@ test("login page presents the approved internal finance auth screen", () => {
     "Alisson Joias",
     "Financeiro",
     "Ambiente interno",
-    "Supabase Auth",
     "Entrar",
     "Email",
     "Senha",
@@ -32,13 +31,23 @@ test("login page presents the approved internal finance auth screen", () => {
   }
 
   assert.doesNotMatch(page, /raniel@gmail\.com/);
+  assert.doesNotMatch(page, /Supabase Auth/);
   assert.doesNotMatch(page, /LoginBackdrop/);
   assert.doesNotMatch(page, /Painel Financeiro/);
   assert.doesNotMatch(page, /AR Outstanding/);
   assert.doesNotMatch(page, /Overdue/);
   assert.doesNotMatch(page, /backdrop-blur/);
+  assert.match(page, /login-hero\.png/);
   assert.match(page, /bg-\[var\(--color-graphite-950\)\]/);
   assert.match(page, /type="password"/);
+});
+
+test("login hero background asset is stored in the project", () => {
+  assert.equal(
+    existsSync(join(projectRoot, "public", "images", "login-hero.png")),
+    true,
+    "expected generated login hero image to be available from public/images",
+  );
 });
 
 test("auth server actions sign in and sign out through Supabase", () => {
