@@ -71,6 +71,16 @@ When a skill is unavailable or stale, document the fallback in the affected doc 
 
 ## Development Workflow
 
+### Day 1 Frontend Ideation Flow
+
+For `feat/dashboard-financeiro`, start with frontend design ideation before writing product code:
+
+- First define the frontend development tokens: colors, typography, spacing, radius, shadows, status colors, chart colors, and density rules.
+- Then define the initial screens and finance shell for the dashboard experience.
+- Prototype the approved direction with the `imagegen` skill before coding UI implementation.
+- Wait for explicit user approval of the visual prototype and token direction before scaffolding or coding the frontend.
+- Keep the flow aligned with `docs/tasks.md`, `docs/requirements.md`, and `docs/visual-direction.md`.
+
 Use semantic branch names:
 
 - `docs/pre-development`
