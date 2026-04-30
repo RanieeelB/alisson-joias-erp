@@ -1,8 +1,25 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #faf9f6;
+  --foreground: #202428;
+  --color-app-canvas: #f4f2ed;
+  --color-surface: #fffefd;
+  --color-border: #ddd9cf;
+  --color-muted: #6f6a60;
+  --color-graphite-50: #f5f6f6;
+  --color-graphite-100: #e6e8e9;
+  --color-graphite-800: #2f353b;
+  --color-graphite-900: #1f2327;
+  --color-graphite-950: #202428;
+  --color-gold-200: #f2d98d;
+  --color-gold-300: #e1c36d;
+  --color-gold-400: #d8b75d;
+  --color-gold-500: #d2a84f;
+  --color-gold-700: #8f6c22;
+  --sidebar-width: 17rem;
+  --shadow-widget: 0 1px 2px rgb(32 36 40 / 0.06), 0 10px 24px rgb(32 36 40 / 0.04);
+  --shadow-widget-hover: 0 1px 2px rgb(32 36 40 / 0.08), 0 16px 34px rgb(32 36 40 / 0.08);
 }
 
 @theme inline {
@@ -12,15 +29,13 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
 }
