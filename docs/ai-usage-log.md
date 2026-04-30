@@ -41,3 +41,12 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - Revisão/adaptação humana: os visuais foram mantidos simples, em português, e com foco em apresentação.
 - O que mudou após revisão: os assets foram adicionados ao repositório e referenciados na documentação de diagramas.
 - Riscos ou follow-up: manter Mermaid como referência exata de estrutura, já que os visuais GPT priorizam apresentação.
+
+## 2026-04-29 - chore/initial-next-supabase-setup
+
+- Ferramentas/skills usadas: Codex, `next-best-practices`, `supabase`, `verification-before-completion`, `create-next-app`, Supabase CLI e npm.
+- Resumo do prompt ou tarefa: iniciar a configuração técnica do projeto com Next.js, Tailwind, TypeScript, ESLint, Supabase local e pacotes oficiais de Supabase para Next.js.
+- Saída aceita: scaffold inicial gerado por CLI, `supabase/config.toml`, dependências `@supabase/supabase-js` e `@supabase/ssr`, `.env.example` sem secrets, e ajustes de ignore para artefatos locais.
+- Revisão/adaptação humana: a IA assistiu na escolha dos comandos, verificou flags atuais dos CLIs e preservou o `AGENTS.md` e a documentação existentes.
+- O que mudou após revisão: o pacote foi nomeado como `alisson-joias-erp`, o setup foi feito em branch dedicada e os arquivos gerados foram revisados antes do commit.
+- Riscos ou follow-up: conectar a um projeto Supabase real somente quando houver credenciais seguras; não versionar `.env`, secrets ou PDFs.
