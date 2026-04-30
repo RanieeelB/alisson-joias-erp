@@ -50,3 +50,12 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - Revisão/adaptação humana: a IA assistiu na escolha dos comandos, verificou flags atuais dos CLIs e preservou o `AGENTS.md` e a documentação existentes.
 - O que mudou após revisão: o pacote foi nomeado como `alisson-joias-erp`, o setup foi feito em branch dedicada e os arquivos gerados foram revisados antes do commit.
 - Riscos ou follow-up: conectar a um projeto Supabase real somente quando houver credenciais seguras; não versionar `.env`, secrets ou PDFs.
+
+## 2026-04-30 - feat/dashboard-financeiro
+
+- Ferramentas/skills usadas: Codex, `brainstorming`, `imagegen`, `jewelry-erp-finance-domain`, `next-best-practices`, `vercel-react-best-practices`, `building-components`, `test-driven-development`.
+- Resumo do prompt ou tarefa: iniciar o Dia 1 como um esboço/protótipo inicial do painel financeiro. Antes de escrever a tela final, foram definidos os tokens visuais, a estrutura da tela e um protótipo de referência para aprovar a direção visual.
+- Saída aceita: branch `feat/dashboard-financeiro`, fluxo de ideação registrado em `AGENTS.md`, tokens aprovados como `Graphite Ledger`, layout aprovado como `Finance Command Center` e protótipo visual gerado com IA para orientar a implementação.
+- Revisão/adaptação humana: o usuário escolheu a direção híbrida executiva, aprovou a variação `Graphite Ledger`, selecionou o layout `Finance Command Center`, pediu a interface em português, solicitou moeda em reais, estados reais de carregamento/erro/vazio e ajustes nos gráficos após revisar no navegador.
+- O que mudou após revisão: a implementação passou a usar uma barra lateral escura fixa, área de trabalho clara, acento dourado contido, cartões de indicadores financeiros, gráficos de receita e lucro, gráfico de receita por categoria, tabela de vencimentos, principais clientes e atividades recentes. Os valores passaram de dólar para real brasileiro, o texto central do gráfico circular foi compactado e o gráfico de receita/lucro ganhou escala de valores.
+- Riscos ou follow-up: revisar a legibilidade final no navegador antes de considerar a branch aprovada; manter o dourado apenas como destaque para evitar uma interface bege ou marrom; não implementar integrações reais de QuickBooks, envio de e-mail ou pagamentos nesta etapa.
