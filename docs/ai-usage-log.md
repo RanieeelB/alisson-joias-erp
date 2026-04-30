@@ -68,3 +68,12 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - Revisão/adaptação humana: o usuário pediu branch sem prefixo `codex/`, commits curtos e semânticos, uso das regras de agente e atualização contínua deste registro.
 - O que mudou após revisão: a branch foi criada como `chore/supabase-setup`; a CLI `supabase` não estava disponível no PATH, então foi usado `npx supabase@2.97.0` com cache local isolado para consultar a CLI. A migração foi criada manualmente com timestamp e validada por testes automatizados.
 - Riscos ou follow-up: o `supabase db reset --no-seed` não pôde aplicar a migração porque o Docker Desktop não estava ativo no Windows; aplicar a migração quando o Docker estiver rodando, definir usuários reais com `app_metadata.role` em um projeto Supabase seguro e manter secrets fora do repositório.
+
+## 2026-04-30 - login interno com Supabase Auth
+
+- Ferramentas/skills usadas: Codex, `imagegen`, `supabase`, `next-best-practices`, `test-driven-development`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: criar o primeiro fluxo visual e funcional de autenticação interna antes de iniciar Invoicing.
+- Saída aceita: protótipo visual aprovado pelo usuário, tela `/login` em português, fundo de dashboard escuro e desfocado, server actions de entrar/sair e proteção de `/dashboard` para usuários `admin` ou `staff`.
+- Revisão/adaptação humana: o usuário aprovou o protótipo e pediu que o fundo atrás do login ficasse mais escuro e desfocado.
+- O que mudou após revisão: o fundo da tela usa um preview de dashboard com overlay escuro e blur; o painel de login ficou integrado ao console financeiro, sem aparência de landing page.
+- Riscos ou follow-up: validar o fluxo manualmente no navegador com o usuário local; para produção, usar senha forte e aplicar a mesma migration no Supabase remoto.
