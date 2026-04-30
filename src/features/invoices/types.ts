@@ -19,11 +19,30 @@ export type InvoiceLineItem = {
   lineTotalCents: number;
 };
 
+export type InvoicePaymentMethod =
+  | "ACH"
+  | "Wire"
+  | "Credit Card"
+  | "Pix";
+
+export type InvoicePayment = {
+  id: string;
+  paymentNumber: string;
+  recordedOn: string;
+  amountCents: number;
+  method: InvoicePaymentMethod;
+  reference: string;
+};
+
 export type InvoiceRecord = {
   id: string;
   invoiceNumber: string;
   customerName: string;
   customerSegment: string;
+  contactName: string;
+  billingEmail: string;
+  billingPhone: string;
+  billingAddress: string;
   orderType: InvoiceOrderType;
   issuedOn: string;
   dueOn: string;
@@ -34,6 +53,7 @@ export type InvoiceRecord = {
   quickbooksSyncStatus: QuickbooksSyncStatus;
   paymentTerms: string;
   lineItems: InvoiceLineItem[];
+  payments: InvoicePayment[];
 };
 
 export type InvoiceSummary = {
@@ -41,4 +61,12 @@ export type InvoiceSummary = {
   collectedCents: number;
   outstandingCents: number;
   overdueCents: number;
+};
+
+export type InvoiceDetailSummary = {
+  subtotalCents: number;
+  taxCents: number;
+  totalCents: number;
+  paidCents: number;
+  balanceCents: number;
 };

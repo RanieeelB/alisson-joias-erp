@@ -131,3 +131,12 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - Revisão/adaptação humana: o usuário apontou a sobreposição diretamente por screenshot da tela de `/invoices`.
 - O que mudou após revisão: a tabela passou a usar `table-fixed`, `colgroup` com proporções explícitas, `whitespace-nowrap` para datas e valores, além de larguras mínimas para status e actions.
 - Riscos ou follow-up: validar no navegador em breakpoints menores se vale reduzir texto de colunas ou trocar algumas ações por ícones no futuro.
+
+## 2026-04-30 - detalhe da fatura e painel lateral
+
+- Ferramentas/skills usadas: Codex, `imagegen`, `jewelry-erp-finance-domain`, `next-best-practices`, `test-driven-development`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: concluir os passos restantes da Etapa 2 com a tela de detalhe da fatura, cálculos dos line items, painel lateral de ações e histórico de pagamentos.
+- Saída aceita: rota protegida `/invoices/[id]`, navegação a partir da lista, header escuro, dados do cliente, tabela de joias faturadas, subtotal/tax/total/paid/balance, cards de QuickBooks e payment history.
+- Revisão/adaptação humana: o usuário aprovou o protótipo visual do detalhe antes da implementação.
+- O que mudou após revisão: os mocks de invoices passaram a incluir contato, billing, payments e line items consistentes com os totais; o detalhe usa esses dados para exibir o workspace completo da fatura.
+- Riscos ou follow-up: o próximo avanço natural é tornar as ações funcionais com side panel interativo e persistência real no Supabase.

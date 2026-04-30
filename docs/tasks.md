@@ -37,10 +37,10 @@
 - [x] Build invoice search by number/customer.
 - [x] Build invoice summary cards.
 - [x] Build invoice table with required columns.
-- [ ] Build invoice detail route.
-- [ ] Build jewelry line item display and calculations.
-- [ ] Build invoice action side panel.
-- [ ] Build payment history block.
+- [x] Build invoice detail route.
+- [x] Build jewelry line item display and calculations.
+- [x] Build invoice action side panel.
+- [x] Build payment history block.
 - [x] Build QuickBooks sync indicator.
 
 ## Step 3 - Payments and Accounts

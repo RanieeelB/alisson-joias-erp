@@ -4,10 +4,12 @@ import {
   filterInvoices,
   invoiceRecords,
   invoiceStatusLabels,
+  quickbooksSyncLabels,
   summarizeInvoices,
 } from "@/features/invoices/data";
 import type { InvoiceRecord, InvoiceStatusFilter } from "@/features/invoices/types";
 import { formatMoney } from "@/lib/finance";
+import Link from "next/link";
 
 const statusOrder: InvoiceStatusFilter[] = [
   "all",
@@ -340,15 +342,18 @@ function InvoiceRow({ invoice }: { invoice: InvoiceRecord }) {
             {invoiceStatusLabels[invoice.status]}
           </span>
           <span className={`inline-flex w-fit rounded px-2 py-1 text-xs font-semibold ring-1 ${quickbooksTone[invoice.quickbooksSyncStatus]}`}>
-            QB {invoice.quickbooksSyncStatus}
+            {quickbooksSyncLabels[invoice.quickbooksSyncStatus]}
           </span>
         </div>
       </td>
       <td className="border-b border-[var(--color-border)] py-4 align-top">
         <div className="flex min-w-[11.5rem] flex-wrap gap-2">
-          <button className="min-h-9 rounded-md border border-[var(--color-border)] bg-white px-2.5 text-xs font-medium text-[var(--color-graphite-800)] transition hover:border-[var(--color-gold-400)] hover:text-[var(--color-graphite-950)]">
+          <Link
+            href={`/invoices/${invoice.id}`}
+            className="inline-flex min-h-9 items-center rounded-md border border-[var(--color-border)] bg-white px-2.5 text-xs font-medium text-[var(--color-graphite-800)] transition hover:border-[var(--color-gold-400)] hover:text-[var(--color-graphite-950)]"
+          >
             Ver
-          </button>
+          </Link>
           <button className="min-h-9 rounded-md border border-[var(--color-border)] bg-white px-2.5 text-xs font-medium text-[var(--color-graphite-800)] transition hover:border-[var(--color-gold-400)] hover:text-[var(--color-graphite-950)]">
             Enviar
           </button>
