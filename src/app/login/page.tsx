@@ -39,59 +39,40 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   return (
     <main className="min-h-screen overflow-hidden bg-[var(--color-graphite-950)] text-white">
       <div className="grid min-h-screen lg:grid-cols-[minmax(0,0.92fr)_minmax(28rem,0.68fr)]">
-        <section className="relative hidden overflow-hidden border-r border-white/10 bg-[var(--color-graphite-900)] px-8 py-8 lg:flex lg:flex-col lg:justify-between xl:px-12">
+        <section className="relative hidden min-h-screen overflow-hidden border-r border-white/10 bg-[var(--color-graphite-900)] px-8 py-10 lg:flex lg:items-center xl:px-12">
           <Image
             alt=""
             aria-hidden="true"
-            className="object-cover opacity-52"
+            className="object-cover opacity-58"
             fill
             priority
             sizes="(min-width: 1024px) 58vw, 0px"
             src="/images/login-hero.png"
           />
-          <div className="absolute inset-0 bg-[var(--color-graphite-950)]/62" />
-          <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-graphite-950)]/92 via-[var(--color-graphite-900)]/66 to-black/46" />
+          <div className="absolute inset-0 bg-[var(--color-graphite-950)]/70" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-graphite-950)]/96 via-[var(--color-graphite-900)]/70 to-black/54" />
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 opacity-42"
+            className="pointer-events-none absolute inset-0 opacity-32"
           >
             <div className="absolute inset-x-12 top-24 h-px bg-[var(--color-gold-300)]/28" />
             <div className="absolute inset-y-20 left-20 w-px bg-white/8" />
-            <div className="absolute inset-y-28 right-24 w-px bg-white/8" />
-            <div className="absolute bottom-24 left-12 right-12 grid gap-2">
-              {[1, 2, 3, 4, 5].map((item) => (
-                <div
-                  key={item}
-                  className="grid grid-cols-[1fr_5rem_4rem] gap-3 border-b border-white/8 py-3"
-                >
-                  <div className="h-2 rounded bg-white/12" />
-                  <div className="h-2 rounded bg-[var(--color-gold-300)]/22" />
-                  <div className="h-2 rounded bg-white/10" />
-                </div>
-              ))}
-            </div>
+            <div className="absolute inset-y-28 right-24 w-px bg-white/6" />
           </div>
 
-          <div className="relative">
+          <div className="relative max-w-xl">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--color-gold-300)]">
               Alisson Joias
             </p>
-            <h1 className="mt-3 max-w-xl text-4xl font-semibold tracking-normal text-white">
+            <h1 className="mt-4 text-5xl font-semibold tracking-normal text-white">
               Financeiro
             </h1>
             <p className="mt-5 max-w-md text-sm leading-6 text-white/66">
               Acesso reservado para acompanhamento de faturas, pagamentos,
               Statements e rotinas financeiras da operação.
             </p>
-          </div>
 
-          <div className="relative grid max-w-xl gap-3">
-            <div className="grid grid-cols-3 gap-3">
-              <AccessMetric label="Autenticação" value="Ativa" />
-              <AccessMetric label="Permissão" value="Admin" />
-              <AccessMetric label="Sessão" value="Segura" />
-            </div>
-            <div className="rounded-md border border-white/10 bg-white/7 p-4">
+            <div className="mt-10 max-w-md rounded-md border border-white/10 bg-black/18 p-4">
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-gold-300)]">
                 Ambiente interno
               </p>
@@ -177,14 +158,5 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         </section>
       </div>
     </main>
-  );
-}
-
-function AccessMetric({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-md border border-white/10 bg-white/7 p-3">
-      <p className="text-xs text-white/52">{label}</p>
-      <p className="mt-2 text-sm font-semibold text-white">{value}</p>
-    </div>
   );
 }

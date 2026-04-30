@@ -95,3 +95,12 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - Revisão/adaptação humana: o usuário pediu um fundo visual gerado em vez de um painel puramente CSS.
 - O que mudou após revisão: o lado esquerdo do login ganhou uma imagem escura com atmosfera de joalheria/financeiro e overlays para manter legibilidade.
 - Riscos ou follow-up: validar contraste final no navegador e substituir o asset se o usuário preferir uma versão mais clara ou mais abstrata.
+
+## 2026-04-30 - ajuste visual da hero do login
+
+- Ferramentas/skills usadas: Codex, `systematic-debugging`, `next-best-practices`, `test-driven-development`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: corrigir a parte esquerda da tela de login que ficou visualmente desconfigurada com elementos decorativos e cards de status competindo com o fundo.
+- Saída aceita: hero simplificada com imagem gerada, overlay escuro, marca, título, texto curto e aviso de ambiente interno em um único bloco visual.
+- Revisão/adaptação humana: o usuário apontou a desorganização visual diretamente pelo navegador com screenshot.
+- O que mudou após revisão: foram removidos os cards de status e a tabela decorativa do rodapé da hero, reduzindo ruído e mantendo o login como tela separada.
+- Riscos ou follow-up: revisar no navegador em larguras diferentes para ajustar posicionamento fino caso a imagem gere áreas muito escuras ou vazias.
