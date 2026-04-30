@@ -140,3 +140,12 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - Revisão/adaptação humana: o usuário aprovou o protótipo visual do detalhe antes da implementação.
 - O que mudou após revisão: os mocks de invoices passaram a incluir contato, billing, payments e line items consistentes com os totais; o detalhe usa esses dados para exibir o workspace completo da fatura.
 - Riscos ou follow-up: o próximo avanço natural é tornar as ações funcionais com side panel interativo e persistência real no Supabase.
+
+## 2026-04-30 - início da Etapa 3 Payments and Accounts
+
+- Ferramentas/skills usadas: Codex, `brainstorming`, `imagegen`, `jewelry-erp-finance-domain`.
+- Resumo do prompt ou tarefa: iniciar a branch `feat/payments-accounts` sem prefixo `codex/` e prototipar visualmente as novas telas de Payments, Accounts Receivable e Accounts Payable antes de implementar código de produto.
+- Saída aceita: protótipo visual inicial salvo em `docs/assets/prototypes/payments-accounts-prototype.png`, com cards de pagamentos, listagem de pagamentos, Aging Analysis, saldos por cliente, reminders e tabela de Accounts Payable.
+- Revisão/adaptação humana: pendente de aprovação do usuário antes de codificar as rotas e componentes da Etapa 3.
+- O que mudou após revisão: ainda não houve implementação; o protótipo segue a direção visual existente do console financeiro com sidebar escura, superfícies claras, acento dourado contido e dados de joalheria.
+- Riscos ou follow-up: ajustar datas, rótulos ou densidade do protótipo conforme feedback antes de criar `/payments`, `/accounts/receivable` e `/accounts/payable`.
