@@ -113,3 +113,12 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - Revisão/adaptação humana: o pedido foi de refinamento visual sem alterar o fluxo de autenticação nem reintroduzir ruído na composição.
 - O que mudou após revisão: a marca ganhou um ícone geométrico discreto e um sistema de linhas leves em tons dourado/grafite para reforçar a identidade visual.
 - Riscos ou follow-up: validar visualmente no navegador se o ícone precisa crescer um pouco mais no desktop ou reduzir no mobile.
+
+## 2026-04-30 - etapa 2 lista de faturas
+
+- Ferramentas/skills usadas: Codex, `brainstorming`, `imagegen`, `jewelry-erp-finance-domain`, `next-best-practices`, `test-driven-development`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: avançar na Etapa 2 após o setup do Supabase com a primeira entrega de Invoicing: tipos, dados mockados realistas, rota protegida `/invoices`, filtros, busca, cards, tabela e indicador QuickBooks.
+- Saída aceita: branch `feat/invoicing`, protótipo visual aprovado e implementação inicial da listagem de faturas alinhada ao dashboard financeiro existente.
+- Revisão/adaptação humana: o usuário aprovou seguir com os próximos passos da Step 2 após confirmar que o protótipo correspondia à etapa de Invoicing.
+- O que mudou após revisão: foi criado um shell financeiro compartilhado para sidebar/topbar, a navegação passou a incluir `/invoices`, e a listagem usa busca por invoice/customer e filtros por status via query string.
+- Riscos ou follow-up: concluir a segunda metade da Etapa 2 com rota de detalhe, line items detalhados, painel lateral de ações e histórico de pagamentos.
