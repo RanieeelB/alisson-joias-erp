@@ -77,3 +77,12 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - Revisão/adaptação humana: o usuário aprovou o protótipo e pediu que o fundo atrás do login ficasse mais escuro e desfocado.
 - O que mudou após revisão: o fundo da tela usa um preview de dashboard com overlay escuro e blur; o painel de login ficou integrado ao console financeiro, sem aparência de landing page.
 - Riscos ou follow-up: validar o fluxo manualmente no navegador com o usuário local; para produção, usar senha forte e aplicar a mesma migration no Supabase remoto.
+
+## 2026-04-30 - revisão visual da tela de login
+
+- Ferramentas/skills usadas: Codex, `brainstorming`, `imagegen`, `next-best-practices`, `test-driven-development`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: refazer o login como tela separada, sem aparecer no meio do dashboard, com novo protótipo gerado por imagem antes da implementação.
+- Saída aceita: protótipo standalone aprovado pelo usuário e implementação de `/login` com painel de marca escuro, superfície de formulário clara e sinais discretos de acesso financeiro interno.
+- Revisão/adaptação humana: o usuário avaliou que a primeira versão parecia sobreposta ao dashboard e pediu uma tela própria.
+- O que mudou após revisão: removido o fundo com preview/blur do dashboard; a tela passou a ter composição independente, com identidade Alisson Joias, área informativa de acesso interno e formulário em superfície clara.
+- Riscos ou follow-up: validar visualmente no navegador em desktop/mobile e manter a tela sem elementos de dashboard quando a navegação do app crescer.
