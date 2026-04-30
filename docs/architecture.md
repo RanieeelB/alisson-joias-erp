@@ -27,13 +27,14 @@ Use Supabase with SSR-compatible clients. Keep server-only environment variables
 
 Planned layers:
 
-- `lib/supabase/server.ts` for server client.
-- `lib/supabase/client.ts` for browser client.
+- `src/lib/supabase/server.ts` for server-side Supabase access.
+- `src/lib/supabase/client.ts` for browser Supabase access.
+- `src/lib/supabase/proxy.ts` and `src/proxy.ts` for Next.js 16 auth-session refresh.
 - `features/<feature>/data/` for feature-specific queries.
 - `features/<feature>/components/` for UI.
 - `features/<feature>/types.ts` for feature-local types when needed.
 
-Exact file paths will be finalized when the Next.js scaffold exists.
+Supabase environment variables are documented in `.env.example`. Only the public project URL and publishable key belong in `NEXT_PUBLIC_*` variables.
 
 ## Authentication and Authorization
 
@@ -44,6 +45,8 @@ Plan roles early even if the first demo uses a single internal user:
 - `customer`: portal access to own invoices/statements.
 
 Supabase RLS should enforce ownership for customer-facing data and internal role checks for admin/staff workflows.
+
+The initial schema uses `auth.jwt()->app_metadata.role` for `admin`, `staff`, and `customer` authorization decisions. Do not use user-editable metadata for RLS.
 
 ## Integration Boundaries
 
@@ -62,4 +65,3 @@ Supabase Realtime is a strong bonus for dashboard metrics and invoice/payment ac
 ## Diagram Sources
 
 Editable diagram sources live in `docs/diagrams/`. Presentation-style images live in `docs/assets/diagrams/`.
-

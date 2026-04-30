@@ -26,16 +26,22 @@
 
 ## Step 2 - Complete Invoicing
 
-- [ ] Define invoice and invoice line item types/schema.
-- [ ] Build invoice status filters.
-- [ ] Build invoice search by number/customer.
-- [ ] Build invoice summary cards.
-- [ ] Build invoice table with required columns.
-- [ ] Build invoice detail route.
-- [ ] Build jewelry line item display and calculations.
-- [ ] Build invoice action side panel.
-- [ ] Build payment history block.
-- [ ] Build QuickBooks sync indicator.
+- [x] Define initial Supabase invoice and invoice line item schema.
+- [x] Configure Supabase auth locally without email confirmation.
+- [x] Add RLS policies for internal finance users and customer ownership.
+- [x] Connect the Next.js app to Supabase with SSR clients and request proxy.
+- [x] Prototype and implement internal Supabase Auth login screen.
+- [x] Protect the dashboard route for authenticated `admin`/`staff` users.
+- [x] Define invoice and invoice line item TypeScript types for UI/data queries.
+- [x] Build invoice status filters.
+- [x] Build invoice search by number/customer.
+- [x] Build invoice summary cards.
+- [x] Build invoice table with required columns.
+- [x] Build invoice detail route.
+- [x] Build jewelry line item display and calculations.
+- [x] Build invoice action side panel.
+- [x] Build payment history block.
+- [x] Build QuickBooks sync indicator.
 
 ## Step 3 - Payments and Accounts
 
