@@ -44,6 +44,8 @@ test("login page presents the approved internal finance auth screen", () => {
   assert.match(page, /login-hero\.png/);
   assert.match(page, /bg-\[var\(--color-graphite-950\)\]/);
   assert.match(page, /type="password"/);
+  assert.match(page, /data-login-brand-mark/);
+  assert.match(page, /data-login-refined-lines/);
 });
 
 test("login hero background asset is stored in the project", () => {

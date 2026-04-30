@@ -61,6 +61,8 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           </div>
 
           <div className="relative max-w-xl">
+            <BrandMark tone="dark" />
+            <RefinedLines tone="dark" />
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--color-gold-300)]">
               Alisson Joias
             </p>
@@ -87,6 +89,8 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         <section className="flex min-h-screen items-center justify-center bg-[var(--color-app-canvas)] px-4 py-8 text-[var(--color-graphite-950)] sm:px-6 lg:px-10">
           <div className="w-full max-w-[28rem]">
             <div className="mb-6 lg:hidden">
+              <BrandMark tone="light" />
+              <RefinedLines tone="light" />
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--color-gold-700)]">
                 Alisson Joias
               </p>
@@ -158,5 +162,41 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         </section>
       </div>
     </main>
+  );
+}
+
+function BrandMark({ tone }: { tone: "dark" | "light" }) {
+  const lineTone =
+    tone === "dark" ? "border-[var(--color-gold-300)]/70" : "border-[var(--color-gold-700)]/70";
+  const fillTone =
+    tone === "dark" ? "bg-[var(--color-gold-300)]" : "bg-[var(--color-gold-700)]";
+  const shineTone =
+    tone === "dark" ? "bg-white/72" : "bg-[var(--color-app-canvas)]/90";
+
+  return (
+    <div
+      aria-hidden="true"
+      className="mb-4 flex h-12 w-12 items-center justify-center"
+      data-login-brand-mark
+    >
+      <span className={`flex h-9 w-9 items-center justify-center rounded-[0.7rem] border ${lineTone} bg-black/12 shadow-[0_0_0_1px_rgba(255,255,255,0.03)]`}>
+        <span className={`flex h-4 w-4 rotate-45 items-center justify-center rounded-[0.2rem] ${fillTone}`}>
+          <span className={`h-1.5 w-1.5 -rotate-45 rounded-full ${shineTone}`} />
+        </span>
+      </span>
+    </div>
+  );
+}
+
+function RefinedLines({ tone }: { tone: "dark" | "light" }) {
+  const accentTone =
+    tone === "dark" ? "bg-[var(--color-gold-300)]/70" : "bg-[var(--color-gold-700)]/72";
+  const baseTone = tone === "dark" ? "bg-white/20" : "bg-[var(--color-graphite-950)]/14";
+
+  return (
+    <div aria-hidden="true" className="mb-5 flex items-center gap-3" data-login-refined-lines>
+      <span className={`h-px w-14 ${accentTone}`} />
+      <span className={`h-px w-24 ${baseTone}`} />
+    </div>
   );
 }
