@@ -17,19 +17,26 @@ test("login page presents the approved internal finance auth screen", () => {
   const page = readProjectFile("src/app/login/page.tsx");
 
   for (const text of [
-    "Financeiro Alisson Joias",
+    "Alisson Joias",
+    "Financeiro",
     "Ambiente interno",
     "Supabase Auth",
+    "Entrar",
     "Email",
     "Senha",
     "Digite seu email",
+    "Digite sua senha",
     "Acessar dashboard",
   ]) {
     assert.match(page, new RegExp(text), `expected login page to include ${text}`);
   }
 
   assert.doesNotMatch(page, /raniel@gmail\.com/);
-  assert.match(page, /backdrop-blur/);
+  assert.doesNotMatch(page, /LoginBackdrop/);
+  assert.doesNotMatch(page, /Painel Financeiro/);
+  assert.doesNotMatch(page, /AR Outstanding/);
+  assert.doesNotMatch(page, /Overdue/);
+  assert.doesNotMatch(page, /backdrop-blur/);
   assert.match(page, /bg-\[var\(--color-graphite-950\)\]/);
   assert.match(page, /type="password"/);
 });
