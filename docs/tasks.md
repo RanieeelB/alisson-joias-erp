@@ -30,6 +30,8 @@
 - [x] Configure Supabase auth locally without email confirmation.
 - [x] Add RLS policies for internal finance users and customer ownership.
 - [x] Connect the Next.js app to Supabase with SSR clients and request proxy.
+- [x] Prototype and implement internal Supabase Auth login screen.
+- [x] Protect the dashboard route for authenticated `admin`/`staff` users.
 - [ ] Define invoice and invoice line item TypeScript types for UI/data queries.
 - [ ] Build invoice status filters.
 - [ ] Build invoice search by number/customer.
