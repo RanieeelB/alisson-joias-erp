@@ -86,3 +86,12 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - Revisão/adaptação humana: o usuário avaliou que a primeira versão parecia sobreposta ao dashboard e pediu uma tela própria.
 - O que mudou após revisão: removido o fundo com preview/blur do dashboard; a tela passou a ter composição independente, com identidade Alisson Joias, área informativa de acesso interno e formulário em superfície clara.
 - Riscos ou follow-up: validar visualmente no navegador em desktop/mobile e manter a tela sem elementos de dashboard quando a navegação do app crescer.
+
+## 2026-04-30 - fundo hero do login
+
+- Ferramentas/skills usadas: Codex, `imagegen`, `test-driven-development`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: remover o texto "Supabase Auth" da tela de login e usar uma imagem gerada como fundo da hero para ficar mais fiel ao protótipo aprovado.
+- Saída aceita: asset `public/images/login-hero.png`, uso com `next/image` na hero escura e remoção do texto visível "Supabase Auth".
+- Revisão/adaptação humana: o usuário pediu um fundo visual gerado em vez de um painel puramente CSS.
+- O que mudou após revisão: o lado esquerdo do login ganhou uma imagem escura com atmosfera de joalheria/financeiro e overlays para manter legibilidade.
+- Riscos ou follow-up: validar contraste final no navegador e substituir o asset se o usuário preferir uma versão mais clara ou mais abstrata.
