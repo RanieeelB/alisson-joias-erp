@@ -104,3 +104,12 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - Revisão/adaptação humana: o usuário apontou a desorganização visual diretamente pelo navegador com screenshot.
 - O que mudou após revisão: foram removidos os cards de status e a tabela decorativa do rodapé da hero, reduzindo ruído e mantendo o login como tela separada.
 - Riscos ou follow-up: revisar no navegador em larguras diferentes para ajustar posicionamento fino caso a imagem gere áreas muito escuras ou vazias.
+
+## 2026-04-30 - refinamento de marca na tela de login
+
+- Ferramentas/skills usadas: Codex, `brainstorming`, `building-components`, `test-driven-development`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: adicionar um ícone de diamante amarelo acima de "Alisson Joias" e usar linhas refinadas para deixar a tela de login mais profissional.
+- Saída aceita: selo de diamante dourado aplicado na área de marca e linhas finas decorativas para organizar o cabeçalho da hero e a versão mobile.
+- Revisão/adaptação humana: o pedido foi de refinamento visual sem alterar o fluxo de autenticação nem reintroduzir ruído na composição.
+- O que mudou após revisão: a marca ganhou um ícone geométrico discreto e um sistema de linhas leves em tons dourado/grafite para reforçar a identidade visual.
+- Riscos ou follow-up: validar visualmente no navegador se o ícone precisa crescer um pouco mais no desktop ou reduzir no mobile.
