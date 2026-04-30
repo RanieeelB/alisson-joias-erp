@@ -26,7 +26,11 @@
 
 ## Step 2 - Complete Invoicing
 
-- [ ] Define invoice and invoice line item types/schema.
+- [x] Define initial Supabase invoice and invoice line item schema.
+- [x] Configure Supabase auth locally without email confirmation.
+- [x] Add RLS policies for internal finance users and customer ownership.
+- [x] Connect the Next.js app to Supabase with SSR clients and request proxy.
+- [ ] Define invoice and invoice line item TypeScript types for UI/data queries.
 - [ ] Build invoice status filters.
 - [ ] Build invoice search by number/customer.
 - [ ] Build invoice summary cards.
