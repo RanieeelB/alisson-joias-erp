@@ -18,6 +18,7 @@ import {
   formatMoney,
   summarizeDashboard,
 } from "@/lib/finance";
+import { signOut } from "@/app/login/actions";
 
 export type DashboardViewState = "ready" | "loading" | "error" | "empty";
 
@@ -41,8 +42,10 @@ const toneClass = {
 };
 
 export function FinancialDashboard({
+  userEmail,
   viewState = "ready",
 }: {
+  userEmail?: string;
   viewState?: DashboardViewState;
 }) {
   const isLoading = viewState === "loading";
@@ -65,7 +68,7 @@ export function FinancialDashboard({
     <div className="min-h-screen bg-[var(--color-app-canvas)] text-[var(--color-graphite-950)]">
       <Sidebar />
       <main className="min-w-0 lg:pl-[var(--sidebar-width)]">
-        <Topbar />
+        <Topbar userEmail={userEmail} />
           <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-5 px-4 py-4 sm:px-6 lg:px-8 lg:py-6">
             <HeaderActions viewState={viewState} />
             <section
@@ -173,7 +176,7 @@ function Sidebar() {
   );
 }
 
-function Topbar() {
+function Topbar({ userEmail }: { userEmail?: string }) {
   return (
     <div className="sticky top-0 z-20 border-b border-[var(--color-border)] bg-[var(--color-surface)]/92 px-4 py-3 backdrop-blur sm:px-6 lg:px-8">
       <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-3">
@@ -186,12 +189,22 @@ function Topbar() {
           </h1>
         </div>
         <div className="flex items-center gap-2">
+          {userEmail ? (
+            <span className="hidden max-w-48 truncate text-sm text-[var(--color-muted)] md:inline">
+              {userEmail}
+            </span>
+          ) : null}
           <button className="hidden min-h-10 rounded-md border border-[var(--color-border)] bg-white px-3 text-sm font-medium text-[var(--color-graphite-800)] shadow-sm transition hover:border-[var(--color-gold-400)] hover:text-[var(--color-graphite-950)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)] sm:inline-flex sm:items-center">
             Exportar
           </button>
           <button className="min-h-10 rounded-md bg-[var(--color-graphite-900)] px-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--color-graphite-800)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]">
             Nova Fatura
           </button>
+          <form action={signOut}>
+            <button className="min-h-10 rounded-md border border-[var(--color-border)] bg-white px-3 text-sm font-medium text-[var(--color-graphite-800)] shadow-sm transition hover:border-red-300 hover:text-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-400">
+              Sair
+            </button>
+          </form>
         </div>
       </div>
     </div>
