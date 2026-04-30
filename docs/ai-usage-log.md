@@ -149,3 +149,12 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - Revisão/adaptação humana: pendente de aprovação do usuário antes de codificar as rotas e componentes da Etapa 3.
 - O que mudou após revisão: ainda não houve implementação; o protótipo segue a direção visual existente do console financeiro com sidebar escura, superfícies claras, acento dourado contido e dados de joalheria.
 - Riscos ou follow-up: ajustar datas, rótulos ou densidade do protótipo conforme feedback antes de criar `/payments`, `/accounts/receivable` e `/accounts/payable`.
+
+## 2026-04-30 - implementação da Etapa 3 Payments and Accounts
+
+- Ferramentas/skills usadas: Codex, `writing-plans`, `test-driven-development`, `jewelry-erp-finance-domain`, `next-best-practices`, `vercel-react-best-practices`, `building-components`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: após aprovação do protótipo visual, implementar Payments, Accounts Receivable e Accounts Payable como workspaces protegidos do módulo financeiro.
+- Saída aceita: rotas `/payments`, `/accounts/receivable` e `/accounts/payable`, modelos mockados de pagamentos/AR/AP, helpers testáveis de resumo financeiro, navegação lateral atualizada e UI alinhada ao protótipo aprovado.
+- Revisão/adaptação humana: o usuário aprovou o protótipo com “ok” antes da implementação.
+- O que mudou após revisão: a implementação separou as telas por rota, manteve a linguagem operacional em português, preservou os labels financeiros em inglês quando são conceitos do teste e adicionou testes automatizados para os cálculos e estrutura das páginas.
+- Riscos ou follow-up: os fluxos de registrar pagamento e enviar reminder ainda são simulados por botões; persistência real no Supabase e ações funcionais podem entrar em uma etapa bônus ou refinamento posterior.

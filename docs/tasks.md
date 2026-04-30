@@ -45,15 +45,15 @@
 
 ## Step 3 - Payments and Accounts
 
-- [ ] Define payment model and methods.
-- [ ] Build payment list.
-- [ ] Build payment summary cards.
-- [ ] Build register payment flow.
-- [ ] Build AR aging analysis chart.
-- [ ] Build customer balance bars.
-- [ ] Build open invoice reminder list.
-- [ ] Define vendor/AP model.
-- [ ] Build AP table and summary cards.
+- [x] Define payment model and methods.
+- [x] Build payment list.
+- [x] Build payment summary cards.
+- [x] Build register payment flow.
+- [x] Build AR aging analysis chart.
+- [x] Build customer balance bars.
+- [x] Build open invoice reminder list.
+- [x] Define vendor/AP model.
+- [x] Build AP table and summary cards.
 
 ## Step 4 - Statements and Reports
 
