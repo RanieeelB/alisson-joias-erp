@@ -122,3 +122,12 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - Revisão/adaptação humana: o usuário aprovou seguir com os próximos passos da Step 2 após confirmar que o protótipo correspondia à etapa de Invoicing.
 - O que mudou após revisão: foi criado um shell financeiro compartilhado para sidebar/topbar, a navegação passou a incluir `/invoices`, e a listagem usa busca por invoice/customer e filtros por status via query string.
 - Riscos ou follow-up: concluir a segunda metade da Etapa 2 com rota de detalhe, line items detalhados, painel lateral de ações e histórico de pagamentos.
+
+## 2026-04-30 - refinamento da tabela de faturas
+
+- Ferramentas/skills usadas: Codex, `test-driven-development`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: corrigir a sobreposição visual entre colunas da tabela de invoices, especialmente entre datas, totais, status e ações.
+- Saída aceita: tabela com colunas mais estáveis, largura mínima maior, espaçamento horizontal melhor e badges sem colisão entre si.
+- Revisão/adaptação humana: o usuário apontou a sobreposição diretamente por screenshot da tela de `/invoices`.
+- O que mudou após revisão: a tabela passou a usar `table-fixed`, `colgroup` com proporções explícitas, `whitespace-nowrap` para datas e valores, além de larguras mínimas para status e actions.
+- Riscos ou follow-up: validar no navegador em breakpoints menores se vale reduzir texto de colunas ou trocar algumas ações por ícones no futuro.
