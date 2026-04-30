@@ -103,6 +103,9 @@ test("invoice route wires the protected finance list experience", () => {
   assert.match(view, /invoiceRecords/);
   assert.match(view, /searchParams/);
   assert.match(view, /invoiceStatusLabels/);
+  assert.match(view, /table-fixed/);
+  assert.match(view, /min-w-\[86rem\]/);
+  assert.match(view, /<colgroup>/);
 
   for (const text of ["Todos", "Pendentes", "Parciais", "Pagas", "Em atraso"]) {
     assert.match(data, new RegExp(text), `expected invoice labels to include ${text}`);

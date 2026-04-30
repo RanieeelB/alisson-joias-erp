@@ -182,18 +182,30 @@ export function InvoicesPage({ userEmail, searchParams }: InvoicesPageProps) {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[72rem] border-separate border-spacing-0 text-left text-sm">
+                <table className="w-full min-w-[86rem] table-fixed border-separate border-spacing-0 text-left text-sm">
+                  <colgroup>
+                    <col className="w-[7%]" />
+                    <col className="w-[18%]" />
+                    <col className="w-[12%]" />
+                    <col className="w-[8%]" />
+                    <col className="w-[8%]" />
+                    <col className="w-[9%]" />
+                    <col className="w-[9%]" />
+                    <col className="w-[9%]" />
+                    <col className="w-[8%]" />
+                    <col className="w-[12%]" />
+                  </colgroup>
                   <thead>
                     <tr className="text-xs uppercase tracking-[0.12em] text-[var(--color-muted)]">
-                      <th className="border-b border-[var(--color-border)] pb-3 font-semibold">Invoice #</th>
-                      <th className="border-b border-[var(--color-border)] pb-3 font-semibold">Customer</th>
-                      <th className="border-b border-[var(--color-border)] pb-3 font-semibold">Type</th>
-                      <th className="border-b border-[var(--color-border)] pb-3 font-semibold">Date</th>
-                      <th className="border-b border-[var(--color-border)] pb-3 font-semibold">Due Date</th>
-                      <th className="border-b border-[var(--color-border)] pb-3 font-semibold">Total</th>
-                      <th className="border-b border-[var(--color-border)] pb-3 font-semibold">Paid</th>
-                      <th className="border-b border-[var(--color-border)] pb-3 font-semibold">Balance</th>
-                      <th className="border-b border-[var(--color-border)] pb-3 font-semibold">Status</th>
+                      <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Invoice #</th>
+                      <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Customer</th>
+                      <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Type</th>
+                      <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Date</th>
+                      <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Due Date</th>
+                      <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Total</th>
+                      <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Paid</th>
+                      <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Balance</th>
+                      <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Status</th>
                       <th className="border-b border-[var(--color-border)] pb-3 font-semibold">Actions</th>
                     </tr>
                   </thead>
@@ -295,35 +307,35 @@ function SummaryCard({
 function InvoiceRow({ invoice }: { invoice: InvoiceRecord }) {
   return (
     <tr>
-      <td className="border-b border-[var(--color-border)] py-3 font-semibold text-[var(--color-graphite-900)]">
+      <td className="border-b border-[var(--color-border)] py-4 pr-4 align-top font-semibold text-[var(--color-graphite-900)]">
         {invoice.invoiceNumber}
       </td>
-      <td className="border-b border-[var(--color-border)] py-3">
-        <div>
-          <p className="font-medium text-[var(--color-graphite-900)]">{invoice.customerName}</p>
+      <td className="border-b border-[var(--color-border)] py-4 pr-4 align-top">
+        <div className="min-w-0">
+          <p className="truncate font-medium text-[var(--color-graphite-900)]">{invoice.customerName}</p>
           <p className="text-xs text-[var(--color-muted)]">{invoice.customerSegment}</p>
         </div>
       </td>
-      <td className="border-b border-[var(--color-border)] py-3 text-[var(--color-muted)]">
+      <td className="border-b border-[var(--color-border)] py-4 pr-4 align-top text-[var(--color-muted)]">
         {invoice.orderType}
       </td>
-      <td className="border-b border-[var(--color-border)] py-3 font-mono text-[var(--color-muted)]">
+      <td className="border-b border-[var(--color-border)] py-4 pr-4 align-top font-mono text-[var(--color-muted)] whitespace-nowrap">
         {formatShortDate(invoice.issuedOn)}
       </td>
-      <td className="border-b border-[var(--color-border)] py-3 font-mono text-[var(--color-muted)]">
+      <td className="border-b border-[var(--color-border)] py-4 pr-4 align-top font-mono text-[var(--color-muted)] whitespace-nowrap">
         {formatShortDate(invoice.dueOn)}
       </td>
-      <td className="border-b border-[var(--color-border)] py-3 font-mono font-medium">
+      <td className="border-b border-[var(--color-border)] py-4 pr-4 align-top font-mono font-medium whitespace-nowrap">
         {formatMoney(invoice.totalCents)}
       </td>
-      <td className="border-b border-[var(--color-border)] py-3 font-mono text-[var(--color-muted)]">
+      <td className="border-b border-[var(--color-border)] py-4 pr-4 align-top font-mono text-[var(--color-muted)] whitespace-nowrap">
         {formatMoney(invoice.paidCents)}
       </td>
-      <td className="border-b border-[var(--color-border)] py-3 font-mono font-medium text-[var(--color-graphite-900)]">
+      <td className="border-b border-[var(--color-border)] py-4 pr-4 align-top font-mono font-medium text-[var(--color-graphite-900)] whitespace-nowrap">
         {formatMoney(invoice.balanceCents)}
       </td>
-      <td className="border-b border-[var(--color-border)] py-3">
-        <div className="flex flex-col gap-2">
+      <td className="border-b border-[var(--color-border)] py-4 pr-4 align-top">
+        <div className="flex min-w-[7rem] flex-col gap-2">
           <span className={`inline-flex w-fit rounded px-2 py-1 text-xs font-semibold ring-1 ${badgeTone[invoice.status]}`}>
             {invoiceStatusLabels[invoice.status]}
           </span>
@@ -332,8 +344,8 @@ function InvoiceRow({ invoice }: { invoice: InvoiceRecord }) {
           </span>
         </div>
       </td>
-      <td className="border-b border-[var(--color-border)] py-3">
-        <div className="flex flex-wrap gap-2">
+      <td className="border-b border-[var(--color-border)] py-4 align-top">
+        <div className="flex min-w-[11.5rem] flex-wrap gap-2">
           <button className="min-h-9 rounded-md border border-[var(--color-border)] bg-white px-2.5 text-xs font-medium text-[var(--color-graphite-800)] transition hover:border-[var(--color-gold-400)] hover:text-[var(--color-graphite-950)]">
             Ver
           </button>
