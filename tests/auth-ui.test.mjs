@@ -22,11 +22,13 @@ test("login page presents the approved internal finance auth screen", () => {
     "Supabase Auth",
     "Email",
     "Senha",
+    "Digite seu email",
     "Acessar dashboard",
   ]) {
     assert.match(page, new RegExp(text), `expected login page to include ${text}`);
   }
 
+  assert.doesNotMatch(page, /raniel@gmail\.com/);
   assert.match(page, /backdrop-blur/);
   assert.match(page, /bg-\[var\(--color-graphite-950\)\]/);
   assert.match(page, /type="password"/);
