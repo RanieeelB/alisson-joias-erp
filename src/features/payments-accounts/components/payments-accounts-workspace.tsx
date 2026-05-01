@@ -1,7 +1,11 @@
 "use client";
 
 import { signOut } from "@/app/login/actions";
-import { createPayableAction, recordPaymentAction } from "@/features/finance/actions";
+import {
+  createPayableAction,
+  createVendorAction,
+  recordPaymentAction,
+} from "@/features/finance/actions";
 import type { FinanceWorkspaceData } from "@/features/finance/data";
 import { FinanceShell } from "@/features/finance-shell/components/finance-shell";
 import {
@@ -114,12 +118,17 @@ export function PaymentsAccountsWorkspace({
   const [activeTab, setActiveTab] = useState<PaymentsAccountsTab>(initialTab);
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [isPayableOpen, setIsPayableOpen] = useState(false);
+  const [isVendorOpen, setIsVendorOpen] = useState(false);
   const [paymentState, paymentAction, isPaymentPending] = useActionState(
     recordPaymentAction,
     { ok: false, message: "" },
   );
   const [payableState, payableAction, isPayablePending] = useActionState(
     createPayableAction,
+    { ok: false, message: "" },
+  );
+  const [vendorState, vendorAction, isVendorPending] = useActionState(
+    createVendorAction,
     { ok: false, message: "" },
   );
   const paymentSummary = summarizePayments(data.paymentRecords, asOf);
@@ -144,6 +153,7 @@ export function PaymentsAccountsWorkspace({
             activeTab={activeTab}
             onNewPayable={() => setIsPayableOpen(true)}
             onNewPayment={() => setIsPaymentOpen(true)}
+            onNewVendor={() => setIsVendorOpen(true)}
             setActiveTab={setActiveTab}
           />
           <form action={signOut}>
@@ -181,6 +191,15 @@ export function PaymentsAccountsWorkspace({
           ok={payableState.ok}
           onClose={() => setIsPayableOpen(false)}
           vendors={data.vendors}
+        />
+      ) : null}
+      {isVendorOpen ? (
+        <VendorDialog
+          action={vendorAction}
+          isPending={isVendorPending}
+          message={vendorState.message}
+          ok={vendorState.ok}
+          onClose={() => setIsVendorOpen(false)}
         />
       ) : null}
       <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-5 px-4 py-4 sm:px-6 lg:px-8 lg:py-6">
@@ -711,11 +730,13 @@ function PrimaryAction({
   activeTab,
   onNewPayable,
   onNewPayment,
+  onNewVendor,
   setActiveTab,
 }: {
   activeTab: PaymentsAccountsTab;
   onNewPayable: () => void;
   onNewPayment: () => void;
+  onNewVendor: () => void;
   setActiveTab: (tab: PaymentsAccountsTab) => void;
 }) {
   if (activeTab === "receivable") {
@@ -732,13 +753,22 @@ function PrimaryAction({
 
   if (activeTab === "payable") {
     return (
-      <button
-        type="button"
-        onClick={onNewPayable}
-        className="hidden min-h-10 rounded-md bg-[var(--color-graphite-900)] px-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--color-graphite-800)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)] sm:inline-flex sm:items-center"
-      >
-        Nova obrigação
-      </button>
+      <>
+        <button
+          type="button"
+          onClick={onNewVendor}
+          className="inline-flex min-h-10 items-center rounded-md border border-[var(--color-border)] bg-white px-3 text-sm font-medium text-[var(--color-graphite-800)] shadow-sm transition hover:border-[var(--color-gold-400)] hover:text-[var(--color-graphite-950)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]"
+        >
+          Novo fornecedor
+        </button>
+        <button
+          type="button"
+          onClick={onNewPayable}
+          className="inline-flex min-h-10 items-center rounded-md bg-[var(--color-graphite-900)] px-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--color-graphite-800)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]"
+        >
+          Nova obrigação
+        </button>
+      </>
     );
   }
 
@@ -750,6 +780,62 @@ function PrimaryAction({
     >
       Registrar pagamento
     </button>
+  );
+}
+
+function VendorDialog({
+  action,
+  isPending,
+  message,
+  ok,
+  onClose,
+}: {
+  action: (payload: FormData) => void;
+  isPending: boolean;
+  message: string;
+  ok: boolean;
+  onClose: () => void;
+}) {
+  return (
+    <ModalForm action={action} title="Novo fornecedor" onClose={onClose}>
+      <FormField label="Nome do fornecedor">
+        <input
+          name="vendorName"
+          required
+          placeholder="GoldSource Refinery"
+          className={fieldClassName}
+        />
+      </FormField>
+      <FormField label="Categoria">
+        <select name="vendorCategory" required className={fieldClassName}>
+          <option value="raw_materials">Matéria-prima</option>
+          <option value="components">Componentes</option>
+          <option value="certification">Certificação</option>
+          <option value="services">Serviços</option>
+        </select>
+      </FormField>
+      <FormField label="Email financeiro">
+        <input
+          name="vendorEmail"
+          type="email"
+          placeholder="billing@fornecedor.com"
+          className={fieldClassName}
+        />
+      </FormField>
+      <FormField label="Telefone">
+        <input
+          name="vendorPhone"
+          placeholder="+55 11 4002-1100"
+          className={fieldClassName}
+        />
+      </FormField>
+      <DialogStatus
+        isPending={isPending}
+        message={message}
+        ok={ok}
+        submitLabel="Salvar fornecedor"
+      />
+    </ModalForm>
   );
 }
 

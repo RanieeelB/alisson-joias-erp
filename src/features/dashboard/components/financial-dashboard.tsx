@@ -13,7 +13,10 @@ import {
   type CustomerBalance,
   type RevenuePoint,
 } from "@/features/dashboard/data";
-import { createInvoiceAction } from "@/features/finance/actions";
+import {
+  createCustomerAction,
+  createInvoiceAction,
+} from "@/features/finance/actions";
 import {
   buildAgingSummary,
   buildDashboardInvoices,
@@ -47,7 +50,12 @@ export function FinancialDashboard({
   userEmail?: string;
   viewState?: DashboardViewState;
 }) {
+  const [isCreatingCustomer, setIsCreatingCustomer] = useState(false);
   const [isCreatingInvoice, setIsCreatingInvoice] = useState(false);
+  const [customerState, customerAction, isCustomerPending] = useActionState(
+    createCustomerAction,
+    { ok: false, message: "" },
+  );
   const [invoiceState, invoiceAction, isInvoicePending] = useActionState(
     createInvoiceAction,
     { ok: false, message: "" },
@@ -90,6 +98,13 @@ export function FinancialDashboard({
         <>
           <button
             type="button"
+            onClick={() => setIsCreatingCustomer(true)}
+            className="min-h-10 rounded-md border border-[var(--color-border)] bg-white px-3 text-sm font-medium text-[var(--color-graphite-800)] shadow-sm transition hover:border-[var(--color-gold-400)] hover:text-[var(--color-graphite-950)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]"
+          >
+            Novo Cliente
+          </button>
+          <button
+            type="button"
             onClick={() => setIsCreatingInvoice(true)}
             className="min-h-10 rounded-md bg-[var(--color-graphite-900)] px-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--color-graphite-800)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]"
           >
@@ -111,6 +126,15 @@ export function FinancialDashboard({
         </div>
       }
     >
+      {isCreatingCustomer ? (
+        <CustomerDialog
+          action={customerAction}
+          isPending={isCustomerPending}
+          message={customerState.message}
+          ok={customerState.ok}
+          onClose={() => setIsCreatingCustomer(false)}
+        />
+      ) : null}
       {isCreatingInvoice ? (
         <InvoiceDialog
           action={invoiceAction}
@@ -223,6 +247,93 @@ function HeaderActions({ viewState }: { viewState: DashboardViewState }) {
   );
 }
 
+function CustomerDialog({
+  action,
+  isPending,
+  message,
+  ok,
+  onClose,
+}: {
+  action: (payload: FormData) => void;
+  isPending: boolean;
+  message: string;
+  ok: boolean;
+  onClose: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 px-4">
+      <form
+        action={action}
+        className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-md border border-[var(--color-border)] bg-white p-5 shadow-2xl"
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-gold-700)]">
+              Cadastro financeiro
+            </p>
+            <h2 className="mt-1 text-lg font-semibold text-[var(--color-graphite-950)]">
+              Novo Cliente
+            </h2>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md border border-[var(--color-border)] px-3 py-2 text-sm"
+          >
+            Fechar
+          </button>
+        </div>
+        <div className="mt-5 grid gap-4 md:grid-cols-2">
+          <FormField label="Nome do cliente">
+            <input
+              name="customerName"
+              required
+              placeholder="Aurora & Co. Fine Jewelry"
+              className={fieldClassName}
+            />
+          </FormField>
+          <FormField label="Email financeiro">
+            <input
+              name="customerEmail"
+              type="email"
+              required
+              placeholder="financeiro@cliente.com"
+              className={fieldClassName}
+            />
+          </FormField>
+          <FormField label="Telefone">
+            <input
+              name="customerPhone"
+              placeholder="+55 11 98888-2049"
+              className={fieldClassName}
+            />
+          </FormField>
+          <FormField label="Segmento">
+            <select name="customerSegment" required className={fieldClassName}>
+              <option value="Personalizados de alto ticket">Personalizados de alto ticket</option>
+              <option value="Varejo">Varejo</option>
+              <option value="Atacado">Atacado</option>
+              <option value="Reparos recorrentes">Reparos recorrentes</option>
+            </select>
+          </FormField>
+          <FormField label="Cidade">
+            <input name="billingCity" placeholder="São Paulo" className={fieldClassName} />
+          </FormField>
+          <FormField label="UF">
+            <input name="billingRegion" placeholder="SP" className={fieldClassName} />
+          </FormField>
+        </div>
+        <DialogFooter
+          isPending={isPending}
+          message={message}
+          ok={ok}
+          submitLabel="Salvar cliente"
+        />
+      </form>
+    </div>
+  );
+}
+
 function InvoiceDialog({
   action,
   customers,
@@ -294,11 +405,11 @@ function InvoiceDialog({
           <FormField label="Descrição">
             <input name="description" required placeholder="Anel 18k com diamante certificado" className={fieldClassName} />
           </FormField>
-        </div>
-        {message ? (
-          <p className={`mt-4 text-sm font-medium ${ok ? "text-emerald-700" : "text-red-700"}`}>
-            {message}
-          </p>
+          </div>
+          {message ? (
+            <p className={`mt-4 text-sm font-medium ${ok ? "text-emerald-700" : "text-red-700"}`}>
+              {message}
+            </p>
         ) : null}
         <div className="mt-5 flex justify-end gap-2">
           <button
@@ -311,6 +422,37 @@ function InvoiceDialog({
         </div>
       </form>
     </div>
+  );
+}
+
+function DialogFooter({
+  isPending,
+  message,
+  ok,
+  submitLabel,
+}: {
+  isPending: boolean;
+  message: string;
+  ok: boolean;
+  submitLabel: string;
+}) {
+  return (
+    <>
+      {message ? (
+        <p className={`mt-4 text-sm font-medium ${ok ? "text-emerald-700" : "text-red-700"}`}>
+          {message}
+        </p>
+      ) : null}
+      <div className="mt-5 flex justify-end gap-2">
+        <button
+          type="submit"
+          disabled={isPending}
+          className="min-h-10 rounded-md bg-[var(--color-graphite-900)] px-4 text-sm font-semibold text-white disabled:opacity-60"
+        >
+          {isPending ? "Salvando..." : submitLabel}
+        </button>
+      </div>
+    </>
   );
 }
 

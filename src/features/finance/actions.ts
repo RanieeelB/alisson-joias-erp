@@ -19,6 +19,48 @@ const financePaths = [
   "/declarations",
 ];
 
+export async function createCustomerAction(
+  _previousState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const name = required(formData, "customerName", "Informe o nome do cliente.");
+  const email = required(formData, "customerEmail", "Informe o email do cliente.");
+  const segment = required(formData, "customerSegment", "Selecione o segmento.");
+
+  if (isActionState(name)) return name;
+  if (isActionState(email)) return email;
+  if (isActionState(segment)) return segment;
+
+  const phone = optional(formData, "customerPhone");
+  const billingCity = optional(formData, "billingCity");
+  const billingRegion = optional(formData, "billingRegion");
+  const supabase = await createClient();
+  const { error } = await supabase.from("customers").insert({
+    name,
+    email,
+    phone,
+    segment,
+    billing_city: billingCity,
+    billing_region: billingRegion,
+    billing_country: "BR",
+  });
+
+  if (error) {
+    return fail(`Não foi possível cadastrar o cliente: ${error.message}`);
+  }
+
+  await supabase.from("financial_activities").insert({
+    title: "Cliente cadastrado",
+    detail: `${name} foi adicionado à carteira financeira`,
+    amount_cents: 0,
+    tone: "info",
+  });
+
+  revalidateFinance();
+
+  return { ok: true, message: `Cliente ${name} cadastrado com sucesso.` };
+}
+
 export async function createInvoiceAction(
   _previousState: ActionState,
   formData: FormData,
@@ -175,6 +217,42 @@ export async function recordPaymentAction(
   return { ok: true, message: `Pagamento ${paymentNumber} registrado com sucesso.` };
 }
 
+export async function createVendorAction(
+  _previousState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const name = required(formData, "vendorName", "Informe o nome do fornecedor.");
+  const category = required(formData, "vendorCategory", "Selecione a categoria.");
+
+  if (isActionState(name)) return name;
+  if (isActionState(category)) return category;
+
+  const email = optional(formData, "vendorEmail");
+  const phone = optional(formData, "vendorPhone");
+  const supabase = await createClient();
+  const { error } = await supabase.from("vendors").insert({
+    name,
+    category,
+    email,
+    phone,
+  });
+
+  if (error) {
+    return fail(`Não foi possível cadastrar o fornecedor: ${error.message}`);
+  }
+
+  await supabase.from("financial_activities").insert({
+    title: "Fornecedor cadastrado",
+    detail: `${name} foi adicionado ao Accounts Payable`,
+    amount_cents: 0,
+    tone: "info",
+  });
+
+  revalidateFinance();
+
+  return { ok: true, message: `Fornecedor ${name} cadastrado com sucesso.` };
+}
+
 export async function createPayableAction(
   _previousState: ActionState,
   formData: FormData,
@@ -232,6 +310,12 @@ function required(formData: FormData, key: string, message: string) {
   if (!value) return fail(message);
 
   return value;
+}
+
+function optional(formData: FormData, key: string) {
+  const value = String(formData.get(key) ?? "").trim();
+
+  return value || null;
 }
 
 function moneyToCents(value: string | ActionState) {

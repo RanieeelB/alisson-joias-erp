@@ -66,10 +66,28 @@ test("main finance actions and PDF export routes are wired", () => {
   const actions = readProjectFile("src/features/finance/actions.ts");
 
   for (const actionName of [
+    "createCustomerAction",
     "createInvoiceAction",
     "recordPaymentAction",
+    "createVendorAction",
     "createPayableAction",
   ]) {
     assert.match(actions, new RegExp(`export async function ${actionName}`));
   }
+
+  assert.match(actions, /\.from\("customers"\)\s*\.\s*insert/);
+  assert.match(actions, /\.from\("vendors"\)\s*\.\s*insert/);
+});
+
+test("finance workspaces expose customer and vendor registration actions", () => {
+  const dashboard = readProjectFile("src/features/dashboard/components/financial-dashboard.tsx");
+  const paymentsAccounts = readProjectFile("src/features/payments-accounts/components/payments-accounts-workspace.tsx");
+
+  assert.match(dashboard, /Novo Cliente/);
+  assert.match(dashboard, /name="customerName"/);
+  assert.match(dashboard, /name="customerEmail"/);
+
+  assert.match(paymentsAccounts, /Novo fornecedor/);
+  assert.match(paymentsAccounts, /name="vendorName"/);
+  assert.match(paymentsAccounts, /name="vendorCategory"/);
 });
