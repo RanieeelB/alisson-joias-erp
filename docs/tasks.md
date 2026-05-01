@@ -71,11 +71,11 @@
 
 ## Step 5 - Bonus and Automations
 
-- [ ] Choose bonus features based on remaining time.
-- [ ] Add automatic invoice generation from finalized order.
-- [ ] Add overdue reminders.
-- [ ] Add late fee calculation.
-- [ ] Add Supabase Realtime updates.
-- [ ] Add scheduled statement email concept.
-- [ ] Add PDF/CSV export concept.
-- [ ] Add gold price API concept if useful.
+- [x] Choose bonus features based on remaining time.
+- [x] Add automatic invoice generation from finalized order.
+- [x] Add overdue reminders.
+- [x] Add late fee calculation.
+- [x] Add Supabase Realtime updates.
+- [x] Add scheduled statement email concept.
+- [x] Add PDF/CSV export concept.
+- [x] Add gold price API concept if useful.

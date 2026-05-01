@@ -221,3 +221,30 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - Revisão/adaptação humana: o usuário pediu explicitamente que a substituição fosse feita em todas as seções após a primeira implementação em Reports.
 - O que mudou após revisão: Invoices deixou de ler `searchParams`; Payments/Accounts e Statements/Reports ganharam workspaces compartilhados com wrappers por rota para manter entrada direta e alternância local.
 - Riscos ou follow-up: as tabs locais não preservam seleção na URL; caso a apresentação precise de links diretos para uma aba específica, sincronizar estado e URL de forma intencional.
+
+## 2026-05-01 - início da Etapa 5 Bonus e Automações
+
+- Ferramentas/skills usadas: Codex, `brainstorming`, `imagegen`, `jewelry-erp-finance-domain`, `next-best-practices`.
+- Resumo do prompt ou tarefa: iniciar a branch `feat/automations` sem prefixo `codex/`, escolher os bônus viáveis da Etapa 5 e prototipar a nova tela de automações antes de escrever código de produto.
+- Saída aceita: protótipo visual inicial salvo em `docs/assets/prototypes/automations-prototype.png`, cobrindo workflow de pedido finalizado para Invoice, fila de automações, overdue reminders, late fees, Supabase Realtime, scheduled statements, export queue e Gold price API como integração conceitual.
+- Revisão/adaptação humana: pendente de aprovação do usuário antes de implementar a rota e os componentes da Etapa 5.
+- O que mudou após revisão: ainda não houve implementação; a escolha inicial prioriza uma tela operacional única de automações para demonstrar proatividade sem abrir integrações reais demais para o prazo.
+- Riscos ou follow-up: ajustar o escopo caso o usuário prefira persistência real no Supabase ou uma automação específica acima dos conceitos visuais de e-mail, PDF/CSV e API de ouro.
+
+## 2026-05-01 - revisão do protótipo de Automações
+
+- Ferramentas/skills usadas: Codex, `jewelry-erp-finance-domain`, `imagegen`.
+- Resumo do prompt ou tarefa: corrigir a arquitetura de informação do protótipo da Etapa 5 após o usuário apontar que gerar relatórios, adicionar faturas e cobrança manual pertencem às outras abas.
+- Saída aceita: protótipo revisado salvo em `docs/assets/prototypes/automations-prototype-v2.png`, com foco em regras, filas, jobs, integrações e monitoramento.
+- Revisão/adaptação humana: o usuário identificou que a tela de Automações não deve duplicar responsabilidades de Faturas, Relatórios, Payments ou Accounts Receivable.
+- O que mudou após revisão: a tela passou a explicitar que ações manuais ficam nas abas correspondentes; Automações apenas orquestra regras como criar draft de Invoice, agendar reminder, simular late fee, preparar statements em lote e enfileirar PDF/CSV.
+- Riscos ou follow-up: implementar a versão revisada como cockpit de automações, mantendo botões manuais nas telas de origem e exibindo status `mock`, `queued`, `sync pending`, `failed` e `completed`.
+
+## 2026-05-01 - implementação da Etapa 5 Automações
+
+- Ferramentas/skills usadas: Codex, `test-driven-development`, `verification-before-completion`, `jewelry-erp-finance-domain`, `next-best-practices`, `vercel-react-best-practices`, `building-components`, `supabase`.
+- Resumo do prompt ou tarefa: implementar a tela revisada de Automações após aprovação do protótipo v2, mantendo as ações manuais nas abas de origem.
+- Saída aceita: rota protegida `/automations`, navegação lateral atualizada, cockpit de regras, fila de jobs, monitor de integrações, eventos recentes, política de segurança, assinatura Supabase Realtime via broadcast channel e cálculo testável de late fee.
+- Revisão/adaptação humana: o usuário aprovou seguir com a implementação depois da correção de arquitetura de informação.
+- O que mudou após revisão: Automações ficou responsável por orquestrar regras e monitorar jobs; Faturas, Payments, Accounts Receivable, Statements e Reports continuam como donos das ações manuais. O Realtime foi implementado como status client-side com cleanup do canal, e os conceitos de QuickBooks, e-mail, Storage, PDF/CSV e Gold price API foram mantidos como boundaries.
+- Riscos ou follow-up: a maioria das ações continua em modo `mock` para apresentação; para produção seria necessário persistir jobs no Supabase, criar triggers/Edge Functions, configurar Realtime replication quando houver tabela real de eventos e integrar provedores externos com secrets server-side.
