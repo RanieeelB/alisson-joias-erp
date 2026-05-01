@@ -203,3 +203,12 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - Revisão/adaptação humana: o usuário apontou que os quatro tipos ainda não funcionavam.
 - O que mudou após revisão: foram adicionados testes para os links por tipo e a renderização ativa de reports; cada opção agora troca o painel principal.
 - Riscos ou follow-up: os reports continuam baseados em dados mockados; export real ainda é boundary visual.
+
+## 2026-05-01 - feat/internal-tabs
+
+- Ferramentas/skills usadas: Codex, `next-best-practices`, `vercel-react-best-practices`, `building-components`, `test-driven-development`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: analisar a navegação existente e substituir a troca de tipo em Reports por tabs internas sem mudança de rota.
+- Saída aceita: seletor Revenue Analysis, Cash Flow, Profit & Loss e Tax Summary passou de links com query string para tabs controladas por estado local.
+- Revisão/adaptação humana: o usuário pediu branch sem prefixo `codex/`, commits curtos e semânticos, e reforçou que queria a implementação completa após a branch inicial.
+- O que mudou após revisão: a rota `/reports` deixou de ler `searchParams`; `ReportsPage` virou componente client apenas para manter a aba ativa com `useState`, preservando o layout e a responsividade existentes.
+- Riscos ou follow-up: como a troca agora é local, o tipo de relatório ativo não fica mais compartilhável por URL; se deep link virar requisito, será necessário reintroduzir sincronização com URL de forma controlada.
