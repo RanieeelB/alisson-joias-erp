@@ -92,3 +92,74 @@ test("summarizes cash flow, profit and loss, and tax reports", () => {
   assert.equal(taxSummary.collectedCents, 16540500);
   assert.equal(taxSummary.payableCents, 3124500);
 });
+
+test("statements and reports routes use protected finance workspaces", () => {
+  const routeFiles = [
+    "src/app/statements/page.tsx",
+    "src/app/reports/page.tsx",
+  ];
+
+  for (const path of routeFiles) {
+    const page = readProjectFile(path);
+
+    assert.match(page, /createClient/);
+    assert.match(page, /auth\.getUser/);
+    assert.match(page, /isInternalFinanceUser/);
+    assert.match(page, /redirect\("\/login/);
+  }
+
+  const statementsView = readProjectFile(
+    "src/features/statements-reports/components/statements-page.tsx",
+  );
+  const reportsView = readProjectFile(
+    "src/features/statements-reports/components/reports-page.tsx",
+  );
+  const shell = readProjectFile(
+    "src/features/finance-shell/components/finance-shell.tsx",
+  );
+
+  for (const text of [
+    "Statements",
+    "Período",
+    "Email All Statements",
+    "Bulk Download",
+    "View",
+    "Print",
+    "Email",
+    "Balance",
+    "Faturas",
+  ]) {
+    assert.match(
+      statementsView,
+      new RegExp(text),
+      `expected statements page to include ${text}`,
+    );
+  }
+
+  for (const text of [
+    "Reports",
+    "Export Report",
+    "Revenue Analysis",
+    "Cash Flow",
+    "Profit & Loss",
+    "Tax Summary",
+    "Inflows",
+    "Outflows",
+    "COGS",
+    "Operating Expenses",
+    "Receita",
+    "Despesas",
+    "Lucro",
+    "Margem",
+  ]) {
+    assert.match(
+      reportsView,
+      new RegExp(text),
+      `expected reports page to include ${text}`,
+    );
+  }
+
+  for (const href of ["/statements", "/reports"]) {
+    assert.match(shell, new RegExp(href), `expected shell navigation to include ${href}`);
+  }
+});

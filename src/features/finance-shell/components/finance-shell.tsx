@@ -11,8 +11,8 @@ const navItems: FinanceNavItem[] = [
   { label: "Pagamentos", href: "/payments" },
   { label: "Contas a Receber", href: "/accounts/receivable" },
   { label: "Contas a Pagar", href: "/accounts/payable" },
-  { label: "Extratos", href: "#" },
-  { label: "Relatórios", href: "#" },
+  { label: "Extratos", href: "/statements" },
+  { label: "Relatórios", href: "/reports" },
 ];
 
 export function FinanceShell({
