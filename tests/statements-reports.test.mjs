@@ -114,6 +114,9 @@ test("statements and reports routes use protected finance workspaces", () => {
   const reportsView = readProjectFile(
     "src/features/statements-reports/components/reports-page.tsx",
   );
+  const workspaceView = readProjectFile(
+    "src/features/statements-reports/components/statements-reports-workspace.tsx",
+  );
   const reportsRoute = readProjectFile("src/app/reports/page.tsx");
   const shell = readProjectFile(
     "src/features/finance-shell/components/finance-shell.tsx",
@@ -131,9 +134,9 @@ test("statements and reports routes use protected finance workspaces", () => {
     "Faturas",
   ]) {
     assert.match(
-      statementsView,
+      workspaceView,
       new RegExp(text),
-      `expected statements page to include ${text}`,
+      `expected statements tab to include ${text}`,
     );
   }
 
@@ -154,15 +157,24 @@ test("statements and reports routes use protected finance workspaces", () => {
     "Margem",
   ]) {
     assert.match(
-      reportsView,
+      workspaceView,
       new RegExp(text),
-      `expected reports page to include ${text}`,
+      `expected reports tab to include ${text}`,
     );
   }
 
-  assert.match(reportsRoute, /searchParams/);
-  assert.match(reportsRoute, /getActiveReportType/);
-  assert.match(reportsRoute, /activeReportType/);
+  assert.match(statementsView, /StatementsReportsWorkspace/);
+  assert.match(reportsView, /StatementsReportsWorkspace/);
+  assert.match(workspaceView, /"use client"/);
+  assert.match(workspaceView, /useState<StatementsReportsTab>\(initialTab\)/);
+  assert.match(workspaceView, /role="tablist"/);
+  assert.match(workspaceView, /role="tab"/);
+  assert.match(workspaceView, /aria-selected={isActive}/);
+  assert.match(workspaceView, /onClick={\(\) => setActiveTab\(tab\)}/);
+
+  assert.doesNotMatch(reportsRoute, /searchParams/);
+  assert.doesNotMatch(reportsRoute, /getActiveReportType/);
+  assert.doesNotMatch(reportsRoute, /activeReportType/);
 
   for (const href of [
     "/reports?tipo=revenue_analysis",
@@ -170,15 +182,23 @@ test("statements and reports routes use protected finance workspaces", () => {
     "/reports?tipo=profit_loss",
     "/reports?tipo=tax_summary",
   ]) {
-    assert.match(
-      reportsView,
+    assert.doesNotMatch(
+      workspaceView,
       new RegExp(href.replace("?", "\\?")),
-      `expected report selector to include ${href}`,
+      `expected report selector to avoid route-changing href ${href}`,
     );
   }
 
-  assert.match(reportsView, /activeReportType === type/);
-  assert.match(reportsView, /renderActiveReport/);
+  assert.match(workspaceView, /useState<ReportType>\("revenue_analysis"\)/);
+  assert.match(workspaceView, /isActive={activeReportType === type}/);
+  assert.match(workspaceView, /aria-selected={isActive}/);
+  assert.match(workspaceView, /onClick={\(\) => setActiveReportType\(type\)}/);
+  assert.match(workspaceView, /renderActiveReport/);
+
+  for (const view of [workspaceView, statementsView, reportsView]) {
+    assert.doesNotMatch(view, /<ActiveTab href=/);
+    assert.doesNotMatch(view, /<InactiveTab href=/);
+  }
 
   for (const href of ["/statements", "/reports"]) {
     assert.match(shell, new RegExp(href), `expected shell navigation to include ${href}`);
