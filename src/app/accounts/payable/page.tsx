@@ -1,4 +1,5 @@
 import { AccountsPayablePage } from "@/features/payments-accounts/components/accounts-payable-page";
+import { loadFinanceWorkspace } from "@/features/finance/data";
 import { isInternalFinanceUser } from "@/lib/supabase/authz";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
@@ -20,5 +21,7 @@ export default async function AccountsPayableRoute() {
     redirect("/login?erro=acesso");
   }
 
-  return <AccountsPayablePage userEmail={user.email ?? "usuario interno"} />;
+  const data = await loadFinanceWorkspace(supabase);
+
+  return <AccountsPayablePage data={data} userEmail={user.email ?? "usuario interno"} />;
 }

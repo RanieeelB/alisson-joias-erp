@@ -1,4 +1,4 @@
-import { AccountsReceivablePage } from "@/features/payments-accounts/components/accounts-receivable-page";
+import { DeclarationsPage } from "@/features/declarations/components/declarations-page";
 import { loadFinanceWorkspace } from "@/features/finance/data";
 import { isInternalFinanceUser } from "@/lib/supabase/authz";
 import { createClient } from "@/lib/supabase/server";
@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
-export default async function AccountsReceivableRoute() {
+export default async function DeclarationsRoute() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -23,5 +23,5 @@ export default async function AccountsReceivableRoute() {
 
   const data = await loadFinanceWorkspace(supabase);
 
-  return <AccountsReceivablePage data={data} userEmail={user.email ?? "usuario interno"} />;
+  return <DeclarationsPage data={data} userEmail={user.email ?? "usuario interno"} />;
 }

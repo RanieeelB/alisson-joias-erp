@@ -8,7 +8,7 @@ export type InvoiceOrderType =
   | "Atacado"
   | "Varejo";
 
-export type QuickbooksSyncStatus = "synced" | "pending" | "failed";
+export type QuickbooksSyncStatus = "synced" | "pending" | "failed" | "not_synced";
 
 export type InvoiceLineItem = {
   id: string;
@@ -23,7 +23,9 @@ export type InvoicePaymentMethod =
   | "ACH"
   | "Wire"
   | "Credit Card"
-  | "Pix";
+  | "Pix"
+  | "Cash"
+  | "Check";
 
 export type InvoicePayment = {
   id: string;

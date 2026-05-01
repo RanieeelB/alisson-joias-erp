@@ -1,6 +1,6 @@
 import type { AgingBucket, InvoiceStatus } from "@/lib/finance";
 
-export type PaymentMethod = "ACH" | "Wire" | "Credit Card" | "Pix" | "Check";
+export type PaymentMethod = "ACH" | "Wire" | "Credit Card" | "Pix" | "Check" | "Cash";
 
 export type PaymentStatus = "settled" | "pending_deposit" | "credit";
 

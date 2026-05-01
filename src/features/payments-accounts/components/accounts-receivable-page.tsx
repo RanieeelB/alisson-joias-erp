@@ -1,5 +1,12 @@
+import type { FinanceWorkspaceData } from "@/features/finance/data";
 import { PaymentsAccountsWorkspace } from "@/features/payments-accounts/components/payments-accounts-workspace";
 
-export function AccountsReceivablePage({ userEmail }: { userEmail?: string }) {
-  return <PaymentsAccountsWorkspace initialTab="receivable" userEmail={userEmail} />;
+export function AccountsReceivablePage({
+  data,
+  userEmail,
+}: {
+  data: FinanceWorkspaceData;
+  userEmail?: string;
+}) {
+  return <PaymentsAccountsWorkspace data={data} initialTab="receivable" userEmail={userEmail} />;
 }

@@ -1,4 +1,5 @@
 import { InvoicesPage } from "@/features/invoices/components/invoices-page";
+import { loadFinanceWorkspace } from "@/features/finance/data";
 import { isInternalFinanceUser } from "@/lib/supabase/authz";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
@@ -20,9 +21,7 @@ export default async function InvoicesRoute() {
     redirect("/login?erro=acesso");
   }
 
-  return (
-    <InvoicesPage
-      userEmail={user.email ?? "usuario interno"}
-    />
-  );
+  const data = await loadFinanceWorkspace(supabase);
+
+  return <InvoicesPage data={data} userEmail={user.email ?? "usuario interno"} />;
 }
