@@ -167,3 +167,12 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - Revisão/adaptação humana: o usuário decidiu abandonar o fluxo local do Docker e seguir com Supabase hospedado.
 - O que mudou após revisão: a documentação agora orienta setup por `.env`, explica o papel de `admin`/`staff` no Auth SSR e reforça que service role keys não entram no frontend.
 - Riscos ou follow-up: aplicar a migration de referência no projeto remoto, criar os usuários internos corretos no painel do Supabase e revisar depois como demonstrar Storage real na entrega final.
+
+## 2026-05-01 - início da Etapa 4 Statements and Reports
+
+- Ferramentas/skills usadas: Codex, `brainstorming`, `imagegen`, `jewelry-erp-finance-domain`, `next-best-practices`, `vercel-react-best-practices`, `building-components`.
+- Resumo do prompt ou tarefa: iniciar a branch `feat/statements-reports` sem prefixo `codex/` e prototipar visualmente as novas telas de Statements e Reports antes de escrever código de produto.
+- Saída aceita: protótipo visual inicial salvo em `docs/assets/prototypes/statements-reports-prototype.png`, com seletor de período, cards de statements por cliente, ações View/Print/Email, Email All Statements, Bulk Download, seletor de relatórios e visão Revenue Analysis.
+- Revisão/adaptação humana: pendente de aprovação do usuário antes de codificar as rotas e componentes da Etapa 4.
+- O que mudou após revisão: ainda não houve implementação; o protótipo segue a direção visual existente do console financeiro com sidebar escura, superfícies claras, acento dourado contido e dados de joalheria.
+- Riscos ou follow-up: ajustar rótulos, densidade, composição ou prioridades dos relatórios conforme feedback antes de criar `/statements` e `/reports`.
