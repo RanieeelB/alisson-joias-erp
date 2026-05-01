@@ -57,17 +57,17 @@
 
 ## Step 4 - Statements and Reports
 
-- [ ] Build statement date range selector.
-- [ ] Build customer statement cards.
-- [ ] Build View/Print/Email statement actions.
-- [ ] Build Email All Statements action.
-- [ ] Build Bulk Download action.
-- [ ] Build report type selector.
-- [ ] Build Revenue Analysis view.
-- [ ] Build Cash Flow view.
-- [ ] Build Profit & Loss view.
-- [ ] Build Tax Summary view.
-- [ ] Build Export Report action.
+- [x] Build statement date range selector.
+- [x] Build customer statement cards.
+- [x] Build View/Print/Email statement actions.
+- [x] Build Email All Statements action.
+- [x] Build Bulk Download action.
+- [x] Build report type selector.
+- [x] Build Revenue Analysis view.
+- [x] Build Cash Flow view.
+- [x] Build Profit & Loss view.
+- [x] Build Tax Summary view.
+- [x] Build Export Report action.
 
 ## Step 5 - Bonus and Automations
 

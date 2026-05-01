@@ -185,3 +185,12 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - Revisão/adaptação humana: o usuário tentou configurar `app_metadata` manualmente e depois pediu ajuda para resolver de forma prática.
 - O que mudou após revisão: as rotas protegidas passaram a chamar o helper central em vez de repetir a lógica de role em cada arquivo.
 - Riscos ou follow-up: manter o fallback apenas para ambiente controlado; para produção, preferir `app_metadata.role` preenchido por Admin API ou SQL seguro.
+
+## 2026-05-01 - implementação da Etapa 4 Statements and Reports
+
+- Ferramentas/skills usadas: Codex, `writing-plans`, `executing-plans`, `test-driven-development`, `jewelry-erp-finance-domain`, `next-best-practices`, `vercel-react-best-practices`, `building-components`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: implementar `/statements` e `/reports` após aprovação do protótipo visual.
+- Saída aceita: rotas protegidas `/statements` e `/reports`, dados mockados realistas, helpers testáveis de statements e reports, cards de cliente, ações View/Print/Email, Email All Statements, Bulk Download, seletor de reports, Revenue Analysis, Cash Flow, Profit & Loss e Tax Summary.
+- Revisão/adaptação humana: o usuário aprovou o protótipo visual antes da implementação e pediu continuidade com commits curtos e semânticos.
+- O que mudou após revisão: a navegação lateral passou a apontar para Statements e Reports, e a implementação manteve labels financeiros do teste em English com texto operacional em português.
+- Riscos ou follow-up: ações de envio, impressão, download e export ainda são simulações visuais; persistência Supabase, PDF/CSV real e e-mail real podem entrar em bônus ou refinamento.
