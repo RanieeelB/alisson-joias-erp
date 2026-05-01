@@ -115,6 +115,9 @@ test("payments and accounts routes use protected finance workspaces", () => {
   const paymentsView = readProjectFile(
     "src/features/payments-accounts/components/payments-page.tsx",
   );
+  const workspaceView = readProjectFile(
+    "src/features/payments-accounts/components/payments-accounts-workspace.tsx",
+  );
   const receivableView = readProjectFile(
     "src/features/payments-accounts/components/accounts-receivable-page.tsx",
   );
@@ -137,7 +140,7 @@ test("payments and accounts routes use protected finance workspaces", () => {
     "Method",
     "Reference",
   ]) {
-    assert.match(paymentsView, new RegExp(text), `expected payments page to include ${text}`);
+    assert.match(workspaceView, new RegExp(text), `expected payments workspace to include ${text}`);
   }
 
   for (const text of [
@@ -147,7 +150,7 @@ test("payments and accounts routes use protected finance workspaces", () => {
     "Faturas abertas",
     "Enviar reminder",
   ]) {
-    assert.match(receivableView, new RegExp(text), `expected AR page to include ${text}`);
+    assert.match(workspaceView, new RegExp(text), `expected AR tab to include ${text}`);
   }
 
   for (const text of [
@@ -163,7 +166,23 @@ test("payments and accounts routes use protected finance workspaces", () => {
     "Certification",
     "Services",
   ]) {
-    assert.match(payableView, new RegExp(text), `expected AP page to include ${text}`);
+    assert.match(workspaceView, new RegExp(text), `expected AP tab to include ${text}`);
+  }
+
+  assert.match(workspaceView, /"use client"/);
+  assert.match(workspaceView, /useState<PaymentsAccountsTab>\(initialTab\)/);
+  assert.match(workspaceView, /role="tablist"/);
+  assert.match(workspaceView, /role="tab"/);
+  assert.match(workspaceView, /aria-selected={isActive}/);
+  assert.match(workspaceView, /onClick={\(\) => setActiveTab\(tab\)}/);
+
+  assert.match(paymentsView, /PaymentsAccountsWorkspace/);
+  assert.match(receivableView, /PaymentsAccountsWorkspace/);
+  assert.match(payableView, /PaymentsAccountsWorkspace/);
+
+  for (const view of [workspaceView, paymentsView, receivableView, payableView]) {
+    assert.doesNotMatch(view, /<ActiveTab href=/);
+    assert.doesNotMatch(view, /<InactiveTab href=/);
   }
 
   for (const href of [
