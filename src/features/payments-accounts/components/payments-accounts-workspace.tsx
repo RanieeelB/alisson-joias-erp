@@ -36,8 +36,8 @@ const paymentsAccountsTabs: PaymentsAccountsTab[] = [
 
 const tabLabels: Record<PaymentsAccountsTab, string> = {
   payments: "Pagamentos",
-  receivable: "Accounts Receivable",
-  payable: "Accounts Payable",
+  receivable: "Contas a receber",
+  payable: "Contas a pagar",
 };
 
 const tabPaths: Record<PaymentsAccountsTab, string> = {
@@ -49,11 +49,11 @@ const tabPaths: Record<PaymentsAccountsTab, string> = {
 const tabCopy: Record<PaymentsAccountsTab, { footer: string; title: string }> = {
   payments: {
     footer: "Pagamentos aguardando conciliação",
-    title: "Pagamentos recebidos, depósitos pendentes e créditos por overpayment",
+    title: "Pagamentos recebidos, depósitos pendentes e créditos ativos",
   },
   receivable: {
-    footer: "Aging de Accounts Receivable",
-    title: "Aging Analysis, saldos por cliente e reminders para faturas abertas",
+    footer: "Vencimentos de contas a receber",
+    title: "Análise de vencimentos, saldos por cliente e lembretes para faturas abertas",
   },
   payable: {
     footer: "Obrigações de fornecedores",
@@ -87,6 +87,12 @@ const receivableStatusTone = {
   pending: "bg-amber-50 text-amber-700 ring-amber-200",
   partial: "bg-blue-50 text-blue-700 ring-blue-200",
   overdue: "bg-red-50 text-red-700 ring-red-200",
+};
+
+const receivableStatusLabels = {
+  pending: "Pendente",
+  partial: "Parcial",
+  overdue: "Em atraso",
 };
 
 const payableStatusTone = {
@@ -125,7 +131,7 @@ export function PaymentsAccountsWorkspace({
     <FinanceShell
       currentPath={tabPaths[activeTab]}
       eyebrow="Financeiro Alisson Joias"
-      title="Payments and Accounts"
+      title="Pagamentos e Contas"
       userEmail={userEmail}
       secondaryAction={
         <HeaderButton onClick={() => setActiveTab(nextTab(activeTab))}>
@@ -188,7 +194,7 @@ export function PaymentsAccountsWorkspace({
                 Priorização financeira para cobrança, conciliação e fornecedores críticos de joalheria.
               </p>
             </div>
-            <div role="tablist" aria-label="Payments and accounts" className="flex flex-wrap gap-2">
+            <div role="tablist" aria-label="Pagamentos e contas" className="flex flex-wrap gap-2">
               {paymentsAccountsTabs.map((tab) => (
                 <WorkspaceTab
                   key={tab}
@@ -244,7 +250,7 @@ function PaymentsTab({
         <MetricCard
           label="Créditos"
           value={formatMoney(summary.creditCents)}
-          detail="Overpayments/Credits ativos"
+          detail="Créditos ativos de clientes"
           tone="credit"
         />
       </section>
@@ -259,7 +265,7 @@ function PaymentsTab({
               Lista de pagamentos
             </h2>
           </div>
-          <FilterButtons labels={["Todos métodos", "Pix", "ACH", "Wire", "Credit Card"]} />
+          <FilterChips labels={["Todos os métodos", "Pix", "ACH", "Transferência", "Cartão de crédito"]} />
         </div>
 
         <div className="overflow-x-auto">
@@ -276,13 +282,13 @@ function PaymentsTab({
             </colgroup>
             <thead>
               <tr className="text-xs uppercase tracking-[0.12em] text-[var(--color-muted)]">
-                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Payment #</th>
-                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Invoice</th>
-                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Customer</th>
+                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Pagamento #</th>
+                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Fatura</th>
+                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Cliente</th>
                 <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Date</th>
                 <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Amount</th>
-                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Method</th>
-                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Reference</th>
+                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Forma</th>
+                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Referência</th>
                 <th className="border-b border-[var(--color-border)] pb-3 font-semibold">Status</th>
               </tr>
             </thead>
@@ -316,10 +322,10 @@ function ReceivableTab({
       <section className="grid gap-5 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
         <section className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-widget)]">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-gold-700)]">
-            Accounts Receivable
+              Contas a receber
           </p>
           <h2 className="mt-1 text-base font-semibold tracking-normal text-[var(--color-graphite-950)]">
-            Aging Analysis
+              Análise de vencimentos
           </h2>
           <div className="mt-5 grid gap-4">
             {agingOrder.map((bucket) => {
@@ -384,22 +390,22 @@ function ReceivableTab({
               Faturas abertas
             </p>
             <h2 className="mt-1 text-base font-semibold tracking-normal text-[var(--color-graphite-950)]">
-              Lista de reminder
+              Lembretes de cobrança
             </h2>
           </div>
-          <button className="min-h-10 rounded-md bg-[var(--color-gold-500)] px-3 text-sm font-semibold text-[var(--color-graphite-950)] shadow-sm transition hover:bg-[var(--color-gold-400)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]">
-            Enviar reminder
-          </button>
+          <a href="mailto:?subject=Lembretes de faturas em aberto" className="min-h-10 rounded-md bg-[var(--color-gold-500)] px-3 py-2 text-sm font-semibold text-[var(--color-graphite-950)] shadow-sm transition hover:bg-[var(--color-gold-400)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]">
+            Enviar lembretes
+          </a>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full min-w-[56rem] table-fixed border-separate border-spacing-0 text-left text-sm">
             <thead>
               <tr className="text-xs uppercase tracking-[0.12em] text-[var(--color-muted)]">
-                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Invoice</th>
-                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Customer</th>
-                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Due</th>
-                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Balance</th>
+                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Fatura</th>
+                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Cliente</th>
+                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Vencimento</th>
+                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Saldo</th>
                 <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Status</th>
                 <th className="border-b border-[var(--color-border)] pb-3 font-semibold">Action</th>
               </tr>
@@ -427,19 +433,19 @@ function PayableTab({
     <>
       <section className="grid gap-3 md:grid-cols-3">
         <PayableMetricCard
-          label="Total Payable"
+          label="Total a pagar"
           value={formatMoney(summary.totalPayableCents)}
           detail="Saldo de obrigações abertas"
           tone="neutral"
         />
         <PayableMetricCard
-          label="Paid This Month"
+          label="Pago no mês"
           value={formatMoney(summary.paidThisMonthCents)}
           detail="Pagamentos para fornecedores"
           tone="success"
         />
         <PayableMetricCard
-          label="Overdue"
+          label="Em atraso"
           value={formatMoney(summary.overdueCents)}
           detail="Requer follow-up financeiro"
           tone="danger"
@@ -450,13 +456,13 @@ function PayableTab({
         <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-gold-700)]">
-              Accounts Payable
+              Contas a pagar
             </p>
             <h2 className="mt-1 text-base font-semibold tracking-normal text-[var(--color-graphite-950)]">
               Obrigações por fornecedor
             </h2>
           </div>
-          <FilterButtons labels={["Raw Materials", "Components", "Certification", "Services"]} />
+          <FilterChips labels={["Matéria-prima", "Componentes", "Certificação", "Serviços"]} />
         </div>
 
         <div className="overflow-x-auto">
@@ -475,13 +481,13 @@ function PayableTab({
             <thead>
               <tr className="text-xs uppercase tracking-[0.12em] text-[var(--color-muted)]">
                 <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">AP #</th>
-                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Vendor</th>
-                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Category</th>
+                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Fornecedor</th>
+                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Categoria</th>
                 <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Date</th>
-                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Due</th>
+                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Vencimento</th>
                 <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Total</th>
-                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Paid</th>
-                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Balance</th>
+                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Pago</th>
+                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Saldo</th>
                 <th className="border-b border-[var(--color-border)] pb-3 font-semibold">Status</th>
               </tr>
             </thead>
@@ -549,13 +555,13 @@ function ReceivableRow({ invoice }: { invoice: ReceivableInvoice }) {
       </td>
       <td className="border-b border-[var(--color-border)] py-4 pr-4 align-top">
         <span className={`inline-flex rounded px-2 py-1 text-xs font-semibold ring-1 ${receivableStatusTone[invoice.status]}`}>
-          {invoice.status}
+          {receivableStatusLabels[invoice.status]}
         </span>
       </td>
       <td className="border-b border-[var(--color-border)] py-4 align-top">
-        <button className="min-h-9 rounded-md border border-[var(--color-border)] bg-white px-2.5 text-xs font-medium text-[var(--color-graphite-800)] transition hover:border-[var(--color-gold-400)] hover:text-[var(--color-graphite-950)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]">
-          Enviar reminder
-        </button>
+        <a href={`mailto:?subject=Lembrete ${invoice.invoiceNumber}`} className="inline-flex min-h-9 items-center rounded-md border border-[var(--color-border)] bg-white px-2.5 text-xs font-medium text-[var(--color-graphite-800)] transition hover:border-[var(--color-gold-400)] hover:text-[var(--color-graphite-950)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]">
+          Enviar lembrete
+        </a>
       </td>
     </tr>
   );
@@ -719,7 +725,7 @@ function PrimaryAction({
         onClick={() => setActiveTab("payable")}
         className="hidden min-h-10 items-center rounded-md bg-[var(--color-graphite-900)] px-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--color-graphite-800)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)] sm:inline-flex"
       >
-        Accounts Payable
+        Contas a pagar
       </button>
     );
   }
@@ -874,16 +880,16 @@ function PayableDialog({
   );
 }
 
-function FilterButtons({ labels }: { labels: string[] }) {
+function FilterChips({ labels }: { labels: string[] }) {
   return (
     <div className="flex flex-wrap gap-2">
       {labels.map((label) => (
-        <button
+        <span
           key={label}
-          className="min-h-9 rounded-md border border-[var(--color-border)] bg-white px-3 text-xs font-medium text-[var(--color-graphite-800)] transition hover:border-[var(--color-gold-400)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]"
+          className="inline-flex min-h-9 items-center rounded-md border border-[var(--color-border)] bg-white px-3 text-xs font-medium text-[var(--color-graphite-800)]"
         >
           {label}
-        </button>
+        </span>
       ))}
     </div>
   );
@@ -977,10 +983,10 @@ function getFooterValue(
   }
 
   if (activeTab === "receivable") {
-    return `${formatMoney(totalAgingCents)} em invoices abertas`;
+    return `${formatMoney(totalAgingCents)} em faturas abertas`;
   }
 
-  return `${formatMoney(payableSummary.totalPayableCents)} em Accounts Payable`;
+  return `${formatMoney(payableSummary.totalPayableCents)} em contas a pagar`;
 }
 
 function formatShortDate(value: string) {

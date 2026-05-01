@@ -115,7 +115,7 @@ export function InvoicesPage({ data, userEmail }: InvoicesPageProps) {
                 Fila de faturamento com foco em cobrança e sincronização
               </p>
               <p className="mt-1 text-sm text-[var(--color-muted)]">
-                Busca por cliente ou invoice, filtros por status e leitura rápida do saldo em aberto.
+                Busca por cliente ou fatura, filtros por status e leitura rápida do saldo em aberto.
               </p>
             </div>
             <div role="tablist" aria-label="Filtros de status de faturas" className="flex flex-wrap gap-2">
@@ -142,7 +142,7 @@ export function InvoicesPage({ data, userEmail }: InvoicesPageProps) {
                 value={query}
                 name="busca"
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="Invoice # ou customer"
+                placeholder="Fatura # ou cliente"
                 type="search"
               />
             </label>
@@ -165,7 +165,7 @@ export function InvoicesPage({ data, userEmail }: InvoicesPageProps) {
           <SummaryCard
             label="Total faturado"
             value={formatMoney(summary.totalInvoicedCents)}
-            detail={`${visibleInvoices.length} invoices visíveis`}
+            detail={`${visibleInvoices.length} faturas visíveis`}
           />
           <SummaryCard
             label="Coletado"
@@ -173,12 +173,12 @@ export function InvoicesPage({ data, userEmail }: InvoicesPageProps) {
             detail="Pagamentos já conciliados"
           />
           <SummaryCard
-            label="Outstanding"
+            label="Em aberto"
             value={formatMoney(summary.outstandingCents)}
             detail="Saldo ainda em aberto"
           />
           <SummaryCard
-            label="Overdue"
+            label="Em atraso"
             value={formatMoney(summary.overdueCents)}
             detail="Cobranças que exigem follow-up"
             tone="danger"
@@ -207,7 +207,7 @@ export function InvoicesPage({ data, userEmail }: InvoicesPageProps) {
                   Nenhuma fatura encontrada
                 </p>
                 <p className="mt-1 text-sm text-[var(--color-muted)]">
-                  Ajuste os filtros ou a busca para revisar outro conjunto de invoices.
+                  Ajuste os filtros ou a busca para revisar outro conjunto de faturas.
                 </p>
               </div>
             ) : (
@@ -227,8 +227,8 @@ export function InvoicesPage({ data, userEmail }: InvoicesPageProps) {
                   </colgroup>
                   <thead>
                     <tr className="text-xs uppercase tracking-[0.12em] text-[var(--color-muted)]">
-                      <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Invoice #</th>
-                      <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Customer</th>
+                      <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Fatura #</th>
+                      <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Cliente</th>
                       <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Type</th>
                       <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Date</th>
                       <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Due Date</th>
@@ -258,9 +258,9 @@ export function InvoicesPage({ data, userEmail }: InvoicesPageProps) {
                 Sync indicator
               </h2>
               <div className="mt-4 grid gap-3">
-                <MiniMetric label="Synced" value={countQuickbooks("synced", visibleInvoices)} tone="success" />
-                <MiniMetric label="Pending" value={countQuickbooks("pending", visibleInvoices)} tone="warning" />
-                <MiniMetric label="Failed" value={countQuickbooks("failed", visibleInvoices)} tone="danger" />
+                <MiniMetric label="Sincronizadas" value={countQuickbooks("synced", visibleInvoices)} tone="success" />
+                <MiniMetric label="Pendentes" value={countQuickbooks("pending", visibleInvoices)} tone="warning" />
+                <MiniMetric label="Falhas" value={countQuickbooks("failed", visibleInvoices)} tone="danger" />
               </div>
             </section>
 

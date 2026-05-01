@@ -149,7 +149,7 @@ export function StatementsReportsWorkspace({
                 </div>
               )}
             </div>
-            <div role="tablist" aria-label="Statements and reports" className="flex flex-wrap gap-2">
+            <div role="tablist" aria-label="Extratos e relatórios" className="flex flex-wrap gap-2">
               {workspaceTabs.map((tab) => (
                 <WorkspaceTab
                   key={tab}
@@ -191,9 +191,9 @@ function StatementsTab({
   return (
     <>
       <section className="grid gap-3 md:grid-cols-4">
-        <MetricCard label="Clientes" value={String(summary.totalCustomers)} detail="Statements gerados" />
+        <MetricCard label="Clientes" value={String(summary.totalCustomers)} detail="Extratos gerados" />
         <MetricCard label="Faturas" value={String(summary.totalInvoices)} detail="No período selecionado" />
-        <MetricCard label="Balance" value={formatMoney(summary.netBalanceCents)} detail="Saldo líquido" />
+        <MetricCard label="Saldo" value={formatMoney(summary.netBalanceCents)} detail="Saldo líquido" />
         <MetricCard label="Créditos" value={formatMoney(summary.creditCents)} detail="Overpayments ativos" />
       </section>
 
@@ -206,15 +206,15 @@ function StatementsTab({
 
         <aside className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-widget)]">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-gold-700)]">
-            Reports preview
+            Prévia de relatórios
           </p>
           <h2 className="mt-1 text-base font-semibold tracking-normal text-[var(--color-graphite-950)]">
-            Revenue Analysis
+            Análise de Receita
           </h2>
           <div className="mt-4 space-y-3">
             <PreviewMetric label="Outstanding" value={formatMoney(summary.outstandingCents)} />
             <PreviewMetric label="Credits" value={formatMoney(summary.creditCents)} />
-            <PreviewMetric label="Net Balance" value={formatMoney(summary.netBalanceCents)} />
+            <PreviewMetric label="Saldo líquido" value={formatMoney(summary.netBalanceCents)} />
           </div>
         </aside>
       </section>
@@ -243,7 +243,7 @@ function ReportsTab({
     <>
       <section className="grid gap-3 md:grid-cols-4">
         <MetricCard label="Receita" value={formatMoney(revenue.revenueCents)} detail={`+${revenue.revenueTrendPercent}% vs Abr/2026`} />
-        <MetricCard label="Despesas" value={formatMoney(revenue.expensesCents)} detail="COGS + operating expenses" />
+        <MetricCard label="Despesas" value={formatMoney(revenue.expensesCents)} detail="Custos + despesas operacionais" />
         <MetricCard label="Lucro" value={formatMoney(revenue.profitCents)} detail="Profit líquido do mês" />
         <MetricCard label="Margem" value={`${revenue.marginPercent}%`} detail="Margem líquida" />
       </section>
@@ -259,33 +259,33 @@ function ReportsTab({
         })}
 
         <aside className="grid gap-3">
-          <SideReportCard title="Cash Flow" value={formatMoney(cashFlow.netCashFlowCents)} detail="Inflows versus outflows" tone="blue" />
-          <SideReportCard title="Profit & Loss" value={formatMoney(profitLoss.netProfitCents)} detail="Revenue, COGS e expenses" tone="emerald" />
-          <SideReportCard title="Tax Summary" value={formatMoney(taxSummary.payableCents)} detail="Impostos a pagar" tone="red" />
+          <SideReportCard title="Fluxo de Caixa" value={formatMoney(cashFlow.netCashFlowCents)} detail="Entradas versus saídas" tone="blue" />
+          <SideReportCard title="Lucros e Perdas" value={formatMoney(profitLoss.netProfitCents)} detail="Receita, custos e despesas" tone="emerald" />
+          <SideReportCard title="Resumo de Impostos" value={formatMoney(taxSummary.payableCents)} detail="Impostos a pagar" tone="red" />
           <article className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-widget)]">
             <h2 className="text-base font-semibold tracking-normal text-[var(--color-graphite-950)]">
-              Cash Flow
+              Fluxo de Caixa
             </h2>
             <div className="mt-4 space-y-3">
-              <FlowMetric label="Inflows" value={formatMoney(cashFlow.inflowsCents)} tone="positive" />
-              <FlowMetric label="Outflows" value={formatMoney(cashFlow.outflowsCents)} tone="negative" />
-              <FlowMetric label="Net Cash Flow" value={formatMoney(cashFlow.netCashFlowCents)} tone="positive" />
+              <FlowMetric label="Entradas" value={formatMoney(cashFlow.inflowsCents)} tone="positive" />
+              <FlowMetric label="Saídas" value={formatMoney(cashFlow.outflowsCents)} tone="negative" />
+              <FlowMetric label="Fluxo líquido" value={formatMoney(cashFlow.netCashFlowCents)} tone="positive" />
             </div>
           </article>
           <article className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-widget)]">
             <h2 className="text-base font-semibold tracking-normal text-[var(--color-graphite-950)]">
-              Profit & Loss
+              Lucros e Perdas
             </h2>
             <div className="mt-4 space-y-3">
               <FlowMetric label="Revenue" value={formatMoney(profitLoss.revenueCents)} tone="positive" />
-              <FlowMetric label="COGS" value={formatMoney(profitLoss.cogsCents)} tone="neutral" />
-              <FlowMetric label="Operating Expenses" value={formatMoney(profitLoss.operatingExpensesCents)} tone="neutral" />
+              <FlowMetric label="Custos" value={formatMoney(profitLoss.cogsCents)} tone="neutral" />
+              <FlowMetric label="Despesas operacionais" value={formatMoney(profitLoss.operatingExpensesCents)} tone="neutral" />
               <FlowMetric label="Net Profit" value={formatMoney(profitLoss.netProfitCents)} tone="positive" />
             </div>
           </article>
           <article className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-widget)]">
             <h2 className="text-base font-semibold tracking-normal text-[var(--color-graphite-950)]">
-              Tax Summary
+              Resumo de Impostos
             </h2>
             <div className="mt-3 space-y-3">
               {taxCards.map((card) => (
@@ -319,19 +319,19 @@ function renderActiveReport({
       <div className="grid gap-4">
         <article className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-widget)]">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-gold-700)]">
-            Cash Flow
+            Fluxo de Caixa
           </p>
           <h2 className="mt-1 text-base font-semibold tracking-normal text-[var(--color-graphite-950)]">
-            Inflows versus Outflows
+            Entradas versus saídas
           </h2>
           <div className="mt-5 grid gap-3 md:grid-cols-3">
-            <MetricCard label="Inflows" value={formatMoney(cashFlow.inflowsCents)} detail="Recebimentos e entradas" />
-            <MetricCard label="Outflows" value={formatMoney(cashFlow.outflowsCents)} detail="Pagamentos e saídas" />
-            <MetricCard label="Net Cash Flow" value={formatMoney(cashFlow.netCashFlowCents)} detail="Fluxo líquido" />
+            <MetricCard label="Entradas" value={formatMoney(cashFlow.inflowsCents)} detail="Recebimentos e entradas" />
+            <MetricCard label="Saídas" value={formatMoney(cashFlow.outflowsCents)} detail="Pagamentos e saídas" />
+            <MetricCard label="Fluxo líquido" value={formatMoney(cashFlow.netCashFlowCents)} detail="Fluxo líquido" />
           </div>
           <div className="mt-6 grid min-h-64 grid-cols-2 items-end gap-8 border-l border-b border-[var(--color-border)] px-8 pt-4">
-            <CashFlowBar label="Inflows" value={cashFlow.inflowsCents} max={cashFlow.inflowsCents} tone="bg-emerald-600" />
-            <CashFlowBar label="Outflows" value={cashFlow.outflowsCents} max={cashFlow.inflowsCents} tone="bg-red-500" />
+            <CashFlowBar label="Entradas" value={cashFlow.inflowsCents} max={cashFlow.inflowsCents} tone="bg-emerald-600" />
+            <CashFlowBar label="Saídas" value={cashFlow.outflowsCents} max={cashFlow.inflowsCents} tone="bg-red-500" />
           </div>
         </article>
       </div>
@@ -343,15 +343,15 @@ function renderActiveReport({
       <div className="grid gap-4">
         <article className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-widget)]">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-gold-700)]">
-            Profit & Loss
+            Lucros e Perdas
           </p>
           <h2 className="mt-1 text-base font-semibold tracking-normal text-[var(--color-graphite-950)]">
-            Revenue, COGS, Operating Expenses e Net Profit
+            Receita, custos, despesas operacionais e lucro líquido
           </h2>
           <div className="mt-5 grid gap-3 md:grid-cols-2">
             <FlowMetric label="Revenue" value={formatMoney(profitLoss.revenueCents)} tone="positive" />
-            <FlowMetric label="COGS" value={formatMoney(profitLoss.cogsCents)} tone="neutral" />
-            <FlowMetric label="Operating Expenses" value={formatMoney(profitLoss.operatingExpensesCents)} tone="neutral" />
+            <FlowMetric label="Custos" value={formatMoney(profitLoss.cogsCents)} tone="neutral" />
+            <FlowMetric label="Despesas operacionais" value={formatMoney(profitLoss.operatingExpensesCents)} tone="neutral" />
             <FlowMetric label="Net Profit" value={formatMoney(profitLoss.netProfitCents)} tone="positive" />
           </div>
         </article>
@@ -364,7 +364,7 @@ function renderActiveReport({
       <div className="grid gap-4">
         <article className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-widget)]">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-gold-700)]">
-            Tax Summary
+            Resumo de Impostos
           </p>
           <h2 className="mt-1 text-base font-semibold tracking-normal text-[var(--color-graphite-950)]">
             Trimestres, valores coletados e status
@@ -389,7 +389,7 @@ function renderActiveReport({
         <div className="mb-5 flex items-center justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-gold-700)]">
-              Revenue Analysis
+              Análise de Receita
             </p>
             <h2 className="mt-1 text-base font-semibold tracking-normal text-[var(--color-graphite-950)]">
               Receita, despesas e lucro
@@ -460,7 +460,7 @@ function StatementCard({ statement }: { statement: CustomerStatement }) {
           <p className="mt-1 font-mono text-xl font-semibold text-[var(--color-graphite-950)]">
             {statement.invoiceCount}
           </p>
-          <p className="mt-2 text-xs font-medium text-[var(--color-muted)]">Balance</p>
+          <p className="mt-2 text-xs font-medium text-[var(--color-muted)]">Saldo</p>
           <p className={`mt-1 font-mono text-sm font-semibold ${isCredit ? "text-red-700" : "text-emerald-700"}`}>
             {formatMoney(statement.balanceCents)}
           </p>
@@ -712,7 +712,7 @@ function getActionLabel(action: CustomerStatement["actions"][number]) {
   if (action === "view") return "Visualizar";
   if (action === "print") return "Imprimir";
 
-  return "Email";
+  return "E-mail";
 }
 
 function formatShortDate(value: string) {

@@ -88,9 +88,9 @@ export function InvoiceDetailPage({
             </div>
 
             <div className="grid gap-3 sm:grid-cols-3">
-              <DetailStat label="Issue date" value={formatLongDate(invoice.issuedOn)} />
-              <DetailStat label="Due date" value={formatLongDate(invoice.dueOn)} />
-              <DetailStat label="Payment terms" value={invoice.paymentTerms} />
+              <DetailStat label="Emissão" value={formatLongDate(invoice.issuedOn)} />
+              <DetailStat label="Vencimento" value={formatLongDate(invoice.dueOn)} />
+              <DetailStat label="Condições de pagamento" value={invoice.paymentTerms} />
             </div>
           </div>
         </section>
@@ -103,7 +103,7 @@ export function InvoiceDetailPage({
               </p>
               <div className="mt-4 grid gap-4 md:grid-cols-2">
                 <DetailBlock label="Contato" value={invoice.contactName} />
-                <DetailBlock label="Billing email" value={invoice.billingEmail} />
+                <DetailBlock label="E-mail financeiro" value={invoice.billingEmail} />
                 <DetailBlock label="Telefone" value={invoice.billingPhone} />
                 <DetailBlock label="Endereco" value={invoice.billingAddress} />
               </div>
@@ -112,7 +112,7 @@ export function InvoiceDetailPage({
             <section className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-widget)]">
               <div className="mb-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-gold-700)]">
-                  Line items
+                  Itens da fatura
                 </p>
                 <h3 className="mt-1 text-base font-semibold tracking-normal text-[var(--color-graphite-950)]">
                   Itens de joalheria e cálculo financeiro
@@ -125,7 +125,7 @@ export function InvoiceDetailPage({
                       <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Item</th>
                       <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Qty</th>
                       <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Unit</th>
-                      <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Tax</th>
+                      <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Imposto</th>
                       <th className="border-b border-[var(--color-border)] pb-3 font-semibold">Line total</th>
                     </tr>
                   </thead>
@@ -156,10 +156,10 @@ export function InvoiceDetailPage({
               <div className="mt-5 grid justify-end">
                 <div className="min-w-[18rem] space-y-2 rounded-md border border-[var(--color-border)] bg-[var(--color-graphite-50)] p-4">
                   <TotalRow label="Subtotal" value={formatMoney(summary.subtotalCents)} />
-                  <TotalRow label="Tax" value={formatMoney(summary.taxCents)} />
+                  <TotalRow label="Imposto" value={formatMoney(summary.taxCents)} />
                   <TotalRow label="Total" value={formatMoney(summary.totalCents)} strong />
-                  <TotalRow label="Paid" value={formatMoney(summary.paidCents)} />
-                  <TotalRow label="Balance" value={formatMoney(summary.balanceCents)} strong />
+                  <TotalRow label="Pago" value={formatMoney(summary.paidCents)} />
+                  <TotalRow label="Saldo" value={formatMoney(summary.balanceCents)} strong />
                 </div>
               </div>
             </section>
@@ -168,14 +168,13 @@ export function InvoiceDetailPage({
           <aside className="grid content-start gap-5">
             <section className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-widget)]">
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-gold-700)]">
-                Action panel
+                Ações da fatura
               </p>
               <div className="mt-4 grid gap-2">
                 <ActionButton href={`mailto:${invoice.billingEmail}`}>Enviar</ActionButton>
                 <ActionButton href="/payments" primary>Registrar Pagamento</ActionButton>
                 <ActionButton href={`/api/exports/invoices/${invoice.id}`}>Imprimir</ActionButton>
                 <ActionButton href={`/api/exports/invoices/${invoice.id}`}>Baixar PDF</ActionButton>
-                <ActionButton>Edit</ActionButton>
               </div>
             </section>
 
@@ -200,7 +199,7 @@ export function InvoiceDetailPage({
 
             <section className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-widget)]">
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-gold-700)]">
-                Payment history
+                  Histórico de pagamentos
               </p>
               <div className="mt-4 space-y-3">
                 {invoice.payments.map((payment) => (
@@ -306,13 +305,7 @@ function ActionButton({
     );
   }
 
-  return (
-    <button
-      className={className}
-    >
-      {children}
-    </button>
-  );
+  return null;
 }
 
 function formatLongDate(value: string) {
