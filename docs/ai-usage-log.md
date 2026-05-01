@@ -257,3 +257,21 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - Revisão/adaptação humana: o usuário pediu branch sem prefixo `codex/`, commits curtos e semânticos, padronização em português e remoção de botões mortos.
 - O que mudou após revisão: os arrays mockados saíram dos módulos de produção; os fixtures ficaram restritos aos testes, e as telas passaram a receber um workspace financeiro carregado do banco.
 - Riscos ou follow-up: a Supabase CLI não estava disponível no PATH desta sessão, então a migration foi criada manualmente e precisa ser aplicada no projeto hospedado; fluxos manuais com autenticação dependem de `.env` e usuário interno configurados.
+
+## 2026-05-01 - correção dos avisos SVG do Dashboard
+
+- Ferramentas/skills usadas: Codex, `systematic-debugging`, `test-driven-development`, `next-best-practices`, `vercel-react-best-practices`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: investigar e corrigir avisos do navegador em `/dashboard` sobre chaves duplicadas `0` e atributos SVG com `NaN`.
+- Saída aceita: helpers testáveis para escala do gráfico Receita e Lucro e segmentos do donut de categoria, protegendo séries com valores zerados.
+- Revisão/adaptação humana: o usuário trouxe o log completo do navegador e pediu verificação com correção.
+- O que mudou após revisão: o gráfico de linha agora usa escala mínima finita quando todos os valores são `0`, evitando ticks duplicados; o donut exibe estado vazio quando o total das categorias é `0`.
+- Riscos ou follow-up: validar visualmente em sessão autenticada do navegador local após o HMR carregar a correção.
+
+## 2026-05-01 - cadastro de clientes e fornecedores
+
+- Ferramentas/skills usadas: Codex, `brainstorming`, `supabase`, `jewelry-erp-finance-domain`, `building-components`, `test-driven-development`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: corrigir a ausência de opções para cadastrar cliente e vendedor/fornecedor antes de criar faturas ou contas a pagar.
+- Saída aceita: server actions para inserir `customers` e `vendors`, botão `Novo Cliente` no Dashboard e botão `Novo fornecedor` em Accounts Payable.
+- Revisão/adaptação humana: o usuário apontou a lacuna ao navegar pela aplicação persistida.
+- O que mudou após revisão: os formulários passaram a salvar dados básicos financeiros, revalidar as rotas e registrar atividade recente.
+- Riscos ou follow-up: os cadastros são mínimos para o teste; uma tela completa de CRM/vendor master poderia adicionar edição, duplicidade por email/CNPJ e endereço completo.
