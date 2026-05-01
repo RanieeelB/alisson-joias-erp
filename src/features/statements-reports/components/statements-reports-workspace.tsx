@@ -4,6 +4,7 @@ import { signOut } from "@/app/login/actions";
 import type { FinanceWorkspaceData } from "@/features/finance/data";
 import { FinanceShell } from "@/features/finance-shell/components/finance-shell";
 import {
+  buildRevenueChartColumns,
   reportTypeLabels,
   statementPeriod,
   summarizeCashFlow,
@@ -68,6 +69,7 @@ export function StatementsReportsWorkspace({
   const [activeReportType, setActiveReportType] = useState<ReportType>("revenue_analysis");
   const statementsSummary = summarizeStatements(data.customerStatements);
   const revenue = summarizeRevenueAnalysis(data.monthlyReportRows);
+  const revenueColumns = buildRevenueChartColumns(data.monthlyReportRows);
   const cashFlow = summarizeCashFlow(data.cashFlowRows);
   const profitLoss = summarizeProfitLoss(data.profitLossReport);
   const taxSummary = summarizeTaxSummary(data.taxQuarterCards);
@@ -172,6 +174,7 @@ export function StatementsReportsWorkspace({
             monthlyRows={data.monthlyReportRows}
             profitLoss={profitLoss}
             revenue={revenue}
+            revenueColumns={revenueColumns}
             taxCards={data.taxQuarterCards}
             taxSummary={taxSummary}
           />
@@ -228,6 +231,7 @@ function ReportsTab({
   monthlyRows,
   profitLoss,
   revenue,
+  revenueColumns,
   taxCards,
   taxSummary,
 }: {
@@ -236,6 +240,7 @@ function ReportsTab({
   monthlyRows: MonthlyReportRow[];
   profitLoss: ReturnType<typeof summarizeProfitLoss>;
   revenue: ReturnType<typeof summarizeRevenueAnalysis>;
+  revenueColumns: ReturnType<typeof buildRevenueChartColumns>;
   taxCards: TaxQuarterCard[];
   taxSummary: ReturnType<typeof summarizeTaxSummary>;
 }) {
@@ -254,6 +259,7 @@ function ReportsTab({
           cashFlow,
           monthlyRows,
           profitLoss,
+          revenueColumns,
           taxCards,
           taxSummary,
         })}
@@ -304,6 +310,7 @@ function renderActiveReport({
   cashFlow,
   monthlyRows,
   profitLoss,
+  revenueColumns,
   taxCards,
   taxSummary,
 }: {
@@ -311,6 +318,7 @@ function renderActiveReport({
   cashFlow: ReturnType<typeof summarizeCashFlow>;
   monthlyRows: MonthlyReportRow[];
   profitLoss: ReturnType<typeof summarizeProfitLoss>;
+  revenueColumns: ReturnType<typeof buildRevenueChartColumns>;
   taxCards: TaxQuarterCard[];
   taxSummary: ReturnType<typeof summarizeTaxSummary>;
 }) {
@@ -402,8 +410,8 @@ function renderActiveReport({
           </div>
         </div>
         <div className="grid min-h-64 grid-cols-6 items-end gap-3 border-l border-b border-[var(--color-border)] px-3 pt-4">
-          {monthlyRows.map((row) => (
-            <ChartColumn key={row.month} row={row} />
+          {monthlyRows.map((row, index) => (
+            <ChartColumn key={row.month} row={row} scale={revenueColumns[index]} />
           ))}
         </div>
       </article>
@@ -530,17 +538,23 @@ function CashFlowBar({
   );
 }
 
-function ChartColumn({ row }: { row: MonthlyReportRow }) {
-  const revenueHeight = Math.max(18, Math.round((row.revenueCents / 284245000) * 100));
-  const expensesHeight = Math.max(18, Math.round((row.expensesCents / 116523000) * 100));
-  const profitHeight = Math.max(18, Math.round((row.profitCents / 167722000) * 100));
+function ChartColumn({
+  row,
+  scale,
+}: {
+  row: MonthlyReportRow;
+  scale?: ReturnType<typeof buildRevenueChartColumns>[number];
+}) {
+  const revenueHeight = scale?.revenueHeightPercent ?? 0;
+  const expensesHeight = scale?.expensesHeightPercent ?? 0;
+  const profitHeight = scale?.profitHeightPercent ?? 0;
 
   return (
     <div className="flex h-full min-h-56 flex-col justify-end gap-2">
       <div className="flex h-44 items-end justify-center gap-1">
-        <span className="w-3 rounded-t bg-blue-500" style={{ height: `${revenueHeight}%` }} />
-        <span className="w-3 rounded-t bg-red-500" style={{ height: `${expensesHeight}%` }} />
-        <span className="w-3 rounded-t bg-emerald-600" style={{ height: `${profitHeight}%` }} />
+        <span className="w-3 rounded-t bg-blue-500" style={{ height: revenueHeight > 0 ? `${revenueHeight}%` : "0%" }} />
+        <span className="w-3 rounded-t bg-red-500" style={{ height: expensesHeight > 0 ? `${expensesHeight}%` : "0%" }} />
+        <span className="w-3 rounded-t bg-emerald-600" style={{ height: profitHeight > 0 ? `${profitHeight}%` : "0%" }} />
       </div>
       <p className="truncate text-center font-mono text-xs text-[var(--color-muted)]">{row.month}</p>
     </div>
@@ -548,7 +562,10 @@ function ChartColumn({ row }: { row: MonthlyReportRow }) {
 }
 
 function ReportRow({ row }: { row: MonthlyReportRow }) {
-  const margin = Math.round((row.profitCents / row.revenueCents) * 1000) / 10;
+  const margin =
+    row.revenueCents > 0
+      ? Math.round((row.profitCents / row.revenueCents) * 1000) / 10
+      : 0;
 
   return (
     <tr className="transition hover:bg-[var(--color-graphite-50)]">

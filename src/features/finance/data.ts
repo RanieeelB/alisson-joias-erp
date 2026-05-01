@@ -2,8 +2,10 @@ import type {
   CategoryRevenue,
   CustomerBalance,
   DashboardInvoiceRecord,
+  QuickBooksSyncSummary,
   RevenuePoint,
 } from "@/features/dashboard/data";
+import { summarizeQuickBooksSync } from "@/features/dashboard/data";
 import type { InvoiceRecord } from "@/features/invoices/types";
 import type {
   AccountsPayableRecord,
@@ -123,6 +125,7 @@ export type FinanceWorkspaceData = {
   openReceivableInvoices: ReceivableInvoice[];
   paymentRecords: PaymentRecord[];
   profitLossReport: ProfitLossReport;
+  quickBooksSyncSummary: QuickBooksSyncSummary;
   recentActivity: Array<{
     id: string;
     title: string;
@@ -272,6 +275,7 @@ export async function loadFinanceWorkspace(
     openReceivableInvoices,
     paymentRecords,
     profitLossReport: buildProfitLoss(invoiceRecords, accountsPayableRecords),
+    quickBooksSyncSummary: summarizeQuickBooksSync(invoiceRecords),
     recentActivity: ((activityResult.data ?? []) as Array<{
       id: string;
       title: string;

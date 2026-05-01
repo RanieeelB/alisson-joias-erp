@@ -104,6 +104,30 @@ test("summarizes revenue analysis for the active report period", () => {
   assert.equal(summary.revenueTrendPercent, 18.5);
 });
 
+test("keeps revenue analysis finite when the latest month has zero revenue", () => {
+  const { summarizeRevenueAnalysis, buildRevenueChartColumns } = loadTsModule(
+    "src/features/statements-reports/data.ts",
+  );
+
+  const rows = [
+    { month: "Abr", revenueCents: 200000, expensesCents: 80000, profitCents: 120000 },
+    { month: "Mai", revenueCents: 0, expensesCents: 0, profitCents: 0 },
+  ];
+
+  const summary = summarizeRevenueAnalysis(rows);
+  const columns = buildRevenueChartColumns(rows);
+
+  assert.equal(summary.marginPercent, 0);
+  assert.equal(summary.revenueTrendPercent, -100);
+  assert.equal(columns.length, 2);
+  assert.equal(columns[0].revenueHeightPercent, 100);
+  assert.equal(columns[0].expensesHeightPercent, 40);
+  assert.equal(columns[0].profitHeightPercent, 60);
+  assert.equal(columns[1].revenueHeightPercent, 0);
+  assert.equal(columns[1].expensesHeightPercent, 0);
+  assert.equal(columns[1].profitHeightPercent, 0);
+});
+
 test("summarizes cash flow, profit and loss, and tax reports", () => {
   const {
     summarizeCashFlow,
