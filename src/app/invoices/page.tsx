@@ -5,15 +5,7 @@ import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
-type InvoicesRouteProps = {
-  searchParams: Promise<{
-    status?: string;
-    busca?: string;
-  }>;
-};
-
-export default async function InvoicesRoute({ searchParams }: InvoicesRouteProps) {
-  const params = await searchParams;
+export default async function InvoicesRoute() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -30,7 +22,6 @@ export default async function InvoicesRoute({ searchParams }: InvoicesRouteProps
 
   return (
     <InvoicesPage
-      searchParams={params}
       userEmail={user.email ?? "usuario interno"}
     />
   );

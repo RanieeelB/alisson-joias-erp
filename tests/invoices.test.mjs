@@ -100,8 +100,16 @@ test("invoice route wires the protected finance list experience", () => {
   assert.match(page, /auth\.getUser/);
   assert.match(page, /redirect\("\/login/);
   assert.match(page, /InvoicesPage/);
+  assert.doesNotMatch(page, /searchParams/);
   assert.match(view, /invoiceRecords/);
-  assert.match(view, /searchParams/);
+  assert.match(view, /"use client"/);
+  assert.match(view, /useState<InvoiceStatusFilter>\("all"\)/);
+  assert.match(view, /role="tablist"/);
+  assert.match(view, /role="tab"/);
+  assert.match(view, /aria-selected={isActive}/);
+  assert.match(view, /onClick={\(\) => setActiveStatus\(status\)}/);
+  assert.doesNotMatch(view, /buildInvoicesHref/);
+  assert.doesNotMatch(view, /href={buildInvoicesHref/);
   assert.match(view, /invoiceStatusLabels/);
   assert.match(view, /table-fixed/);
   assert.match(view, /min-w-\[86rem\]/);

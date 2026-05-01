@@ -1,3 +1,5 @@
+"use client";
+
 import { signOut } from "@/app/login/actions";
 import { FinanceShell } from "@/features/finance-shell/components/finance-shell";
 import {
@@ -10,6 +12,8 @@ import {
 import type { InvoiceRecord, InvoiceStatusFilter } from "@/features/invoices/types";
 import { formatMoney } from "@/lib/finance";
 import Link from "next/link";
+import type { FormEvent } from "react";
+import { useState } from "react";
 
 const statusOrder: InvoiceStatusFilter[] = [
   "all",
@@ -34,15 +38,11 @@ const quickbooksTone = {
 
 type InvoicesPageProps = {
   userEmail?: string;
-  searchParams: {
-    status?: string;
-    busca?: string;
-  };
 };
 
-export function InvoicesPage({ userEmail, searchParams }: InvoicesPageProps) {
-  const activeStatus = getStatusFilter(searchParams.status);
-  const query = searchParams.busca?.trim() ?? "";
+export function InvoicesPage({ userEmail }: InvoicesPageProps) {
+  const [activeStatus, setActiveStatus] = useState<InvoiceStatusFilter>("all");
+  const [query, setQuery] = useState("");
   const visibleInvoices = filterInvoices(invoiceRecords, {
     status: activeStatus,
     query,
@@ -92,42 +92,44 @@ export function InvoicesPage({ userEmail, searchParams }: InvoicesPageProps) {
                 Busca por cliente ou invoice, filtros por status e leitura rápida do saldo em aberto.
               </p>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div role="tablist" aria-label="Filtros de status de faturas" className="flex flex-wrap gap-2">
               {statusOrder.map((status) => (
-                <a
+                <StatusTab
                   key={status}
-                  href={buildInvoicesHref({
-                    status,
-                    busca: query,
-                  })}
-                  aria-current={status === activeStatus ? "page" : undefined}
-                  className="inline-flex min-h-10 items-center rounded-md border border-[var(--color-border)] bg-white px-3 text-sm font-medium text-[var(--color-graphite-800)] transition hover:border-[var(--color-gold-400)] hover:text-[var(--color-graphite-950)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)] aria-[current=page]:border-[var(--color-gold-400)] aria-[current=page]:bg-[var(--color-gold-500)] aria-[current=page]:text-[var(--color-graphite-950)]"
+                  isActive={activeStatus === status}
+                  onClick={() => setActiveStatus(status)}
                 >
                   {invoiceStatusLabels[status]}
-                </a>
+                </StatusTab>
               ))}
             </div>
           </div>
 
-          <form className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_11rem_9rem]" method="get">
+          <form
+            className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_11rem_9rem]"
+            onSubmit={(event: FormEvent<HTMLFormElement>) => event.preventDefault()}
+          >
             <label className="grid gap-2 text-sm font-medium text-[var(--color-graphite-900)]">
               Buscar
               <input
                 className="min-h-11 rounded-md border border-[var(--color-border)] bg-white px-3 text-sm text-[var(--color-graphite-950)] shadow-inner outline-none transition placeholder:text-[var(--color-muted)] hover:border-[var(--color-gold-400)] focus:border-[var(--color-gold-500)] focus:ring-2 focus:ring-[var(--color-gold-500)]/22"
-                defaultValue={query}
+                value={query}
                 name="busca"
+                onChange={(event) => setQuery(event.target.value)}
                 placeholder="Invoice # ou customer"
                 type="search"
               />
             </label>
-            <input name="status" type="hidden" value={activeStatus} />
             <div className="grid gap-2 text-sm font-medium text-[var(--color-graphite-900)]">
               <span>Período</span>
               <div className="inline-flex min-h-11 items-center rounded-md border border-[var(--color-border)] bg-[var(--color-graphite-50)] px-3 text-sm text-[var(--color-graphite-800)]">
                 Abril 2026
               </div>
             </div>
-            <button className="mt-auto min-h-11 rounded-md bg-[var(--color-gold-500)] px-4 text-sm font-semibold text-[var(--color-graphite-950)] shadow-sm transition hover:bg-[var(--color-gold-400)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]">
+            <button
+              type="submit"
+              className="mt-auto min-h-11 rounded-md bg-[var(--color-gold-500)] px-4 text-sm font-semibold text-[var(--color-graphite-950)] shadow-sm transition hover:bg-[var(--color-gold-400)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]"
+            >
               Aplicar busca
             </button>
           </form>
@@ -274,6 +276,32 @@ export function InvoicesPage({ userEmail, searchParams }: InvoicesPageProps) {
   );
 }
 
+function StatusTab({
+  children,
+  isActive,
+  onClick,
+}: {
+  children: string;
+  isActive: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      role="tab"
+      aria-selected={isActive}
+      onClick={onClick}
+      className={
+        isActive
+          ? "inline-flex min-h-10 items-center rounded-md border border-[var(--color-gold-400)] bg-[var(--color-gold-500)] px-3 text-sm font-semibold text-[var(--color-graphite-950)]"
+          : "inline-flex min-h-10 items-center rounded-md border border-[var(--color-border)] bg-white px-3 text-sm font-medium text-[var(--color-graphite-800)] transition hover:border-[var(--color-gold-400)] hover:text-[var(--color-graphite-950)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]"
+      }
+    >
+      {children}
+    </button>
+  );
+}
+
 function SummaryCard({
   label,
   value,
@@ -387,34 +415,6 @@ function MiniMetric({
       <p className="mt-1 text-xs text-[var(--color-muted)]">{label}</p>
     </div>
   );
-}
-
-function getStatusFilter(value?: string): InvoiceStatusFilter {
-  return statusOrder.includes(value as InvoiceStatusFilter)
-    ? (value as InvoiceStatusFilter)
-    : "all";
-}
-
-function buildInvoicesHref({
-  status,
-  busca,
-}: {
-  status: InvoiceStatusFilter;
-  busca: string;
-}) {
-  const params = new URLSearchParams();
-
-  if (status !== "all") {
-    params.set("status", status);
-  }
-
-  if (busca.trim()) {
-    params.set("busca", busca.trim());
-  }
-
-  const query = params.toString();
-
-  return query ? `/invoices?${query}` : "/invoices";
 }
 
 function countQuickbooks(
