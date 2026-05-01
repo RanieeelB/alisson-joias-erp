@@ -335,6 +335,15 @@ function ReceivableTab({
   totalAgingCents: number;
 }) {
   const balances = getReceivableBalanceScale(receivableBalances);
+  const [hoveredAgingBucket, setHoveredAgingBucket] = useState<{
+    label: string;
+    value: number;
+    percent: number;
+  } | null>(null);
+  const [hoveredBalance, setHoveredBalance] = useState<(typeof balances)[number] | null>(
+    null,
+  );
+  const activeBalance = hoveredBalance ?? balances[0] ?? null;
 
   return (
     <>
@@ -352,7 +361,18 @@ function ReceivableTab({
               const percent = totalAgingCents > 0 ? Math.round((value / totalAgingCents) * 100) : 0;
 
               return (
-                <div key={bucket} className="grid gap-2">
+                <div
+                  key={bucket}
+                  className="grid gap-2"
+                  onMouseEnter={() =>
+                    setHoveredAgingBucket({
+                      label: agingBucketLabels[bucket],
+                      value,
+                      percent,
+                    })
+                  }
+                  onMouseLeave={() => setHoveredAgingBucket(null)}
+                >
                   <div className="flex items-center justify-between gap-4 text-sm">
                     <span className="font-medium text-[var(--color-graphite-900)]">
                       {agingBucketLabels[bucket]}
@@ -371,6 +391,11 @@ function ReceivableTab({
                 </div>
               );
             })}
+            <div className="rounded-md border border-[var(--color-border)] bg-[var(--color-graphite-50)] px-3 py-2 font-mono text-xs text-[var(--color-graphite-800)]">
+              {hoveredAgingBucket
+                ? `${hoveredAgingBucket.label}: ${formatMoney(hoveredAgingBucket.value)} (${hoveredAgingBucket.percent}%)`
+                : "Passe o mouse sobre as barras"}
+            </div>
           </div>
         </section>
 
@@ -383,7 +408,12 @@ function ReceivableTab({
           </h2>
           <div className="mt-5 grid gap-4">
             {balances.map((balance) => (
-              <div key={balance.customerName} className="grid gap-2">
+              <div
+                key={balance.customerName}
+                className="grid gap-2"
+                onMouseEnter={() => setHoveredBalance(balance)}
+                onMouseLeave={() => setHoveredBalance(null)}
+              >
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-sm font-semibold text-[var(--color-graphite-900)]">
@@ -406,6 +436,11 @@ function ReceivableTab({
                 </div>
               </div>
             ))}
+            <div className="rounded-md border border-[var(--color-border)] bg-[var(--color-graphite-50)] px-3 py-2 font-mono text-xs text-[var(--color-graphite-800)]">
+              {activeBalance
+                ? `${activeBalance.customerName}: ${formatMoney(activeBalance.currentCents + activeBalance.overdueCents)}`
+                : "Passe o mouse sobre os clientes"}
+            </div>
           </div>
         </section>
       </section>

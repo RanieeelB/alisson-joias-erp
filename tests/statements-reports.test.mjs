@@ -250,9 +250,9 @@ test("statements and reports routes use protected finance workspaces", () => {
   assert.match(workspaceView, /onClick={\(\) => setActiveReportType\(type\)}/);
   assert.match(workspaceView, /renderActiveReport/);
   assert.match(workspaceView, /buildRevenueChartAxis/);
-  assert.match(workspaceView, /title=\{formatMoney\(row\.revenueCents\)\}/);
-  assert.match(workspaceView, /title=\{tooltip\}/);
-  assert.match(workspaceView, /formatMoney\(value\)/);
+  assert.match(workspaceView, /Passe o mouse sobre as colunas/);
+  assert.match(workspaceView, /Passe o mouse sobre as barras/);
+  assert.match(workspaceView, /onMouseEnter=\{\(\) => onHover\(row\)\}/);
 
   for (const view of [workspaceView, statementsView, reportsView]) {
     assert.doesNotMatch(view, /<ActiveTab href=/);
