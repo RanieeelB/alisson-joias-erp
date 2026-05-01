@@ -194,3 +194,12 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - Revisão/adaptação humana: o usuário aprovou o protótipo visual antes da implementação e pediu continuidade com commits curtos e semânticos.
 - O que mudou após revisão: a navegação lateral passou a apontar para Statements e Reports, e a implementação manteve labels financeiros do teste em English com texto operacional em português.
 - Riscos ou follow-up: ações de envio, impressão, download e export ainda são simulações visuais; persistência Supabase, PDF/CSV real e e-mail real podem entrar em bônus ou refinamento.
+
+## 2026-05-01 - ajuste do seletor de Reports
+
+- Ferramentas/skills usadas: Codex, `systematic-debugging`, `test-driven-development`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: corrigir o seletor Revenue Analysis, Cash Flow, Profit & Loss e Tax Summary, que existia visualmente mas não trocava a visão ativa.
+- Saída aceita: `/reports` passou a ler `?tipo=...`, renderizar a visão ativa no servidor e usar links específicos para cada report type.
+- Revisão/adaptação humana: o usuário apontou que os quatro tipos ainda não funcionavam.
+- O que mudou após revisão: foram adicionados testes para os links por tipo e a renderização ativa de reports; cada opção agora troca o painel principal.
+- Riscos ou follow-up: os reports continuam baseados em dados mockados; export real ainda é boundary visual.

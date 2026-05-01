@@ -22,13 +22,26 @@ const reportTypes: ReportType[] = [
   "tax_summary",
 ];
 
+const reportTypeHrefs: Record<ReportType, string> = {
+  revenue_analysis: "/reports?tipo=revenue_analysis",
+  cash_flow: "/reports?tipo=cash_flow",
+  profit_loss: "/reports?tipo=profit_loss",
+  tax_summary: "/reports?tipo=tax_summary",
+};
+
 const taxStatusTone = {
   filed: "bg-emerald-50 text-emerald-700 ring-emerald-200",
   due: "bg-red-50 text-red-700 ring-red-200",
   projected: "bg-blue-50 text-blue-700 ring-blue-200",
 };
 
-export function ReportsPage({ userEmail }: { userEmail?: string }) {
+export function ReportsPage({
+  activeReportType,
+  userEmail,
+}: {
+  activeReportType: ReportType;
+  userEmail?: string;
+}) {
   const revenue = summarizeRevenueAnalysis(monthlyReportRows);
   const cashFlow = summarizeCashFlow(cashFlowRows);
   const profitLoss = summarizeProfitLoss(profitLossReport);
@@ -55,7 +68,7 @@ export function ReportsPage({ userEmail }: { userEmail?: string }) {
       }
       footer={
         <div className="rounded-md bg-white/8 p-3 text-xs leading-5 text-white/72">
-          Revenue Analysis ativo
+          {reportTypeLabels[activeReportType]} ativo
           <div className="mt-2 font-medium text-[var(--color-gold-200)]">
             {revenue.revenueTrendPercent}% vs mês anterior
           </div>
@@ -67,12 +80,12 @@ export function ReportsPage({ userEmail }: { userEmail?: string }) {
           <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
             <nav aria-label="Report type selector" className="flex flex-wrap gap-2">
               {reportTypes.map((type) =>
-                type === "revenue_analysis" ? (
-                  <ActiveTab key={type} href="/reports">
+                activeReportType === type ? (
+                  <ActiveTab key={type} href={reportTypeHrefs[type]}>
                     {reportTypeLabels[type]}
                   </ActiveTab>
                 ) : (
-                  <InactiveTab key={type} href="/reports">
+                  <InactiveTab key={type} href={reportTypeHrefs[type]}>
                     {reportTypeLabels[type]}
                   </InactiveTab>
                 ),
@@ -93,54 +106,12 @@ export function ReportsPage({ userEmail }: { userEmail?: string }) {
         </section>
 
         <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_22rem]">
-          <div className="grid gap-4">
-            <article className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-widget)]">
-              <div className="mb-5 flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-gold-700)]">
-                    Revenue Analysis
-                  </p>
-                  <h2 className="mt-1 text-base font-semibold tracking-normal text-[var(--color-graphite-950)]">
-                    Receita, despesas e lucro
-                  </h2>
-                </div>
-                <div className="hidden gap-3 text-xs text-[var(--color-muted)] sm:flex">
-                  <Legend color="bg-blue-500" label="Receita" />
-                  <Legend color="bg-red-500" label="Despesas" />
-                  <Legend color="bg-emerald-600" label="Lucro" />
-                </div>
-              </div>
-              <div className="grid min-h-64 grid-cols-6 items-end gap-3 border-l border-b border-[var(--color-border)] px-3 pt-4">
-                {monthlyReportRows.map((row) => (
-                  <ChartColumn key={row.month} row={row} />
-                ))}
-              </div>
-            </article>
-
-            <article className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-widget)]">
-              <h2 className="text-base font-semibold tracking-normal text-[var(--color-graphite-950)]">
-                Tabela mensal
-              </h2>
-              <div className="mt-4 overflow-x-auto">
-                <table className="w-full min-w-[48rem] table-fixed border-separate border-spacing-0 text-left text-sm">
-                  <thead>
-                    <tr className="text-xs uppercase tracking-[0.12em] text-[var(--color-muted)]">
-                      <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Mês</th>
-                      <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Receita</th>
-                      <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Despesas</th>
-                      <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Lucro</th>
-                      <th className="border-b border-[var(--color-border)] pb-3 font-semibold">Trend</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {monthlyReportRows.map((row) => (
-                      <ReportRow key={row.month} row={row} />
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </article>
-          </div>
+          {renderActiveReport({
+            activeReportType,
+            cashFlow,
+            profitLoss,
+            taxSummary,
+          })}
 
           <aside className="grid gap-3">
             <SideReportCard title="Cash Flow" value={formatMoney(cashFlow.netCashFlowCents)} detail="Inflows versus outflows" tone="blue" />
@@ -184,6 +155,138 @@ export function ReportsPage({ userEmail }: { userEmail?: string }) {
   );
 }
 
+function renderActiveReport({
+  activeReportType,
+  cashFlow,
+  profitLoss,
+  taxSummary,
+}: {
+  activeReportType: ReportType;
+  cashFlow: ReturnType<typeof summarizeCashFlow>;
+  profitLoss: ReturnType<typeof summarizeProfitLoss>;
+  taxSummary: ReturnType<typeof summarizeTaxSummary>;
+}) {
+  if (activeReportType === "cash_flow") {
+    return (
+      <div className="grid gap-4">
+        <article className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-widget)]">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-gold-700)]">
+            Cash Flow
+          </p>
+          <h2 className="mt-1 text-base font-semibold tracking-normal text-[var(--color-graphite-950)]">
+            Inflows versus Outflows
+          </h2>
+          <div className="mt-5 grid gap-3 md:grid-cols-3">
+            <MetricCard label="Inflows" value={formatMoney(cashFlow.inflowsCents)} detail="Recebimentos e entradas" />
+            <MetricCard label="Outflows" value={formatMoney(cashFlow.outflowsCents)} detail="Pagamentos e saídas" />
+            <MetricCard label="Net Cash Flow" value={formatMoney(cashFlow.netCashFlowCents)} detail="Fluxo líquido" />
+          </div>
+          <div className="mt-6 grid min-h-64 grid-cols-2 items-end gap-8 border-l border-b border-[var(--color-border)] px-8 pt-4">
+            <CashFlowBar label="Inflows" value={cashFlow.inflowsCents} max={cashFlow.inflowsCents} tone="bg-emerald-600" />
+            <CashFlowBar label="Outflows" value={cashFlow.outflowsCents} max={cashFlow.inflowsCents} tone="bg-red-500" />
+          </div>
+        </article>
+      </div>
+    );
+  }
+
+  if (activeReportType === "profit_loss") {
+    return (
+      <div className="grid gap-4">
+        <article className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-widget)]">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-gold-700)]">
+            Profit & Loss
+          </p>
+          <h2 className="mt-1 text-base font-semibold tracking-normal text-[var(--color-graphite-950)]">
+            Revenue, COGS, Operating Expenses e Net Profit
+          </h2>
+          <div className="mt-5 grid gap-3 md:grid-cols-2">
+            <FlowMetric label="Revenue" value={formatMoney(profitLoss.revenueCents)} tone="positive" />
+            <FlowMetric label="COGS" value={formatMoney(profitLoss.cogsCents)} tone="neutral" />
+            <FlowMetric label="Operating Expenses" value={formatMoney(profitLoss.operatingExpensesCents)} tone="neutral" />
+            <FlowMetric label="Net Profit" value={formatMoney(profitLoss.netProfitCents)} tone="positive" />
+          </div>
+        </article>
+      </div>
+    );
+  }
+
+  if (activeReportType === "tax_summary") {
+    return (
+      <div className="grid gap-4">
+        <article className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-widget)]">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-gold-700)]">
+            Tax Summary
+          </p>
+          <h2 className="mt-1 text-base font-semibold tracking-normal text-[var(--color-graphite-950)]">
+            Trimestres, valores coletados e status
+          </h2>
+          <div className="mt-5 grid gap-3 md:grid-cols-2">
+            <MetricCard label="Collected" value={formatMoney(taxSummary.collectedCents)} detail="Impostos coletados" />
+            <MetricCard label="Payable" value={formatMoney(taxSummary.payableCents)} detail="Impostos a pagar" />
+          </div>
+          <div className="mt-5 grid gap-3 md:grid-cols-3">
+            {taxQuarterCards.map((card) => (
+              <TaxQuarter key={card.quarter} card={card} />
+            ))}
+          </div>
+        </article>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid gap-4">
+      <article className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-widget)]">
+        <div className="mb-5 flex items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-gold-700)]">
+              Revenue Analysis
+            </p>
+            <h2 className="mt-1 text-base font-semibold tracking-normal text-[var(--color-graphite-950)]">
+              Receita, despesas e lucro
+            </h2>
+          </div>
+          <div className="hidden gap-3 text-xs text-[var(--color-muted)] sm:flex">
+            <Legend color="bg-blue-500" label="Receita" />
+            <Legend color="bg-red-500" label="Despesas" />
+            <Legend color="bg-emerald-600" label="Lucro" />
+          </div>
+        </div>
+        <div className="grid min-h-64 grid-cols-6 items-end gap-3 border-l border-b border-[var(--color-border)] px-3 pt-4">
+          {monthlyReportRows.map((row) => (
+            <ChartColumn key={row.month} row={row} />
+          ))}
+        </div>
+      </article>
+
+      <article className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-widget)]">
+        <h2 className="text-base font-semibold tracking-normal text-[var(--color-graphite-950)]">
+          Tabela mensal
+        </h2>
+        <div className="mt-4 overflow-x-auto">
+          <table className="w-full min-w-[48rem] table-fixed border-separate border-spacing-0 text-left text-sm">
+            <thead>
+              <tr className="text-xs uppercase tracking-[0.12em] text-[var(--color-muted)]">
+                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Mês</th>
+                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Receita</th>
+                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Despesas</th>
+                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Lucro</th>
+                <th className="border-b border-[var(--color-border)] pb-3 font-semibold">Trend</th>
+              </tr>
+            </thead>
+            <tbody>
+              {monthlyReportRows.map((row) => (
+                <ReportRow key={row.month} row={row} />
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </div>
+  );
+}
+
 function MetricCard({
   label,
   value,
@@ -201,6 +304,32 @@ function MetricCard({
       </p>
       <p className="mt-2 text-sm text-[var(--color-muted)]">{detail}</p>
     </article>
+  );
+}
+
+function CashFlowBar({
+  label,
+  max,
+  tone,
+  value,
+}: {
+  label: string;
+  max: number;
+  tone: string;
+  value: number;
+}) {
+  const height = Math.max(14, Math.round((value / max) * 100));
+
+  return (
+    <div className="flex h-full min-h-56 flex-col justify-end gap-2">
+      <div className="flex h-44 items-end justify-center">
+        <span className={`w-16 rounded-t ${tone}`} style={{ height: `${height}%` }} />
+      </div>
+      <p className="text-center text-xs font-semibold text-[var(--color-muted)]">{label}</p>
+      <p className="text-center font-mono text-sm font-semibold text-[var(--color-graphite-950)]">
+        {formatMoney(value)}
+      </p>
+    </div>
   );
 }
 

@@ -114,6 +114,7 @@ test("statements and reports routes use protected finance workspaces", () => {
   const reportsView = readProjectFile(
     "src/features/statements-reports/components/reports-page.tsx",
   );
+  const reportsRoute = readProjectFile("src/app/reports/page.tsx");
   const shell = readProjectFile(
     "src/features/finance-shell/components/finance-shell.tsx",
   );
@@ -158,6 +159,26 @@ test("statements and reports routes use protected finance workspaces", () => {
       `expected reports page to include ${text}`,
     );
   }
+
+  assert.match(reportsRoute, /searchParams/);
+  assert.match(reportsRoute, /getActiveReportType/);
+  assert.match(reportsRoute, /activeReportType/);
+
+  for (const href of [
+    "/reports?tipo=revenue_analysis",
+    "/reports?tipo=cash_flow",
+    "/reports?tipo=profit_loss",
+    "/reports?tipo=tax_summary",
+  ]) {
+    assert.match(
+      reportsView,
+      new RegExp(href.replace("?", "\\?")),
+      `expected report selector to include ${href}`,
+    );
+  }
+
+  assert.match(reportsView, /activeReportType === type/);
+  assert.match(reportsView, /renderActiveReport/);
 
   for (const href of ["/statements", "/reports"]) {
     assert.match(shell, new RegExp(href), `expected shell navigation to include ${href}`);
