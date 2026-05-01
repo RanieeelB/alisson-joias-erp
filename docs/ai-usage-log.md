@@ -248,3 +248,12 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - Revisão/adaptação humana: o usuário aprovou seguir com a implementação depois da correção de arquitetura de informação.
 - O que mudou após revisão: Automações ficou responsável por orquestrar regras e monitorar jobs; Faturas, Payments, Accounts Receivable, Statements e Reports continuam como donos das ações manuais. O Realtime foi implementado como status client-side com cleanup do canal, e os conceitos de QuickBooks, e-mail, Storage, PDF/CSV e Gold price API foram mantidos como boundaries.
 - Riscos ou follow-up: a maioria das ações continua em modo `mock` para apresentação; para produção seria necessário persistir jobs no Supabase, criar triggers/Edge Functions, configurar Realtime replication quando houver tabela real de eventos e integrar provedores externos com secrets server-side.
+
+## 2026-05-01 - feat/persistencia-financeira
+
+- Ferramentas/skills usadas: Codex, `brainstorming`, `supabase`, `supabase-postgres-best-practices`, `next-best-practices`, `jewelry-erp-finance-domain`, `test-driven-development`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: transformar as áreas financeiras principais de protótipo com mocks em aplicação funcional com dados persistidos no Supabase, formulários reais e PDFs exportáveis.
+- Saída aceita: migration idempotente com seed financeiro, loaders reais do Supabase, server actions para faturas/pagamentos/obrigações, rotas de PDF e tela de declarações.
+- Revisão/adaptação humana: o usuário pediu branch sem prefixo `codex/`, commits curtos e semânticos, padronização em português e remoção de botões mortos.
+- O que mudou após revisão: os arrays mockados saíram dos módulos de produção; os fixtures ficaram restritos aos testes, e as telas passaram a receber um workspace financeiro carregado do banco.
+- Riscos ou follow-up: a Supabase CLI não estava disponível no PATH desta sessão, então a migration foi criada manualmente e precisa ser aplicada no projeto hospedado; fluxos manuais com autenticação dependem de `.env` e usuário interno configurados.

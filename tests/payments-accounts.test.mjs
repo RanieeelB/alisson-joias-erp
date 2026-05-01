@@ -40,11 +40,100 @@ function readProjectFile(path) {
   return readFileSync(fullPath, "utf8");
 }
 
+const paymentRecords = [
+  {
+    date: "2026-04-29",
+    amountCents: 1850000,
+    status: "settled",
+  },
+  {
+    date: "2026-04-28",
+    amountCents: 980000,
+    status: "pending_deposit",
+  },
+  {
+    date: "2026-04-25",
+    amountCents: 1250000,
+    status: "settled",
+  },
+  {
+    date: "2026-04-23",
+    amountCents: 610000,
+    status: "credit",
+    creditCents: 610000,
+  },
+  {
+    date: "2026-04-20",
+    amountCents: 2000000,
+    status: "pending_deposit",
+  },
+  {
+    date: "2026-04-18",
+    amountCents: 605000,
+    status: "settled",
+  },
+];
+
+const openReceivableInvoices = [
+  { dueOn: "2026-05-21", balanceCents: 2185000 },
+  { dueOn: "2026-04-27", balanceCents: 1987500 },
+  { dueOn: "2026-04-13", balanceCents: 1610000 },
+  { dueOn: "2026-03-16", balanceCents: 1580000 },
+  { dueOn: "2026-02-10", balanceCents: 905000 },
+  { dueOn: "2026-01-15", balanceCents: 430000 },
+];
+
+const customerReceivableBalances = [
+  {
+    customerName: "Aurora & Co. Fine Jewelry",
+    currentCents: 3080000,
+    overdueCents: 1200000,
+  },
+  {
+    customerName: "Northline Wholesale Jewelers",
+    currentCents: 0,
+    overdueCents: 1987500,
+  },
+  {
+    customerName: "Carvalho Atelier",
+    currentCents: 0,
+    overdueCents: 1225000,
+  },
+  {
+    customerName: "Helena Martins Bridal",
+    currentCents: 0,
+    overdueCents: 905000,
+  },
+  {
+    customerName: "Lu'Mar Joias",
+    currentCents: 0,
+    overdueCents: 500000,
+  },
+];
+
+const accountsPayableRecords = [
+  { balanceCents: 2210000, paidCents: 0, status: "pending" },
+  {
+    balanceCents: 820000,
+    paidCents: 300000,
+    status: "partial",
+    paidOn: "2026-04-24",
+  },
+  { balanceCents: 1285000, paidCents: 0, status: "pending" },
+  {
+    balanceCents: 0,
+    paidCents: 1595000,
+    status: "paid",
+    paidOn: "2026-04-17",
+  },
+  { balanceCents: 1145000, paidCents: 0, status: "overdue" },
+  { balanceCents: 1263000, paidCents: 0, status: "pending" },
+];
+
 test("summarizes payments, pending deposits, and credits", () => {
-  const {
-    paymentRecords,
-    summarizePayments,
-  } = loadTsModule("src/features/payments-accounts/data.ts");
+  const { summarizePayments } = loadTsModule(
+    "src/features/payments-accounts/data.ts",
+  );
 
   const summary = summarizePayments(
     paymentRecords,
@@ -58,8 +147,6 @@ test("summarizes payments, pending deposits, and credits", () => {
 
 test("derives accounts receivable aging and customer balances", () => {
   const {
-    openReceivableInvoices,
-    customerReceivableBalances,
     summarizeReceivableAging,
     getReceivableBalanceScale,
   } = loadTsModule("src/features/payments-accounts/data.ts");
@@ -81,10 +168,9 @@ test("derives accounts receivable aging and customer balances", () => {
 });
 
 test("summarizes accounts payable obligations", () => {
-  const {
-    accountsPayableRecords,
-    summarizeAccountsPayable,
-  } = loadTsModule("src/features/payments-accounts/data.ts");
+  const { summarizeAccountsPayable } = loadTsModule(
+    "src/features/payments-accounts/data.ts",
+  );
 
   const summary = summarizeAccountsPayable(
     accountsPayableRecords,
@@ -129,42 +215,42 @@ test("payments and accounts routes use protected finance workspaces", () => {
   );
 
   for (const text of [
-    "Payments and Accounts",
+    "Pagamentos e Contas",
     "Coletado no mês",
     "Depósitos pendentes",
     "Créditos",
     "Registrar pagamento",
-    "Payment #",
-    "Invoice",
-    "Customer",
-    "Method",
-    "Reference",
+    "Pagamento #",
+    "Fatura",
+    "Cliente",
+    "Forma",
+    "Referência",
   ]) {
     assert.match(workspaceView, new RegExp(text), `expected payments workspace to include ${text}`);
   }
 
   for (const text of [
-    "Accounts Receivable",
-    "Aging Analysis",
+    "Contas a receber",
+    "Análise de vencimentos",
     "Saldos por cliente",
     "Faturas abertas",
-    "Enviar reminder",
+    "Enviar lembrete",
   ]) {
     assert.match(workspaceView, new RegExp(text), `expected AR tab to include ${text}`);
   }
 
   for (const text of [
-    "Accounts Payable",
-    "Total Payable",
-    "Paid This Month",
-    "Overdue",
+    "Contas a pagar",
+    "Total a pagar",
+    "Pago no mês",
+    "Em atraso",
     "AP #",
-    "Vendor",
-    "Category",
-    "Raw Materials",
-    "Components",
-    "Certification",
-    "Services",
+    "Fornecedor",
+    "Categoria",
+    "Matéria-prima",
+    "Componentes",
+    "Certificação",
+    "Serviços",
   ]) {
     assert.match(workspaceView, new RegExp(text), `expected AP tab to include ${text}`);
   }

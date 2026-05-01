@@ -1,12 +1,9 @@
 "use client";
 
 import { signOut } from "@/app/login/actions";
+import type { FinanceWorkspaceData } from "@/features/finance/data";
 import { FinanceShell } from "@/features/finance-shell/components/finance-shell";
 import {
-  cashFlowRows,
-  customerStatements,
-  monthlyReportRows,
-  profitLossReport,
   reportTypeLabels,
   statementPeriod,
   summarizeCashFlow,
@@ -14,7 +11,6 @@ import {
   summarizeRevenueAnalysis,
   summarizeStatements,
   summarizeTaxSummary,
-  taxQuarterCards,
 } from "@/features/statements-reports/data";
 import type {
   CustomerStatement,
@@ -30,8 +26,8 @@ export type StatementsReportsTab = "statements" | "reports";
 const workspaceTabs: StatementsReportsTab[] = ["statements", "reports"];
 
 const workspaceLabels: Record<StatementsReportsTab, string> = {
-  statements: "Statements",
-  reports: "Reports",
+  statements: "Extratos",
+  reports: "Relatórios",
 };
 
 const workspacePaths: Record<StatementsReportsTab, string> = {
@@ -60,19 +56,21 @@ const taxStatusTone = {
 };
 
 export function StatementsReportsWorkspace({
+  data,
   initialTab,
   userEmail,
 }: {
+  data: FinanceWorkspaceData;
   initialTab: StatementsReportsTab;
   userEmail?: string;
 }) {
   const [activeTab, setActiveTab] = useState<StatementsReportsTab>(initialTab);
   const [activeReportType, setActiveReportType] = useState<ReportType>("revenue_analysis");
-  const statementsSummary = summarizeStatements(customerStatements);
-  const revenue = summarizeRevenueAnalysis(monthlyReportRows);
-  const cashFlow = summarizeCashFlow(cashFlowRows);
-  const profitLoss = summarizeProfitLoss(profitLossReport);
-  const taxSummary = summarizeTaxSummary(taxQuarterCards);
+  const statementsSummary = summarizeStatements(data.customerStatements);
+  const revenue = summarizeRevenueAnalysis(data.monthlyReportRows);
+  const cashFlow = summarizeCashFlow(data.cashFlowRows);
+  const profitLoss = summarizeProfitLoss(data.profitLossReport);
+  const taxSummary = summarizeTaxSummary(data.taxQuarterCards);
 
   return (
     <FinanceShell
@@ -82,24 +80,24 @@ export function StatementsReportsWorkspace({
       userEmail={userEmail}
       secondaryAction={
         <HeaderButton onClick={() => setActiveTab(activeTab === "statements" ? "reports" : "statements")}>
-          {activeTab === "statements" ? "Reports" : "Statements"}
+          {activeTab === "statements" ? "Relatórios" : "Extratos"}
         </HeaderButton>
       }
       primaryAction={
         <>
           {activeTab === "statements" ? (
             <>
-              <button className="min-h-10 rounded-md border border-[var(--color-gold-400)] bg-white px-3 text-sm font-semibold text-[var(--color-gold-800)] shadow-sm transition hover:bg-[var(--color-gold-50)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]">
-                Email All Statements
-              </button>
-              <button className="min-h-10 rounded-md bg-[var(--color-gold-500)] px-3 text-sm font-semibold text-[var(--color-graphite-950)] shadow-sm transition hover:bg-[var(--color-gold-400)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]">
-                Bulk Download
-              </button>
+              <a href="mailto:?subject=Extratos Alisson Joias" className="min-h-10 rounded-md border border-[var(--color-gold-400)] bg-white px-3 py-2 text-sm font-semibold text-[var(--color-gold-800)] shadow-sm transition hover:bg-[var(--color-gold-50)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]">
+                Enviar extratos
+              </a>
+              <a href="/api/exports/statements/bulk" target="_blank" className="min-h-10 rounded-md bg-[var(--color-gold-500)] px-3 py-2 text-sm font-semibold text-[var(--color-graphite-950)] shadow-sm transition hover:bg-[var(--color-gold-400)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]">
+                Baixar em lote
+              </a>
             </>
           ) : (
-            <button className="min-h-10 rounded-md bg-[var(--color-gold-500)] px-3 text-sm font-semibold text-[var(--color-graphite-950)] shadow-sm transition hover:bg-[var(--color-gold-400)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]">
-              Export Report
-            </button>
+            <a href="/api/exports/reports" target="_blank" className="min-h-10 rounded-md bg-[var(--color-gold-500)] px-3 py-2 text-sm font-semibold text-[var(--color-graphite-950)] shadow-sm transition hover:bg-[var(--color-gold-400)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]">
+              Exportar relatório
+            </a>
           )}
           <form action={signOut}>
             <button className="min-h-10 rounded-md border border-[var(--color-border)] bg-white px-3 text-sm font-medium text-[var(--color-graphite-800)] shadow-sm transition hover:border-red-300 hover:text-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-400">
@@ -111,7 +109,7 @@ export function StatementsReportsWorkspace({
       footer={
         activeTab === "statements" ? (
           <div className="rounded-md bg-white/8 p-3 text-xs leading-5 text-white/72">
-            Statements prontos para envio
+            Extratos prontos para envio
             <div className="mt-2 font-medium text-[var(--color-gold-200)]">
               {statementsSummary.totalCustomers} clientes no período
             </div>
@@ -151,7 +149,7 @@ export function StatementsReportsWorkspace({
                 </div>
               )}
             </div>
-            <div role="tablist" aria-label="Statements and reports" className="flex flex-wrap gap-2">
+            <div role="tablist" aria-label="Extratos e relatórios" className="flex flex-wrap gap-2">
               {workspaceTabs.map((tab) => (
                 <WorkspaceTab
                   key={tab}
@@ -166,13 +164,15 @@ export function StatementsReportsWorkspace({
         </section>
 
         {activeTab === "statements" ? (
-          <StatementsTab summary={statementsSummary} />
+          <StatementsTab statements={data.customerStatements} summary={statementsSummary} />
         ) : (
           <ReportsTab
             activeReportType={activeReportType}
             cashFlow={cashFlow}
+            monthlyRows={data.monthlyReportRows}
             profitLoss={profitLoss}
             revenue={revenue}
+            taxCards={data.taxQuarterCards}
             taxSummary={taxSummary}
           />
         )}
@@ -181,34 +181,40 @@ export function StatementsReportsWorkspace({
   );
 }
 
-function StatementsTab({ summary }: { summary: ReturnType<typeof summarizeStatements> }) {
+function StatementsTab({
+  statements,
+  summary,
+}: {
+  statements: CustomerStatement[];
+  summary: ReturnType<typeof summarizeStatements>;
+}) {
   return (
     <>
       <section className="grid gap-3 md:grid-cols-4">
-        <MetricCard label="Clientes" value={String(summary.totalCustomers)} detail="Statements gerados" />
+        <MetricCard label="Clientes" value={String(summary.totalCustomers)} detail="Extratos gerados" />
         <MetricCard label="Faturas" value={String(summary.totalInvoices)} detail="No período selecionado" />
-        <MetricCard label="Balance" value={formatMoney(summary.netBalanceCents)} detail="Saldo líquido" />
+        <MetricCard label="Saldo" value={formatMoney(summary.netBalanceCents)} detail="Saldo líquido" />
         <MetricCard label="Créditos" value={formatMoney(summary.creditCents)} detail="Overpayments ativos" />
       </section>
 
       <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="grid gap-3">
-          {customerStatements.map((statement) => (
+          {statements.map((statement) => (
             <StatementCard key={statement.id} statement={statement} />
           ))}
         </div>
 
         <aside className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-widget)]">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-gold-700)]">
-            Reports preview
+            Prévia de relatórios
           </p>
           <h2 className="mt-1 text-base font-semibold tracking-normal text-[var(--color-graphite-950)]">
-            Revenue Analysis
+            Análise de Receita
           </h2>
           <div className="mt-4 space-y-3">
             <PreviewMetric label="Outstanding" value={formatMoney(summary.outstandingCents)} />
             <PreviewMetric label="Credits" value={formatMoney(summary.creditCents)} />
-            <PreviewMetric label="Net Balance" value={formatMoney(summary.netBalanceCents)} />
+            <PreviewMetric label="Saldo líquido" value={formatMoney(summary.netBalanceCents)} />
           </div>
         </aside>
       </section>
@@ -219,21 +225,25 @@ function StatementsTab({ summary }: { summary: ReturnType<typeof summarizeStatem
 function ReportsTab({
   activeReportType,
   cashFlow,
+  monthlyRows,
   profitLoss,
   revenue,
+  taxCards,
   taxSummary,
 }: {
   activeReportType: ReportType;
   cashFlow: ReturnType<typeof summarizeCashFlow>;
+  monthlyRows: MonthlyReportRow[];
   profitLoss: ReturnType<typeof summarizeProfitLoss>;
   revenue: ReturnType<typeof summarizeRevenueAnalysis>;
+  taxCards: TaxQuarterCard[];
   taxSummary: ReturnType<typeof summarizeTaxSummary>;
 }) {
   return (
     <>
       <section className="grid gap-3 md:grid-cols-4">
         <MetricCard label="Receita" value={formatMoney(revenue.revenueCents)} detail={`+${revenue.revenueTrendPercent}% vs Abr/2026`} />
-        <MetricCard label="Despesas" value={formatMoney(revenue.expensesCents)} detail="COGS + operating expenses" />
+        <MetricCard label="Despesas" value={formatMoney(revenue.expensesCents)} detail="Custos + despesas operacionais" />
         <MetricCard label="Lucro" value={formatMoney(revenue.profitCents)} detail="Profit líquido do mês" />
         <MetricCard label="Margem" value={`${revenue.marginPercent}%`} detail="Margem líquida" />
       </section>
@@ -242,41 +252,43 @@ function ReportsTab({
         {renderActiveReport({
           activeReportType,
           cashFlow,
+          monthlyRows,
           profitLoss,
+          taxCards,
           taxSummary,
         })}
 
         <aside className="grid gap-3">
-          <SideReportCard title="Cash Flow" value={formatMoney(cashFlow.netCashFlowCents)} detail="Inflows versus outflows" tone="blue" />
-          <SideReportCard title="Profit & Loss" value={formatMoney(profitLoss.netProfitCents)} detail="Revenue, COGS e expenses" tone="emerald" />
-          <SideReportCard title="Tax Summary" value={formatMoney(taxSummary.payableCents)} detail="Impostos a pagar" tone="red" />
+          <SideReportCard title="Fluxo de Caixa" value={formatMoney(cashFlow.netCashFlowCents)} detail="Entradas versus saídas" tone="blue" />
+          <SideReportCard title="Lucros e Perdas" value={formatMoney(profitLoss.netProfitCents)} detail="Receita, custos e despesas" tone="emerald" />
+          <SideReportCard title="Resumo de Impostos" value={formatMoney(taxSummary.payableCents)} detail="Impostos a pagar" tone="red" />
           <article className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-widget)]">
             <h2 className="text-base font-semibold tracking-normal text-[var(--color-graphite-950)]">
-              Cash Flow
+              Fluxo de Caixa
             </h2>
             <div className="mt-4 space-y-3">
-              <FlowMetric label="Inflows" value={formatMoney(cashFlow.inflowsCents)} tone="positive" />
-              <FlowMetric label="Outflows" value={formatMoney(cashFlow.outflowsCents)} tone="negative" />
-              <FlowMetric label="Net Cash Flow" value={formatMoney(cashFlow.netCashFlowCents)} tone="positive" />
+              <FlowMetric label="Entradas" value={formatMoney(cashFlow.inflowsCents)} tone="positive" />
+              <FlowMetric label="Saídas" value={formatMoney(cashFlow.outflowsCents)} tone="negative" />
+              <FlowMetric label="Fluxo líquido" value={formatMoney(cashFlow.netCashFlowCents)} tone="positive" />
             </div>
           </article>
           <article className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-widget)]">
             <h2 className="text-base font-semibold tracking-normal text-[var(--color-graphite-950)]">
-              Profit & Loss
+              Lucros e Perdas
             </h2>
             <div className="mt-4 space-y-3">
               <FlowMetric label="Revenue" value={formatMoney(profitLoss.revenueCents)} tone="positive" />
-              <FlowMetric label="COGS" value={formatMoney(profitLoss.cogsCents)} tone="neutral" />
-              <FlowMetric label="Operating Expenses" value={formatMoney(profitLoss.operatingExpensesCents)} tone="neutral" />
+              <FlowMetric label="Custos" value={formatMoney(profitLoss.cogsCents)} tone="neutral" />
+              <FlowMetric label="Despesas operacionais" value={formatMoney(profitLoss.operatingExpensesCents)} tone="neutral" />
               <FlowMetric label="Net Profit" value={formatMoney(profitLoss.netProfitCents)} tone="positive" />
             </div>
           </article>
           <article className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-widget)]">
             <h2 className="text-base font-semibold tracking-normal text-[var(--color-graphite-950)]">
-              Tax Summary
+              Resumo de Impostos
             </h2>
             <div className="mt-3 space-y-3">
-              {taxQuarterCards.map((card) => (
+              {taxCards.map((card) => (
                 <TaxQuarter key={card.quarter} card={card} />
               ))}
             </div>
@@ -290,12 +302,16 @@ function ReportsTab({
 function renderActiveReport({
   activeReportType,
   cashFlow,
+  monthlyRows,
   profitLoss,
+  taxCards,
   taxSummary,
 }: {
   activeReportType: ReportType;
   cashFlow: ReturnType<typeof summarizeCashFlow>;
+  monthlyRows: MonthlyReportRow[];
   profitLoss: ReturnType<typeof summarizeProfitLoss>;
+  taxCards: TaxQuarterCard[];
   taxSummary: ReturnType<typeof summarizeTaxSummary>;
 }) {
   if (activeReportType === "cash_flow") {
@@ -303,19 +319,19 @@ function renderActiveReport({
       <div className="grid gap-4">
         <article className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-widget)]">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-gold-700)]">
-            Cash Flow
+            Fluxo de Caixa
           </p>
           <h2 className="mt-1 text-base font-semibold tracking-normal text-[var(--color-graphite-950)]">
-            Inflows versus Outflows
+            Entradas versus saídas
           </h2>
           <div className="mt-5 grid gap-3 md:grid-cols-3">
-            <MetricCard label="Inflows" value={formatMoney(cashFlow.inflowsCents)} detail="Recebimentos e entradas" />
-            <MetricCard label="Outflows" value={formatMoney(cashFlow.outflowsCents)} detail="Pagamentos e saídas" />
-            <MetricCard label="Net Cash Flow" value={formatMoney(cashFlow.netCashFlowCents)} detail="Fluxo líquido" />
+            <MetricCard label="Entradas" value={formatMoney(cashFlow.inflowsCents)} detail="Recebimentos e entradas" />
+            <MetricCard label="Saídas" value={formatMoney(cashFlow.outflowsCents)} detail="Pagamentos e saídas" />
+            <MetricCard label="Fluxo líquido" value={formatMoney(cashFlow.netCashFlowCents)} detail="Fluxo líquido" />
           </div>
           <div className="mt-6 grid min-h-64 grid-cols-2 items-end gap-8 border-l border-b border-[var(--color-border)] px-8 pt-4">
-            <CashFlowBar label="Inflows" value={cashFlow.inflowsCents} max={cashFlow.inflowsCents} tone="bg-emerald-600" />
-            <CashFlowBar label="Outflows" value={cashFlow.outflowsCents} max={cashFlow.inflowsCents} tone="bg-red-500" />
+            <CashFlowBar label="Entradas" value={cashFlow.inflowsCents} max={cashFlow.inflowsCents} tone="bg-emerald-600" />
+            <CashFlowBar label="Saídas" value={cashFlow.outflowsCents} max={cashFlow.inflowsCents} tone="bg-red-500" />
           </div>
         </article>
       </div>
@@ -327,15 +343,15 @@ function renderActiveReport({
       <div className="grid gap-4">
         <article className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-widget)]">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-gold-700)]">
-            Profit & Loss
+            Lucros e Perdas
           </p>
           <h2 className="mt-1 text-base font-semibold tracking-normal text-[var(--color-graphite-950)]">
-            Revenue, COGS, Operating Expenses e Net Profit
+            Receita, custos, despesas operacionais e lucro líquido
           </h2>
           <div className="mt-5 grid gap-3 md:grid-cols-2">
             <FlowMetric label="Revenue" value={formatMoney(profitLoss.revenueCents)} tone="positive" />
-            <FlowMetric label="COGS" value={formatMoney(profitLoss.cogsCents)} tone="neutral" />
-            <FlowMetric label="Operating Expenses" value={formatMoney(profitLoss.operatingExpensesCents)} tone="neutral" />
+            <FlowMetric label="Custos" value={formatMoney(profitLoss.cogsCents)} tone="neutral" />
+            <FlowMetric label="Despesas operacionais" value={formatMoney(profitLoss.operatingExpensesCents)} tone="neutral" />
             <FlowMetric label="Net Profit" value={formatMoney(profitLoss.netProfitCents)} tone="positive" />
           </div>
         </article>
@@ -348,7 +364,7 @@ function renderActiveReport({
       <div className="grid gap-4">
         <article className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-widget)]">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-gold-700)]">
-            Tax Summary
+            Resumo de Impostos
           </p>
           <h2 className="mt-1 text-base font-semibold tracking-normal text-[var(--color-graphite-950)]">
             Trimestres, valores coletados e status
@@ -358,7 +374,7 @@ function renderActiveReport({
             <MetricCard label="Payable" value={formatMoney(taxSummary.payableCents)} detail="Impostos a pagar" />
           </div>
           <div className="mt-5 grid gap-3 md:grid-cols-3">
-            {taxQuarterCards.map((card) => (
+            {taxCards.map((card) => (
               <TaxQuarter key={card.quarter} card={card} />
             ))}
           </div>
@@ -373,7 +389,7 @@ function renderActiveReport({
         <div className="mb-5 flex items-center justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-gold-700)]">
-              Revenue Analysis
+              Análise de Receita
             </p>
             <h2 className="mt-1 text-base font-semibold tracking-normal text-[var(--color-graphite-950)]">
               Receita, despesas e lucro
@@ -386,7 +402,7 @@ function renderActiveReport({
           </div>
         </div>
         <div className="grid min-h-64 grid-cols-6 items-end gap-3 border-l border-b border-[var(--color-border)] px-3 pt-4">
-          {monthlyReportRows.map((row) => (
+          {monthlyRows.map((row) => (
             <ChartColumn key={row.month} row={row} />
           ))}
         </div>
@@ -408,7 +424,7 @@ function renderActiveReport({
               </tr>
             </thead>
             <tbody>
-              {monthlyReportRows.map((row) => (
+              {monthlyRows.map((row) => (
                 <ReportRow key={row.month} row={row} />
               ))}
             </tbody>
@@ -444,7 +460,7 @@ function StatementCard({ statement }: { statement: CustomerStatement }) {
           <p className="mt-1 font-mono text-xl font-semibold text-[var(--color-graphite-950)]">
             {statement.invoiceCount}
           </p>
-          <p className="mt-2 text-xs font-medium text-[var(--color-muted)]">Balance</p>
+          <p className="mt-2 text-xs font-medium text-[var(--color-muted)]">Saldo</p>
           <p className={`mt-1 font-mono text-sm font-semibold ${isCredit ? "text-red-700" : "text-emerald-700"}`}>
             {formatMoney(statement.balanceCents)}
           </p>
@@ -452,12 +468,14 @@ function StatementCard({ statement }: { statement: CustomerStatement }) {
 
         <div className="flex flex-wrap gap-2 lg:justify-end">
           {statement.actions.map((action) => (
-            <button
+            <a
               key={action}
+              href={action === "email" ? `mailto:?subject=${statement.statementNumber}` : `/api/exports/statements/${statement.id}`}
+              target={action === "email" ? undefined : "_blank"}
               className="min-h-9 rounded-md border border-[var(--color-border)] bg-white px-3 text-xs font-semibold text-[var(--color-graphite-800)] transition hover:border-[var(--color-gold-400)] hover:text-[var(--color-graphite-950)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]"
             >
               {getActionLabel(action)}
-            </button>
+            </a>
           ))}
         </div>
       </div>
@@ -691,10 +709,10 @@ function HeaderButton({ children, onClick }: { children: string; onClick: () => 
 }
 
 function getActionLabel(action: CustomerStatement["actions"][number]) {
-  if (action === "view") return "View";
-  if (action === "print") return "Print";
+  if (action === "view") return "Visualizar";
+  if (action === "print") return "Imprimir";
 
-  return "Email";
+  return "E-mail";
 }
 
 function formatShortDate(value: string) {

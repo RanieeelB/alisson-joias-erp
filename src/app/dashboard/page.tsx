@@ -1,4 +1,5 @@
 import { FinancialDashboard } from "@/features/dashboard/components/financial-dashboard";
+import { loadFinanceWorkspace } from "@/features/finance/data";
 import { isInternalFinanceUser } from "@/lib/supabase/authz";
 import type { DashboardViewState } from "@/features/dashboard/components/financial-dashboard";
 import { createClient } from "@/lib/supabase/server";
@@ -28,8 +29,11 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     redirect("/login?erro=acesso");
   }
 
+  const data = await loadFinanceWorkspace(supabase);
+
   return (
     <FinancialDashboard
+      data={data}
       userEmail={user.email ?? "usuario interno"}
       viewState={getViewState(params.estado)}
     />

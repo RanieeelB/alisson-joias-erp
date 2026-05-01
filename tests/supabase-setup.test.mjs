@@ -136,3 +136,41 @@ test("adds Supabase SSR clients and request proxy", () => {
   assert.match(readProjectFile("src/lib/supabase/proxy.ts"), /getClaims/);
   assert.match(readProjectFile("src/proxy.ts"), /export async function proxy/);
 });
+
+test("adds persistent finance seed and printable declaration documents", () => {
+  const migrationsDir = join(projectRoot, "supabase", "migrations");
+  const migrationFile = readdirSync(migrationsDir).find((file) =>
+    file.endsWith("_persist_finance_seed_and_documents.sql"),
+  );
+
+  assert.ok(migrationFile, "expected persistent finance seed migration");
+
+  const migration = readFileSync(join(migrationsDir, migrationFile), "utf8");
+
+  for (const tableName of ["declarations"]) {
+    assert.match(
+      migration,
+      new RegExp(`create table if not exists public\\.${tableName}`),
+      `expected ${tableName} table`,
+    );
+    assert.match(
+      migration,
+      new RegExp(`alter table public\\.${tableName} enable row level security`),
+      `expected RLS enabled for ${tableName}`,
+    );
+  }
+
+  for (const token of [
+    "insert into public.customers",
+    "insert into public.vendors",
+    "insert into public.invoices",
+    "insert into public.invoice_line_items",
+    "insert into public.payments",
+    "insert into public.accounts_payable",
+    "insert into public.financial_activities",
+    "insert into public.declarations",
+    "on conflict",
+  ]) {
+    assert.match(migration, new RegExp(token));
+  }
+});
