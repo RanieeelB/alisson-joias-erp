@@ -108,7 +108,7 @@ test("payments and accounts routes use protected finance workspaces", () => {
 
     assert.match(page, /createClient/);
     assert.match(page, /auth\.getUser/);
-    assert.match(page, /app_metadata\?\.role/);
+    assert.match(page, /isInternalFinanceUser/);
     assert.match(page, /redirect\("\/login/);
   }
 

@@ -71,11 +71,22 @@ test("dashboard requires an authenticated internal finance user", () => {
   const dashboardComponent = readProjectFile(
     "src/features/dashboard/components/financial-dashboard.tsx",
   );
+  const authz = readProjectFile("src/lib/supabase/authz.ts");
 
-  assert.match(dashboardPage, /createClient/);
-  assert.match(dashboardPage, /auth\.getUser/);
-  assert.match(dashboardPage, /app_metadata\?\.role/);
+  assert.match(authz, /INTERNAL_FINANCE_ALLOWED_EMAILS/);
+  assert.match(authz, /app_metadata\?\.role/);
+  assert.match(authz, /admin/);
+  assert.match(authz, /staff/);
+  assert.match(authz, /split\(","\)/);
+  assert.match(authz, /toLowerCase\(\)/);
+  assert.match(dashboardPage, /isInternalFinanceUser/);
   assert.match(dashboardPage, /redirect\("\/login/);
   assert.match(dashboardComponent, /userEmail/);
   assert.match(dashboardComponent, /Sair/);
+});
+
+test("documents internal finance allowlist fallback for development access", () => {
+  const envExample = readProjectFile(".env.example");
+
+  assert.match(envExample, /^INTERNAL_FINANCE_ALLOWED_EMAILS=/m);
 });

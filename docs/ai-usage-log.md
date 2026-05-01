@@ -176,3 +176,12 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - Revisão/adaptação humana: pendente de aprovação do usuário antes de codificar as rotas e componentes da Etapa 4.
 - O que mudou após revisão: ainda não houve implementação; o protótipo segue a direção visual existente do console financeiro com sidebar escura, superfícies claras, acento dourado contido e dados de joalheria.
 - Riscos ou follow-up: ajustar rótulos, densidade, composição ou prioridades dos relatórios conforme feedback antes de criar `/statements` e `/reports`.
+
+## 2026-05-01 - fallback de acesso interno
+
+- Ferramentas/skills usadas: Codex, `supabase`, `test-driven-development`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: destravar o login interno enquanto o `app_metadata.role` do Supabase não estava fácil de configurar pelo Dashboard.
+- Saída aceita: helper central `isInternalFinanceUser` que mantém `app_metadata.role` como regra principal e permite fallback server-side por `INTERNAL_FINANCE_ALLOWED_EMAILS`.
+- Revisão/adaptação humana: o usuário tentou configurar `app_metadata` manualmente e depois pediu ajuda para resolver de forma prática.
+- O que mudou após revisão: as rotas protegidas passaram a chamar o helper central em vez de repetir a lógica de role em cada arquivo.
+- Riscos ou follow-up: manter o fallback apenas para ambiente controlado; para produção, preferir `app_metadata.role` preenchido por Admin API ou SQL seguro.
