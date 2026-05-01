@@ -140,3 +140,66 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - Revisão/adaptação humana: o usuário aprovou o protótipo visual do detalhe antes da implementação.
 - O que mudou após revisão: os mocks de invoices passaram a incluir contato, billing, payments e line items consistentes com os totais; o detalhe usa esses dados para exibir o workspace completo da fatura.
 - Riscos ou follow-up: o próximo avanço natural é tornar as ações funcionais com side panel interativo e persistência real no Supabase.
+
+## 2026-04-30 - início da Etapa 3 Payments and Accounts
+
+- Ferramentas/skills usadas: Codex, `brainstorming`, `imagegen`, `jewelry-erp-finance-domain`.
+- Resumo do prompt ou tarefa: iniciar a branch `feat/payments-accounts` sem prefixo `codex/` e prototipar visualmente as novas telas de Payments, Accounts Receivable e Accounts Payable antes de implementar código de produto.
+- Saída aceita: protótipo visual inicial salvo em `docs/assets/prototypes/payments-accounts-prototype.png`, com cards de pagamentos, listagem de pagamentos, Aging Analysis, saldos por cliente, reminders e tabela de Accounts Payable.
+- Revisão/adaptação humana: pendente de aprovação do usuário antes de codificar as rotas e componentes da Etapa 3.
+- O que mudou após revisão: ainda não houve implementação; o protótipo segue a direção visual existente do console financeiro com sidebar escura, superfícies claras, acento dourado contido e dados de joalheria.
+- Riscos ou follow-up: ajustar datas, rótulos ou densidade do protótipo conforme feedback antes de criar `/payments`, `/accounts/receivable` e `/accounts/payable`.
+
+## 2026-04-30 - implementação da Etapa 3 Payments and Accounts
+
+- Ferramentas/skills usadas: Codex, `writing-plans`, `test-driven-development`, `jewelry-erp-finance-domain`, `next-best-practices`, `vercel-react-best-practices`, `building-components`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: após aprovação do protótipo visual, implementar Payments, Accounts Receivable e Accounts Payable como workspaces protegidos do módulo financeiro.
+- Saída aceita: rotas `/payments`, `/accounts/receivable` e `/accounts/payable`, modelos mockados de pagamentos/AR/AP, helpers testáveis de resumo financeiro, navegação lateral atualizada e UI alinhada ao protótipo aprovado.
+- Revisão/adaptação humana: o usuário aprovou o protótipo com “ok” antes da implementação.
+- O que mudou após revisão: a implementação separou as telas por rota, manteve a linguagem operacional em português, preservou os labels financeiros em inglês quando são conceitos do teste e adicionou testes automatizados para os cálculos e estrutura das páginas.
+- Riscos ou follow-up: os fluxos de registrar pagamento e enviar reminder ainda são simulados por botões; persistência real no Supabase e ações funcionais podem entrar em uma etapa bônus ou refinamento posterior.
+
+## 2026-04-30 - migração para Supabase hospedado
+
+- Ferramentas/skills usadas: Codex, `supabase`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: remover a dependência de Supabase local via Docker e configurar o projeto para usar um projeto Supabase hospedado com URL pública e publishable key.
+- Saída aceita: `.env` local atualizado com as variáveis públicas fornecidas pelo usuário, `.env.example` com placeholders de projeto hospedado e README revisado para um fluxo de setup sem Docker.
+- Revisão/adaptação humana: o usuário decidiu abandonar o fluxo local do Docker e seguir com Supabase hospedado.
+- O que mudou após revisão: a documentação agora orienta setup por `.env`, explica o papel de `admin`/`staff` no Auth SSR e reforça que service role keys não entram no frontend.
+- Riscos ou follow-up: aplicar a migration de referência no projeto remoto, criar os usuários internos corretos no painel do Supabase e revisar depois como demonstrar Storage real na entrega final.
+
+## 2026-05-01 - início da Etapa 4 Statements and Reports
+
+- Ferramentas/skills usadas: Codex, `brainstorming`, `imagegen`, `jewelry-erp-finance-domain`, `next-best-practices`, `vercel-react-best-practices`, `building-components`.
+- Resumo do prompt ou tarefa: iniciar a branch `feat/statements-reports` sem prefixo `codex/` e prototipar visualmente as novas telas de Statements e Reports antes de escrever código de produto.
+- Saída aceita: protótipo visual inicial salvo em `docs/assets/prototypes/statements-reports-prototype.png`, com seletor de período, cards de statements por cliente, ações View/Print/Email, Email All Statements, Bulk Download, seletor de relatórios e visão Revenue Analysis.
+- Revisão/adaptação humana: pendente de aprovação do usuário antes de codificar as rotas e componentes da Etapa 4.
+- O que mudou após revisão: ainda não houve implementação; o protótipo segue a direção visual existente do console financeiro com sidebar escura, superfícies claras, acento dourado contido e dados de joalheria.
+- Riscos ou follow-up: ajustar rótulos, densidade, composição ou prioridades dos relatórios conforme feedback antes de criar `/statements` e `/reports`.
+
+## 2026-05-01 - fallback de acesso interno
+
+- Ferramentas/skills usadas: Codex, `supabase`, `test-driven-development`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: destravar o login interno enquanto o `app_metadata.role` do Supabase não estava fácil de configurar pelo Dashboard.
+- Saída aceita: helper central `isInternalFinanceUser` que mantém `app_metadata.role` como regra principal e permite fallback server-side por `INTERNAL_FINANCE_ALLOWED_EMAILS`.
+- Revisão/adaptação humana: o usuário tentou configurar `app_metadata` manualmente e depois pediu ajuda para resolver de forma prática.
+- O que mudou após revisão: as rotas protegidas passaram a chamar o helper central em vez de repetir a lógica de role em cada arquivo.
+- Riscos ou follow-up: manter o fallback apenas para ambiente controlado; para produção, preferir `app_metadata.role` preenchido por Admin API ou SQL seguro.
+
+## 2026-05-01 - implementação da Etapa 4 Statements and Reports
+
+- Ferramentas/skills usadas: Codex, `writing-plans`, `executing-plans`, `test-driven-development`, `jewelry-erp-finance-domain`, `next-best-practices`, `vercel-react-best-practices`, `building-components`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: implementar `/statements` e `/reports` após aprovação do protótipo visual.
+- Saída aceita: rotas protegidas `/statements` e `/reports`, dados mockados realistas, helpers testáveis de statements e reports, cards de cliente, ações View/Print/Email, Email All Statements, Bulk Download, seletor de reports, Revenue Analysis, Cash Flow, Profit & Loss e Tax Summary.
+- Revisão/adaptação humana: o usuário aprovou o protótipo visual antes da implementação e pediu continuidade com commits curtos e semânticos.
+- O que mudou após revisão: a navegação lateral passou a apontar para Statements e Reports, e a implementação manteve labels financeiros do teste em English com texto operacional em português.
+- Riscos ou follow-up: ações de envio, impressão, download e export ainda são simulações visuais; persistência Supabase, PDF/CSV real e e-mail real podem entrar em bônus ou refinamento.
+
+## 2026-05-01 - ajuste do seletor de Reports
+
+- Ferramentas/skills usadas: Codex, `systematic-debugging`, `test-driven-development`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: corrigir o seletor Revenue Analysis, Cash Flow, Profit & Loss e Tax Summary, que existia visualmente mas não trocava a visão ativa.
+- Saída aceita: `/reports` passou a ler `?tipo=...`, renderizar a visão ativa no servidor e usar links específicos para cada report type.
+- Revisão/adaptação humana: o usuário apontou que os quatro tipos ainda não funcionavam.
+- O que mudou após revisão: foram adicionados testes para os links por tipo e a renderização ativa de reports; cada opção agora troca o painel principal.
+- Riscos ou follow-up: os reports continuam baseados em dados mockados; export real ainda é boundary visual.

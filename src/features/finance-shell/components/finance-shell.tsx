@@ -8,11 +8,11 @@ type FinanceNavItem = {
 const navItems: FinanceNavItem[] = [
   { label: "Painel Financeiro", href: "/dashboard" },
   { label: "Faturas", href: "/invoices" },
-  { label: "Pagamentos", href: "#" },
-  { label: "Contas a Receber", href: "#" },
-  { label: "Contas a Pagar", href: "#" },
-  { label: "Extratos", href: "#" },
-  { label: "Relatórios", href: "#" },
+  { label: "Pagamentos", href: "/payments" },
+  { label: "Contas a Receber", href: "/accounts/receivable" },
+  { label: "Contas a Pagar", href: "/accounts/payable" },
+  { label: "Extratos", href: "/statements" },
+  { label: "Relatórios", href: "/reports" },
 ];
 
 export function FinanceShell({

@@ -45,29 +45,29 @@
 
 ## Step 3 - Payments and Accounts
 
-- [ ] Define payment model and methods.
-- [ ] Build payment list.
-- [ ] Build payment summary cards.
-- [ ] Build register payment flow.
-- [ ] Build AR aging analysis chart.
-- [ ] Build customer balance bars.
-- [ ] Build open invoice reminder list.
-- [ ] Define vendor/AP model.
-- [ ] Build AP table and summary cards.
+- [x] Define payment model and methods.
+- [x] Build payment list.
+- [x] Build payment summary cards.
+- [x] Build register payment flow.
+- [x] Build AR aging analysis chart.
+- [x] Build customer balance bars.
+- [x] Build open invoice reminder list.
+- [x] Define vendor/AP model.
+- [x] Build AP table and summary cards.
 
 ## Step 4 - Statements and Reports
 
-- [ ] Build statement date range selector.
-- [ ] Build customer statement cards.
-- [ ] Build View/Print/Email statement actions.
-- [ ] Build Email All Statements action.
-- [ ] Build Bulk Download action.
-- [ ] Build report type selector.
-- [ ] Build Revenue Analysis view.
-- [ ] Build Cash Flow view.
-- [ ] Build Profit & Loss view.
-- [ ] Build Tax Summary view.
-- [ ] Build Export Report action.
+- [x] Build statement date range selector.
+- [x] Build customer statement cards.
+- [x] Build View/Print/Email statement actions.
+- [x] Build Email All Statements action.
+- [x] Build Bulk Download action.
+- [x] Build report type selector.
+- [x] Build Revenue Analysis view.
+- [x] Build Cash Flow view.
+- [x] Build Profit & Loss view.
+- [x] Build Tax Summary view.
+- [x] Build Export Report action.
 
 ## Step 5 - Bonus and Automations
 

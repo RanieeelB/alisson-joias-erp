@@ -1,5 +1,6 @@
 import { InvoiceDetailPage } from "@/features/invoices/components/invoice-detail-page";
 import { getInvoiceById } from "@/features/invoices/data";
+import { isInternalFinanceUser } from "@/lib/supabase/authz";
 import { createClient } from "@/lib/supabase/server";
 import { notFound, redirect } from "next/navigation";
 
@@ -20,13 +21,12 @@ export default async function InvoiceDetailRoute({
     data: { user },
     error,
   } = await supabase.auth.getUser();
-  const role = user?.app_metadata?.role;
 
   if (error || !user) {
     redirect("/login?erro=acesso");
   }
 
-  if (role !== "admin" && role !== "staff") {
+  if (!isInternalFinanceUser(user)) {
     redirect("/login?erro=acesso");
   }
 
