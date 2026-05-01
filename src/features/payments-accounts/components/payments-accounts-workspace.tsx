@@ -362,7 +362,11 @@ function ReceivableTab({
                     </span>
                   </div>
                   <div className="h-2 overflow-hidden rounded-full bg-[var(--color-graphite-100)]">
-                    <div className={`h-full rounded-full ${bucketTone[bucket]}`} style={{ width: `${percent}%` }} />
+                    <div
+                      className={`h-full rounded-full ${bucketTone[bucket]}`}
+                      style={{ width: `${percent}%` }}
+                      title={formatMoney(value)}
+                    />
                   </div>
                 </div>
               );
@@ -394,7 +398,11 @@ function ReceivableTab({
                   </span>
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-[var(--color-graphite-100)]">
-                  <div className="h-full rounded-full bg-blue-600" style={{ width: `${balance.progress}%` }} />
+                  <div
+                    className="h-full rounded-full bg-blue-600"
+                    style={{ width: `${balance.progress}%` }}
+                    title={formatMoney(balance.currentCents + balance.overdueCents)}
+                  />
                 </div>
               </div>
             ))}

@@ -249,6 +249,10 @@ test("statements and reports routes use protected finance workspaces", () => {
   assert.match(workspaceView, /aria-selected={isActive}/);
   assert.match(workspaceView, /onClick={\(\) => setActiveReportType\(type\)}/);
   assert.match(workspaceView, /renderActiveReport/);
+  assert.match(workspaceView, /buildRevenueChartAxis/);
+  assert.match(workspaceView, /title=\{formatMoney\(row\.revenueCents\)\}/);
+  assert.match(workspaceView, /title=\{tooltip\}/);
+  assert.match(workspaceView, /formatMoney\(value\)/);
 
   for (const view of [workspaceView, statementsView, reportsView]) {
     assert.doesNotMatch(view, /<ActiveTab href=/);

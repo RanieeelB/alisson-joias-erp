@@ -616,6 +616,7 @@ function RevenueProfitChart({
           <path d={pathFor("profitCents")} fill="none" stroke="#3b82f6" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" />
           {data.map((point, index) => (
             <g key={point.month}>
+              <title>{`${point.month} · Receita: ${formatMoney(point.revenueCents)} · Lucro: ${formatMoney(point.profitCents)}`}</title>
               <circle cx={xFor(index)} cy={yFor(point.revenueCents)} fill="#d2a84f" r="5" />
               <circle cx={xFor(index)} cy={yFor(point.profitCents)} fill="#3b82f6" r="4" />
               <text x={xFor(index)} y="218" fill="#6f6a60" fontSize="13" textAnchor="middle">
@@ -688,20 +689,22 @@ function CategoryDonut({
             const strokeDasharray = `${item.segment} ${100 - item.segment}`;
 
             return (
-              <circle
-                key={item.label}
-                cx="60"
-                cy="60"
-                fill="none"
-                r="42"
-                stroke={item.color}
-                strokeDasharray={strokeDasharray}
-                strokeDashoffset={item.offset}
-                strokeLinecap="butt"
-                strokeWidth="18"
-                pathLength="100"
-                transform="rotate(-90 60 60)"
-              />
+              <g key={item.label}>
+                <title>{`${item.label}: ${formatMoney(item.valueCents)}`}</title>
+                <circle
+                  cx="60"
+                  cy="60"
+                  fill="none"
+                  r="42"
+                  stroke={item.color}
+                  strokeDasharray={strokeDasharray}
+                  strokeDashoffset={item.offset}
+                  strokeLinecap="butt"
+                  strokeWidth="18"
+                  pathLength="100"
+                  transform="rotate(-90 60 60)"
+                />
+              </g>
             );
           })}
           <text x="60" y="57" fill="#202428" fontSize="9.5" fontWeight="700" textAnchor="middle">
@@ -781,7 +784,11 @@ function AgingTable({
                       {formatMoney(row.balanceCents)}
                     </td>
                     <td className="border-b border-[var(--color-border)] py-3">
-                      <Progress value={percent} tone={row.bucket === "current" ? "success" : row.bucket === "90+" ? "danger" : "warning"} />
+                      <Progress
+                        value={percent}
+                        tone={row.bucket === "current" ? "success" : row.bucket === "90+" ? "danger" : "warning"}
+                        title={`${row.label}: ${formatMoney(row.balanceCents)} (${percent}%)`}
+                      />
                     </td>
                   </tr>
                 );
@@ -833,10 +840,11 @@ function TopCustomers({
                   {formatMoney(customer.balanceCents)}
                 </span>
               </div>
-              <Progress
-                value={Math.round((customer.balanceCents / maxBalance) * 100)}
-                tone={customer.overdueCents > 0 ? "warning" : "success"}
-              />
+                <Progress
+                  value={Math.round((customer.balanceCents / maxBalance) * 100)}
+                  tone={customer.overdueCents > 0 ? "warning" : "success"}
+                  title={`${customer.name}: ${formatMoney(customer.balanceCents)}`}
+                />
             </div>
           ))}
         </div>
@@ -1033,9 +1041,11 @@ function MetricMini({
 }
 
 function Progress({
+  title,
   value,
   tone,
 }: {
+  title?: string;
   value: number;
   tone: "success" | "warning" | "danger";
 }) {
@@ -1048,7 +1058,7 @@ function Progress({
 
   return (
     <div className="h-2.5 overflow-hidden rounded-full bg-[var(--color-graphite-100)]">
-      <div className={`h-full rounded-full ${colors[tone]}`} style={style} />
+      <div className={`h-full rounded-full ${colors[tone]}`} style={style} title={title} />
     </div>
   );
 }

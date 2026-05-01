@@ -157,6 +157,8 @@ test("dashboard labels accumulated profit as an estimate", () => {
   );
 
   assert.match(source, /Lucro acumulado estimado/);
+  assert.match(source, /<title>\{`\$\{point\.month\} · Receita: /);
+  assert.match(source, /<title>\{`\$\{item\.label\}: /);
 });
 
 test("builds dashboard KPI details from real invoice data", () => {

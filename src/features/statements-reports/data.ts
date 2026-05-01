@@ -78,14 +78,7 @@ export function summarizeRevenueAnalysis(rows: MonthlyReportRow[]) {
 }
 
 export function buildRevenueChartColumns(rows: MonthlyReportRow[]) {
-  const maxValue = rows.reduce((currentMax, row) => {
-    return Math.max(
-      currentMax,
-      row.revenueCents,
-      row.expensesCents,
-      row.profitCents,
-    );
-  }, 0);
+  const maxValue = getMaxChartValue(rows);
 
   return rows.map((row) => ({
     month: row.month,
@@ -93,6 +86,30 @@ export function buildRevenueChartColumns(rows: MonthlyReportRow[]) {
     expensesHeightPercent: scalePercent(row.expensesCents, maxValue),
     profitHeightPercent: scalePercent(row.profitCents, maxValue),
   }));
+}
+
+export function buildRevenueChartAxis(rows: MonthlyReportRow[], steps = 4) {
+  const maxValue = getMaxChartValue(rows);
+
+  return Array.from({ length: steps + 1 }, (_, index) => {
+    const value = Math.round((maxValue * (steps - index)) / steps);
+
+    return {
+      value,
+      ratio: steps === 0 ? 0 : index / steps,
+    };
+  });
+}
+
+function getMaxChartValue(rows: MonthlyReportRow[]) {
+  return rows.reduce((currentMax, row) => {
+    return Math.max(
+      currentMax,
+      row.revenueCents,
+      row.expensesCents,
+      row.profitCents,
+    );
+  }, 0);
 }
 
 export function summarizeCashFlow(rows: CashFlowRow[]) {
