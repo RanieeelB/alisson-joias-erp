@@ -1,4 +1,5 @@
 import { ReportsPage } from "@/features/statements-reports/components/reports-page";
+import { loadFinanceWorkspace } from "@/features/finance/data";
 import { isInternalFinanceUser } from "@/lib/supabase/authz";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
@@ -20,9 +21,7 @@ export default async function ReportsRoute() {
     redirect("/login?erro=acesso");
   }
 
-  return (
-    <ReportsPage
-      userEmail={user.email ?? "usuario interno"}
-    />
-  );
+  const data = await loadFinanceWorkspace(supabase);
+
+  return <ReportsPage data={data} userEmail={user.email ?? "usuario interno"} />;
 }

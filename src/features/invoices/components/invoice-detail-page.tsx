@@ -1,7 +1,6 @@
 import { signOut } from "@/app/login/actions";
 import { FinanceShell } from "@/features/finance-shell/components/finance-shell";
 import {
-  getInvoiceById,
   invoiceStatusLabels,
   quickbooksSyncLabels,
   summarizeInvoiceDetail,
@@ -21,6 +20,7 @@ const quickbooksTone = {
   synced: "bg-emerald-50 text-emerald-700 ring-emerald-200",
   pending: "bg-amber-50 text-amber-700 ring-amber-200",
   failed: "bg-red-50 text-red-700 ring-red-200",
+  not_synced: "bg-slate-50 text-slate-700 ring-slate-200",
 };
 
 export function InvoiceDetailPage({
@@ -171,10 +171,10 @@ export function InvoiceDetailPage({
                 Action panel
               </p>
               <div className="mt-4 grid gap-2">
-                <ActionButton>Send</ActionButton>
-                <ActionButton primary>Record Payment</ActionButton>
-                <ActionButton>Print</ActionButton>
-                <ActionButton>Download PDF</ActionButton>
+                <ActionButton href={`mailto:${invoice.billingEmail}`}>Enviar</ActionButton>
+                <ActionButton href="/payments" primary>Registrar Pagamento</ActionButton>
+                <ActionButton href={`/api/exports/invoices/${invoice.id}`}>Imprimir</ActionButton>
+                <ActionButton href={`/api/exports/invoices/${invoice.id}`}>Baixar PDF</ActionButton>
                 <ActionButton>Edit</ActionButton>
               </div>
             </section>
@@ -287,18 +287,28 @@ function TotalRow({
 
 function ActionButton({
   children,
+  href,
   primary = false,
 }: {
   children: string;
+  href?: string;
   primary?: boolean;
 }) {
+  const className = primary
+    ? "min-h-10 rounded-md bg-[var(--color-gold-500)] px-3 text-sm font-semibold text-[var(--color-graphite-950)] shadow-sm transition hover:bg-[var(--color-gold-400)]"
+    : "min-h-10 rounded-md border border-[var(--color-border)] bg-white px-3 text-sm font-medium text-[var(--color-graphite-800)] shadow-sm transition hover:border-[var(--color-gold-400)] hover:text-[var(--color-graphite-950)]";
+
+  if (href) {
+    return (
+      <a href={href} target={href.startsWith("/api") ? "_blank" : undefined} className={`inline-flex items-center justify-center ${className}`}>
+        {children}
+      </a>
+    );
+  }
+
   return (
     <button
-      className={
-        primary
-          ? "min-h-10 rounded-md bg-[var(--color-gold-500)] px-3 text-sm font-semibold text-[var(--color-graphite-950)] shadow-sm transition hover:bg-[var(--color-gold-400)]"
-          : "min-h-10 rounded-md border border-[var(--color-border)] bg-white px-3 text-sm font-medium text-[var(--color-graphite-800)] shadow-sm transition hover:border-[var(--color-gold-400)] hover:text-[var(--color-graphite-950)]"
-      }
+      className={className}
     >
       {children}
     </button>
@@ -312,5 +322,3 @@ function formatLongDate(value: string) {
     year: "numeric",
   }).format(new Date(`${value}T00:00:00.000Z`));
 }
-
-void getInvoiceById;

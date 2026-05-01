@@ -1,10 +1,11 @@
 "use client";
 
 import { signOut } from "@/app/login/actions";
+import { createInvoiceAction } from "@/features/finance/actions";
+import type { FinanceWorkspaceData } from "@/features/finance/data";
 import { FinanceShell } from "@/features/finance-shell/components/finance-shell";
 import {
   filterInvoices,
-  invoiceRecords,
   invoiceStatusLabels,
   quickbooksSyncLabels,
   summarizeInvoices,
@@ -12,8 +13,8 @@ import {
 import type { InvoiceRecord, InvoiceStatusFilter } from "@/features/invoices/types";
 import { formatMoney } from "@/lib/finance";
 import Link from "next/link";
-import type { FormEvent } from "react";
-import { useState } from "react";
+import type { FormEvent, ReactNode } from "react";
+import { useActionState, useState } from "react";
 
 const statusOrder: InvoiceStatusFilter[] = [
   "all",
@@ -34,16 +35,23 @@ const quickbooksTone = {
   synced: "bg-emerald-50 text-emerald-700 ring-emerald-200",
   pending: "bg-amber-50 text-amber-700 ring-amber-200",
   failed: "bg-red-50 text-red-700 ring-red-200",
+  not_synced: "bg-slate-50 text-slate-700 ring-slate-200",
 };
 
 type InvoicesPageProps = {
+  data: FinanceWorkspaceData;
   userEmail?: string;
 };
 
-export function InvoicesPage({ userEmail }: InvoicesPageProps) {
+export function InvoicesPage({ data, userEmail }: InvoicesPageProps) {
   const [activeStatus, setActiveStatus] = useState<InvoiceStatusFilter>("all");
+  const [isCreatingInvoice, setIsCreatingInvoice] = useState(false);
   const [query, setQuery] = useState("");
-  const visibleInvoices = filterInvoices(invoiceRecords, {
+  const [invoiceState, invoiceAction, isInvoicePending] = useActionState(
+    createInvoiceAction,
+    { ok: false, message: "" },
+  );
+  const visibleInvoices = filterInvoices(data.invoiceRecords, {
     status: activeStatus,
     query,
   });
@@ -56,13 +64,21 @@ export function InvoicesPage({ userEmail }: InvoicesPageProps) {
       title="Faturas"
       userEmail={userEmail}
       secondaryAction={
-        <button className="hidden min-h-10 rounded-md border border-[var(--color-border)] bg-white px-3 text-sm font-medium text-[var(--color-graphite-800)] shadow-sm transition hover:border-[var(--color-gold-400)] hover:text-[var(--color-graphite-950)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)] sm:inline-flex sm:items-center">
+        <a
+          href="/api/exports/dashboard"
+          target="_blank"
+          className="hidden min-h-10 rounded-md border border-[var(--color-border)] bg-white px-3 text-sm font-medium text-[var(--color-graphite-800)] shadow-sm transition hover:border-[var(--color-gold-400)] hover:text-[var(--color-graphite-950)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)] sm:inline-flex sm:items-center"
+        >
           Exportar
-        </button>
+        </a>
       }
       primaryAction={
         <>
-          <button className="min-h-10 rounded-md bg-[var(--color-graphite-900)] px-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--color-graphite-800)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]">
+          <button
+            type="button"
+            onClick={() => setIsCreatingInvoice(true)}
+            className="min-h-10 rounded-md bg-[var(--color-graphite-900)] px-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--color-graphite-800)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]"
+          >
             Nova Fatura
           </button>
           <form action={signOut}>
@@ -81,6 +97,16 @@ export function InvoicesPage({ userEmail }: InvoicesPageProps) {
         </div>
       }
     >
+      {isCreatingInvoice ? (
+        <InvoiceDialog
+          action={invoiceAction}
+          customers={data.customers}
+          isPending={isInvoicePending}
+          message={invoiceState.message}
+          ok={invoiceState.ok}
+          onClose={() => setIsCreatingInvoice(false)}
+        />
+      ) : null}
       <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-5 px-4 py-4 sm:px-6 lg:px-8 lg:py-6">
         <section className="flex flex-col gap-3 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 shadow-[var(--shadow-widget)]">
           <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
@@ -414,6 +440,99 @@ function MiniMetric({
       <p className={`font-mono text-lg font-semibold ${classes[tone]}`}>{value}</p>
       <p className="mt-1 text-xs text-[var(--color-muted)]">{label}</p>
     </div>
+  );
+}
+
+const fieldClassName =
+  "min-h-11 rounded-md border border-[var(--color-border)] bg-white px-3 text-sm text-[var(--color-graphite-950)] outline-none transition focus:border-[var(--color-gold-500)] focus:ring-2 focus:ring-[var(--color-gold-500)]/20";
+
+function InvoiceDialog({
+  action,
+  customers,
+  isPending,
+  message,
+  ok,
+  onClose,
+}: {
+  action: (payload: FormData) => void;
+  customers: FinanceWorkspaceData["customers"];
+  isPending: boolean;
+  message: string;
+  ok: boolean;
+  onClose: () => void;
+}) {
+  const today = new Date().toISOString().slice(0, 10);
+
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 px-4">
+      <form
+        action={action}
+        className="w-full max-w-2xl rounded-md border border-[var(--color-border)] bg-white p-5 shadow-2xl"
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-gold-700)]">
+              Nova Fatura
+            </p>
+            <h2 className="mt-1 text-lg font-semibold text-[var(--color-graphite-950)]">
+              Criar fatura persistida
+            </h2>
+          </div>
+          <button type="button" onClick={onClose} className="rounded-md border border-[var(--color-border)] px-3 py-2 text-sm">
+            Fechar
+          </button>
+        </div>
+        <div className="mt-5 grid gap-4 md:grid-cols-2">
+          <FormField label="Cliente">
+            <select name="customerId" required className={fieldClassName}>
+              <option value="">Selecione</option>
+              {customers.map((customer) => (
+                <option key={customer.id} value={customer.id}>{customer.label}</option>
+              ))}
+            </select>
+          </FormField>
+          <FormField label="Tipo">
+            <select name="orderType" required className={fieldClassName}>
+              <option value="custom_order">Pedido Personalizado</option>
+              <option value="repair">Reparo</option>
+              <option value="wholesale">Atacado</option>
+              <option value="retail">Varejo</option>
+            </select>
+          </FormField>
+          <FormField label="Emissão">
+            <input name="invoiceDate" type="date" required defaultValue={today} className={fieldClassName} />
+          </FormField>
+          <FormField label="Vencimento">
+            <input name="dueDate" type="date" required className={fieldClassName} />
+          </FormField>
+          <FormField label="Valor sem imposto">
+            <input name="subtotal" inputMode="decimal" required placeholder="42850,00" className={fieldClassName} />
+          </FormField>
+          <FormField label="Descrição">
+            <input name="description" required placeholder="Anel 18k com diamante certificado" className={fieldClassName} />
+          </FormField>
+        </div>
+        {message ? (
+          <p className={`mt-4 text-sm font-medium ${ok ? "text-emerald-700" : "text-red-700"}`}>
+            {message}
+          </p>
+        ) : null}
+        <div className="mt-5 flex justify-end">
+          <button type="submit" disabled={isPending} className="min-h-10 rounded-md bg-[var(--color-graphite-900)] px-4 text-sm font-semibold text-white disabled:opacity-60">
+            {isPending ? "Salvando..." : "Salvar fatura"}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+function FormField({ children, label }: { children: ReactNode; label: string }) {
+  return (
+    <label className="grid gap-2 text-sm font-medium text-[var(--color-graphite-900)]">
+      {label}
+      {children}
+    </label>
   );
 }
 

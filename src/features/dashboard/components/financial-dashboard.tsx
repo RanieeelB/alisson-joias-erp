@@ -1,18 +1,20 @@
+"use client";
+
 import type { CSSProperties, ReactNode } from "react";
+import { useActionState, useState } from "react";
 import {
-  agingSummary,
-  categoryRevenue,
-  dashboardAsOf,
-  invoices,
-  recentActivity,
-  revenueSeries,
-  topCustomers,
   type Activity,
   type AgingSummary,
   type CategoryRevenue,
   type CustomerBalance,
   type RevenuePoint,
 } from "@/features/dashboard/data";
+import { createInvoiceAction } from "@/features/finance/actions";
+import {
+  buildAgingSummary,
+  buildDashboardInvoices,
+  type FinanceWorkspaceData,
+} from "@/features/finance/data";
 import { FinanceShell } from "@/features/finance-shell/components/finance-shell";
 import {
   formatCompactMoney,
@@ -33,12 +35,19 @@ const toneClass = {
 };
 
 export function FinancialDashboard({
+  data,
   userEmail,
   viewState = "ready",
 }: {
+  data: FinanceWorkspaceData;
   userEmail?: string;
   viewState?: DashboardViewState;
 }) {
+  const [isCreatingInvoice, setIsCreatingInvoice] = useState(false);
+  const [invoiceState, invoiceAction, isInvoicePending] = useActionState(
+    createInvoiceAction,
+    { ok: false, message: "" },
+  );
   const isLoading = viewState === "loading";
   const hasError = viewState === "error";
   const isEmpty = viewState === "empty";
@@ -47,13 +56,16 @@ export function FinancialDashboard({
     : hasError
       ? "error"
       : "ready";
-  const visibleInvoices = isEmpty ? [] : invoices;
-  const visibleAgingSummary = isEmpty ? [] : agingSummary;
-  const visibleRevenueSeries = isEmpty ? [] : revenueSeries;
-  const visibleCategoryRevenue = isEmpty ? [] : categoryRevenue;
-  const visibleTopCustomers = isEmpty ? [] : topCustomers;
-  const visibleActivity = isEmpty ? [] : recentActivity;
-  const summary = summarizeDashboard(visibleInvoices, dashboardAsOf);
+  const dashboardInvoices = buildDashboardInvoices(data.invoiceRecords);
+  const visibleInvoices = isEmpty ? [] : dashboardInvoices;
+  const visibleAgingSummary = isEmpty
+    ? []
+    : buildAgingSummary(data.invoiceRecords, data.dashboardAsOf);
+  const visibleRevenueSeries = isEmpty ? [] : data.revenueSeries;
+  const visibleCategoryRevenue = isEmpty ? [] : data.categoryRevenue;
+  const visibleTopCustomers = isEmpty ? [] : data.topCustomers;
+  const visibleActivity = isEmpty ? [] : data.recentActivity;
+  const summary = summarizeDashboard(visibleInvoices, data.dashboardAsOf);
 
   return (
     <FinanceShell
@@ -62,13 +74,21 @@ export function FinancialDashboard({
       title="Painel Financeiro"
       userEmail={userEmail}
       secondaryAction={
-        <button className="hidden min-h-10 rounded-md border border-[var(--color-border)] bg-white px-3 text-sm font-medium text-[var(--color-graphite-800)] shadow-sm transition hover:border-[var(--color-gold-400)] hover:text-[var(--color-graphite-950)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)] sm:inline-flex sm:items-center">
+        <a
+          href="/api/exports/dashboard"
+          target="_blank"
+          className="hidden min-h-10 rounded-md border border-[var(--color-border)] bg-white px-3 text-sm font-medium text-[var(--color-graphite-800)] shadow-sm transition hover:border-[var(--color-gold-400)] hover:text-[var(--color-graphite-950)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)] sm:inline-flex sm:items-center"
+        >
           Exportar
-        </button>
+        </a>
       }
       primaryAction={
         <>
-          <button className="min-h-10 rounded-md bg-[var(--color-graphite-900)] px-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--color-graphite-800)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]">
+          <button
+            type="button"
+            onClick={() => setIsCreatingInvoice(true)}
+            className="min-h-10 rounded-md bg-[var(--color-graphite-900)] px-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--color-graphite-800)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]"
+          >
             Nova Fatura
           </button>
           <form action={signOut}>
@@ -80,13 +100,23 @@ export function FinancialDashboard({
       }
       footer={
         <div className="rounded-md bg-white/8 p-3 text-xs leading-5 text-white/72">
-          Dados simulados do Supabase ativos
+          Dados persistidos no Supabase
           <div className="mt-2 font-medium text-[var(--color-gold-200)]">
             Limite da integração QuickBooks visível
           </div>
         </div>
       }
     >
+      {isCreatingInvoice ? (
+        <InvoiceDialog
+          action={invoiceAction}
+          customers={data.customers}
+          isPending={isInvoicePending}
+          message={invoiceState.message}
+          ok={invoiceState.ok}
+          onClose={() => setIsCreatingInvoice(false)}
+        />
+      ) : null}
       <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-5 px-4 py-4 sm:px-6 lg:px-8 lg:py-6">
         <HeaderActions viewState={viewState} />
         <section
@@ -183,8 +213,99 @@ function HeaderActions({ viewState }: { viewState: DashboardViewState }) {
       <div className="flex flex-wrap gap-2">
         <StatusPill tone={statePill.tone}>{statePill.label}</StatusPill>
         <StatusPill tone="warning">3 sincronizações pendentes</StatusPill>
-        <StatusPill tone="info">Dados simulados</StatusPill>
+        <StatusPill tone="info">Dados reais</StatusPill>
       </div>
+    </div>
+  );
+}
+
+function InvoiceDialog({
+  action,
+  customers,
+  isPending,
+  message,
+  ok,
+  onClose,
+}: {
+  action: (payload: FormData) => void;
+  customers: FinanceWorkspaceData["customers"];
+  isPending: boolean;
+  message: string;
+  ok: boolean;
+  onClose: () => void;
+}) {
+  const today = new Date().toISOString().slice(0, 10);
+
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 px-4">
+      <form
+        action={action}
+        className="w-full max-w-2xl rounded-md border border-[var(--color-border)] bg-white p-5 shadow-2xl"
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-gold-700)]">
+              Nova Fatura
+            </p>
+            <h2 className="mt-1 text-lg font-semibold text-[var(--color-graphite-950)]">
+              Criar fatura no banco
+            </h2>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md border border-[var(--color-border)] px-3 py-2 text-sm"
+          >
+            Fechar
+          </button>
+        </div>
+        <div className="mt-5 grid gap-4 md:grid-cols-2">
+          <FormField label="Cliente">
+            <select name="customerId" required className={fieldClassName}>
+              <option value="">Selecione</option>
+              {customers.map((customer) => (
+                <option key={customer.id} value={customer.id}>
+                  {customer.label}
+                </option>
+              ))}
+            </select>
+          </FormField>
+          <FormField label="Tipo">
+            <select name="orderType" required className={fieldClassName}>
+              <option value="custom_order">Pedido Personalizado</option>
+              <option value="repair">Reparo</option>
+              <option value="wholesale">Atacado</option>
+              <option value="retail">Varejo</option>
+            </select>
+          </FormField>
+          <FormField label="Emissão">
+            <input name="invoiceDate" type="date" required defaultValue={today} className={fieldClassName} />
+          </FormField>
+          <FormField label="Vencimento">
+            <input name="dueDate" type="date" required className={fieldClassName} />
+          </FormField>
+          <FormField label="Valor sem imposto">
+            <input name="subtotal" inputMode="decimal" required placeholder="42850,00" className={fieldClassName} />
+          </FormField>
+          <FormField label="Descrição">
+            <input name="description" required placeholder="Anel 18k com diamante certificado" className={fieldClassName} />
+          </FormField>
+        </div>
+        {message ? (
+          <p className={`mt-4 text-sm font-medium ${ok ? "text-emerald-700" : "text-red-700"}`}>
+            {message}
+          </p>
+        ) : null}
+        <div className="mt-5 flex justify-end gap-2">
+          <button
+            type="submit"
+            disabled={isPending}
+            className="min-h-10 rounded-md bg-[var(--color-graphite-900)] px-4 text-sm font-semibold text-white disabled:opacity-60"
+          >
+            {isPending ? "Salvando..." : "Salvar fatura"}
+          </button>
+        </div>
+      </form>
     </div>
   );
 }
@@ -806,6 +927,18 @@ function EmptyState({ title, detail }: { title: string; detail: string }) {
       <p className="text-sm font-semibold text-[var(--color-graphite-900)]">{title}</p>
       <p className="mt-1 text-sm text-[var(--color-muted)]">{detail}</p>
     </div>
+  );
+}
+
+const fieldClassName =
+  "min-h-11 rounded-md border border-[var(--color-border)] bg-white px-3 text-sm text-[var(--color-graphite-950)] outline-none transition focus:border-[var(--color-gold-500)] focus:ring-2 focus:ring-[var(--color-gold-500)]/20";
+
+function FormField({ children, label }: { children: ReactNode; label: string }) {
+  return (
+    <label className="grid gap-2 text-sm font-medium text-[var(--color-graphite-900)]">
+      {label}
+      {children}
+    </label>
   );
 }
 

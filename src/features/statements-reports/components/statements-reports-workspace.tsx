@@ -1,12 +1,9 @@
 "use client";
 
 import { signOut } from "@/app/login/actions";
+import type { FinanceWorkspaceData } from "@/features/finance/data";
 import { FinanceShell } from "@/features/finance-shell/components/finance-shell";
 import {
-  cashFlowRows,
-  customerStatements,
-  monthlyReportRows,
-  profitLossReport,
   reportTypeLabels,
   statementPeriod,
   summarizeCashFlow,
@@ -14,7 +11,6 @@ import {
   summarizeRevenueAnalysis,
   summarizeStatements,
   summarizeTaxSummary,
-  taxQuarterCards,
 } from "@/features/statements-reports/data";
 import type {
   CustomerStatement,
@@ -30,8 +26,8 @@ export type StatementsReportsTab = "statements" | "reports";
 const workspaceTabs: StatementsReportsTab[] = ["statements", "reports"];
 
 const workspaceLabels: Record<StatementsReportsTab, string> = {
-  statements: "Statements",
-  reports: "Reports",
+  statements: "Extratos",
+  reports: "Relatórios",
 };
 
 const workspacePaths: Record<StatementsReportsTab, string> = {
@@ -60,19 +56,21 @@ const taxStatusTone = {
 };
 
 export function StatementsReportsWorkspace({
+  data,
   initialTab,
   userEmail,
 }: {
+  data: FinanceWorkspaceData;
   initialTab: StatementsReportsTab;
   userEmail?: string;
 }) {
   const [activeTab, setActiveTab] = useState<StatementsReportsTab>(initialTab);
   const [activeReportType, setActiveReportType] = useState<ReportType>("revenue_analysis");
-  const statementsSummary = summarizeStatements(customerStatements);
-  const revenue = summarizeRevenueAnalysis(monthlyReportRows);
-  const cashFlow = summarizeCashFlow(cashFlowRows);
-  const profitLoss = summarizeProfitLoss(profitLossReport);
-  const taxSummary = summarizeTaxSummary(taxQuarterCards);
+  const statementsSummary = summarizeStatements(data.customerStatements);
+  const revenue = summarizeRevenueAnalysis(data.monthlyReportRows);
+  const cashFlow = summarizeCashFlow(data.cashFlowRows);
+  const profitLoss = summarizeProfitLoss(data.profitLossReport);
+  const taxSummary = summarizeTaxSummary(data.taxQuarterCards);
 
   return (
     <FinanceShell
@@ -82,24 +80,24 @@ export function StatementsReportsWorkspace({
       userEmail={userEmail}
       secondaryAction={
         <HeaderButton onClick={() => setActiveTab(activeTab === "statements" ? "reports" : "statements")}>
-          {activeTab === "statements" ? "Reports" : "Statements"}
+          {activeTab === "statements" ? "Relatórios" : "Extratos"}
         </HeaderButton>
       }
       primaryAction={
         <>
           {activeTab === "statements" ? (
             <>
-              <button className="min-h-10 rounded-md border border-[var(--color-gold-400)] bg-white px-3 text-sm font-semibold text-[var(--color-gold-800)] shadow-sm transition hover:bg-[var(--color-gold-50)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]">
-                Email All Statements
-              </button>
-              <button className="min-h-10 rounded-md bg-[var(--color-gold-500)] px-3 text-sm font-semibold text-[var(--color-graphite-950)] shadow-sm transition hover:bg-[var(--color-gold-400)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]">
-                Bulk Download
-              </button>
+              <a href="mailto:?subject=Extratos Alisson Joias" className="min-h-10 rounded-md border border-[var(--color-gold-400)] bg-white px-3 py-2 text-sm font-semibold text-[var(--color-gold-800)] shadow-sm transition hover:bg-[var(--color-gold-50)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]">
+                Enviar extratos
+              </a>
+              <a href="/api/exports/statements/bulk" target="_blank" className="min-h-10 rounded-md bg-[var(--color-gold-500)] px-3 py-2 text-sm font-semibold text-[var(--color-graphite-950)] shadow-sm transition hover:bg-[var(--color-gold-400)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]">
+                Baixar em lote
+              </a>
             </>
           ) : (
-            <button className="min-h-10 rounded-md bg-[var(--color-gold-500)] px-3 text-sm font-semibold text-[var(--color-graphite-950)] shadow-sm transition hover:bg-[var(--color-gold-400)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]">
-              Export Report
-            </button>
+            <a href="/api/exports/reports" target="_blank" className="min-h-10 rounded-md bg-[var(--color-gold-500)] px-3 py-2 text-sm font-semibold text-[var(--color-graphite-950)] shadow-sm transition hover:bg-[var(--color-gold-400)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]">
+              Exportar relatório
+            </a>
           )}
           <form action={signOut}>
             <button className="min-h-10 rounded-md border border-[var(--color-border)] bg-white px-3 text-sm font-medium text-[var(--color-graphite-800)] shadow-sm transition hover:border-red-300 hover:text-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-400">
@@ -111,7 +109,7 @@ export function StatementsReportsWorkspace({
       footer={
         activeTab === "statements" ? (
           <div className="rounded-md bg-white/8 p-3 text-xs leading-5 text-white/72">
-            Statements prontos para envio
+            Extratos prontos para envio
             <div className="mt-2 font-medium text-[var(--color-gold-200)]">
               {statementsSummary.totalCustomers} clientes no período
             </div>
@@ -166,13 +164,15 @@ export function StatementsReportsWorkspace({
         </section>
 
         {activeTab === "statements" ? (
-          <StatementsTab summary={statementsSummary} />
+          <StatementsTab statements={data.customerStatements} summary={statementsSummary} />
         ) : (
           <ReportsTab
             activeReportType={activeReportType}
             cashFlow={cashFlow}
+            monthlyRows={data.monthlyReportRows}
             profitLoss={profitLoss}
             revenue={revenue}
+            taxCards={data.taxQuarterCards}
             taxSummary={taxSummary}
           />
         )}
@@ -181,7 +181,13 @@ export function StatementsReportsWorkspace({
   );
 }
 
-function StatementsTab({ summary }: { summary: ReturnType<typeof summarizeStatements> }) {
+function StatementsTab({
+  statements,
+  summary,
+}: {
+  statements: CustomerStatement[];
+  summary: ReturnType<typeof summarizeStatements>;
+}) {
   return (
     <>
       <section className="grid gap-3 md:grid-cols-4">
@@ -193,7 +199,7 @@ function StatementsTab({ summary }: { summary: ReturnType<typeof summarizeStatem
 
       <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="grid gap-3">
-          {customerStatements.map((statement) => (
+          {statements.map((statement) => (
             <StatementCard key={statement.id} statement={statement} />
           ))}
         </div>
@@ -219,14 +225,18 @@ function StatementsTab({ summary }: { summary: ReturnType<typeof summarizeStatem
 function ReportsTab({
   activeReportType,
   cashFlow,
+  monthlyRows,
   profitLoss,
   revenue,
+  taxCards,
   taxSummary,
 }: {
   activeReportType: ReportType;
   cashFlow: ReturnType<typeof summarizeCashFlow>;
+  monthlyRows: MonthlyReportRow[];
   profitLoss: ReturnType<typeof summarizeProfitLoss>;
   revenue: ReturnType<typeof summarizeRevenueAnalysis>;
+  taxCards: TaxQuarterCard[];
   taxSummary: ReturnType<typeof summarizeTaxSummary>;
 }) {
   return (
@@ -242,7 +252,9 @@ function ReportsTab({
         {renderActiveReport({
           activeReportType,
           cashFlow,
+          monthlyRows,
           profitLoss,
+          taxCards,
           taxSummary,
         })}
 
@@ -276,7 +288,7 @@ function ReportsTab({
               Tax Summary
             </h2>
             <div className="mt-3 space-y-3">
-              {taxQuarterCards.map((card) => (
+              {taxCards.map((card) => (
                 <TaxQuarter key={card.quarter} card={card} />
               ))}
             </div>
@@ -290,12 +302,16 @@ function ReportsTab({
 function renderActiveReport({
   activeReportType,
   cashFlow,
+  monthlyRows,
   profitLoss,
+  taxCards,
   taxSummary,
 }: {
   activeReportType: ReportType;
   cashFlow: ReturnType<typeof summarizeCashFlow>;
+  monthlyRows: MonthlyReportRow[];
   profitLoss: ReturnType<typeof summarizeProfitLoss>;
+  taxCards: TaxQuarterCard[];
   taxSummary: ReturnType<typeof summarizeTaxSummary>;
 }) {
   if (activeReportType === "cash_flow") {
@@ -358,7 +374,7 @@ function renderActiveReport({
             <MetricCard label="Payable" value={formatMoney(taxSummary.payableCents)} detail="Impostos a pagar" />
           </div>
           <div className="mt-5 grid gap-3 md:grid-cols-3">
-            {taxQuarterCards.map((card) => (
+            {taxCards.map((card) => (
               <TaxQuarter key={card.quarter} card={card} />
             ))}
           </div>
@@ -386,7 +402,7 @@ function renderActiveReport({
           </div>
         </div>
         <div className="grid min-h-64 grid-cols-6 items-end gap-3 border-l border-b border-[var(--color-border)] px-3 pt-4">
-          {monthlyReportRows.map((row) => (
+          {monthlyRows.map((row) => (
             <ChartColumn key={row.month} row={row} />
           ))}
         </div>
@@ -408,7 +424,7 @@ function renderActiveReport({
               </tr>
             </thead>
             <tbody>
-              {monthlyReportRows.map((row) => (
+              {monthlyRows.map((row) => (
                 <ReportRow key={row.month} row={row} />
               ))}
             </tbody>
@@ -452,12 +468,14 @@ function StatementCard({ statement }: { statement: CustomerStatement }) {
 
         <div className="flex flex-wrap gap-2 lg:justify-end">
           {statement.actions.map((action) => (
-            <button
+            <a
               key={action}
+              href={action === "email" ? `mailto:?subject=${statement.statementNumber}` : `/api/exports/statements/${statement.id}`}
+              target={action === "email" ? undefined : "_blank"}
               className="min-h-9 rounded-md border border-[var(--color-border)] bg-white px-3 text-xs font-semibold text-[var(--color-graphite-800)] transition hover:border-[var(--color-gold-400)] hover:text-[var(--color-graphite-950)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]"
             >
               {getActionLabel(action)}
-            </button>
+            </a>
           ))}
         </div>
       </div>
@@ -691,8 +709,8 @@ function HeaderButton({ children, onClick }: { children: string; onClick: () => 
 }
 
 function getActionLabel(action: CustomerStatement["actions"][number]) {
-  if (action === "view") return "View";
-  if (action === "print") return "Print";
+  if (action === "view") return "Visualizar";
+  if (action === "print") return "Imprimir";
 
   return "Email";
 }

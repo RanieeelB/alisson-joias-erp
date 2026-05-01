@@ -1,15 +1,13 @@
 "use client";
 
 import { signOut } from "@/app/login/actions";
+import { createPayableAction, recordPaymentAction } from "@/features/finance/actions";
+import type { FinanceWorkspaceData } from "@/features/finance/data";
 import { FinanceShell } from "@/features/finance-shell/components/finance-shell";
 import {
-  accountsPayableRecords,
   agingBucketLabels,
-  customerReceivableBalances,
   getReceivableBalanceScale,
-  openReceivableInvoices,
   payableStatusLabels,
-  paymentRecords,
   paymentStatusLabels,
   summarizeAccountsPayable,
   summarizePayments,
@@ -17,12 +15,14 @@ import {
 } from "@/features/payments-accounts/data";
 import type {
   AccountsPayableRecord,
+  CustomerReceivableBalance,
   PaymentRecord,
   ReceivableAgingSummary,
   ReceivableInvoice,
 } from "@/features/payments-accounts/types";
 import { formatMoney } from "@/lib/finance";
-import { useState } from "react";
+import type { ReactNode } from "react";
+import { useActionState, useState } from "react";
 
 export type PaymentsAccountsTab = "payments" | "receivable" | "payable";
 
@@ -97,16 +97,28 @@ const payableStatusTone = {
 };
 
 export function PaymentsAccountsWorkspace({
+  data,
   initialTab,
   userEmail,
 }: {
+  data: FinanceWorkspaceData;
   initialTab: PaymentsAccountsTab;
   userEmail?: string;
 }) {
   const [activeTab, setActiveTab] = useState<PaymentsAccountsTab>(initialTab);
-  const paymentSummary = summarizePayments(paymentRecords, asOf);
-  const payableSummary = summarizeAccountsPayable(accountsPayableRecords, asOf);
-  const aging = summarizeReceivableAging(openReceivableInvoices, asOf);
+  const [isPaymentOpen, setIsPaymentOpen] = useState(false);
+  const [isPayableOpen, setIsPayableOpen] = useState(false);
+  const [paymentState, paymentAction, isPaymentPending] = useActionState(
+    recordPaymentAction,
+    { ok: false, message: "" },
+  );
+  const [payableState, payableAction, isPayablePending] = useActionState(
+    createPayableAction,
+    { ok: false, message: "" },
+  );
+  const paymentSummary = summarizePayments(data.paymentRecords, asOf);
+  const payableSummary = summarizeAccountsPayable(data.accountsPayableRecords, asOf);
+  const aging = summarizeReceivableAging(data.openReceivableInvoices, asOf);
   const totalAgingCents = agingOrder.reduce((sum, bucket) => sum + aging[bucket], 0);
 
   return (
@@ -122,7 +134,12 @@ export function PaymentsAccountsWorkspace({
       }
       primaryAction={
         <>
-          <PrimaryAction activeTab={activeTab} setActiveTab={setActiveTab} />
+          <PrimaryAction
+            activeTab={activeTab}
+            onNewPayable={() => setIsPayableOpen(true)}
+            onNewPayment={() => setIsPaymentOpen(true)}
+            setActiveTab={setActiveTab}
+          />
           <form action={signOut}>
             <button className="min-h-10 rounded-md border border-[var(--color-border)] bg-white px-3 text-sm font-medium text-[var(--color-graphite-800)] shadow-sm transition hover:border-red-300 hover:text-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-400">
               Sair
@@ -139,6 +156,27 @@ export function PaymentsAccountsWorkspace({
         </div>
       }
     >
+      {isPaymentOpen ? (
+        <PaymentDialog
+          action={paymentAction}
+          customers={data.customers}
+          invoices={data.invoiceRecords}
+          isPending={isPaymentPending}
+          message={paymentState.message}
+          ok={paymentState.ok}
+          onClose={() => setIsPaymentOpen(false)}
+        />
+      ) : null}
+      {isPayableOpen ? (
+        <PayableDialog
+          action={payableAction}
+          isPending={isPayablePending}
+          message={payableState.message}
+          ok={payableState.ok}
+          onClose={() => setIsPayableOpen(false)}
+          vendors={data.vendors}
+        />
+      ) : null}
       <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-5 px-4 py-4 sm:px-6 lg:px-8 lg:py-6">
         <section className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 shadow-[var(--shadow-widget)]">
           <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
@@ -165,18 +203,29 @@ export function PaymentsAccountsWorkspace({
         </section>
 
         {activeTab === "payments" ? (
-          <PaymentsTab summary={paymentSummary} />
+          <PaymentsTab payments={data.paymentRecords} summary={paymentSummary} />
         ) : activeTab === "receivable" ? (
-          <ReceivableTab aging={aging} totalAgingCents={totalAgingCents} />
+          <ReceivableTab
+            aging={aging}
+            balances={data.customerReceivableBalances}
+            invoices={data.openReceivableInvoices}
+            totalAgingCents={totalAgingCents}
+          />
         ) : (
-          <PayableTab summary={payableSummary} />
+          <PayableTab records={data.accountsPayableRecords} summary={payableSummary} />
         )}
       </div>
     </FinanceShell>
   );
 }
 
-function PaymentsTab({ summary }: { summary: ReturnType<typeof summarizePayments> }) {
+function PaymentsTab({
+  payments,
+  summary,
+}: {
+  payments: PaymentRecord[];
+  summary: ReturnType<typeof summarizePayments>;
+}) {
   return (
     <>
       <section className="grid gap-3 md:grid-cols-3">
@@ -238,7 +287,7 @@ function PaymentsTab({ summary }: { summary: ReturnType<typeof summarizePayments
               </tr>
             </thead>
             <tbody>
-              {paymentRecords.map((payment) => (
+              {payments.map((payment) => (
                 <PaymentRow key={payment.id} payment={payment} />
               ))}
             </tbody>
@@ -251,12 +300,16 @@ function PaymentsTab({ summary }: { summary: ReturnType<typeof summarizePayments
 
 function ReceivableTab({
   aging,
+  balances: receivableBalances,
+  invoices,
   totalAgingCents,
 }: {
   aging: ReceivableAgingSummary;
+  balances: CustomerReceivableBalance[];
+  invoices: ReceivableInvoice[];
   totalAgingCents: number;
 }) {
-  const balances = getReceivableBalanceScale(customerReceivableBalances);
+  const balances = getReceivableBalanceScale(receivableBalances);
 
   return (
     <>
@@ -352,7 +405,7 @@ function ReceivableTab({
               </tr>
             </thead>
             <tbody>
-              {openReceivableInvoices.map((invoice) => (
+              {invoices.map((invoice) => (
                 <ReceivableRow key={invoice.id} invoice={invoice} />
               ))}
             </tbody>
@@ -363,7 +416,13 @@ function ReceivableTab({
   );
 }
 
-function PayableTab({ summary }: { summary: ReturnType<typeof summarizeAccountsPayable> }) {
+function PayableTab({
+  records,
+  summary,
+}: {
+  records: AccountsPayableRecord[];
+  summary: ReturnType<typeof summarizeAccountsPayable>;
+}) {
   return (
     <>
       <section className="grid gap-3 md:grid-cols-3">
@@ -427,7 +486,7 @@ function PayableTab({ summary }: { summary: ReturnType<typeof summarizeAccountsP
               </tr>
             </thead>
             <tbody>
-              {accountsPayableRecords.map((record) => (
+              {records.map((record) => (
                 <PayableRow key={record.id} record={record} />
               ))}
             </tbody>
@@ -644,9 +703,13 @@ function HeaderButton({ children, onClick }: { children: string; onClick: () => 
 
 function PrimaryAction({
   activeTab,
+  onNewPayable,
+  onNewPayment,
   setActiveTab,
 }: {
   activeTab: PaymentsAccountsTab;
+  onNewPayable: () => void;
+  onNewPayment: () => void;
   setActiveTab: (tab: PaymentsAccountsTab) => void;
 }) {
   if (activeTab === "receivable") {
@@ -663,16 +726,151 @@ function PrimaryAction({
 
   if (activeTab === "payable") {
     return (
-      <button className="hidden min-h-10 rounded-md bg-[var(--color-graphite-900)] px-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--color-graphite-800)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)] sm:inline-flex sm:items-center">
+      <button
+        type="button"
+        onClick={onNewPayable}
+        className="hidden min-h-10 rounded-md bg-[var(--color-graphite-900)] px-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--color-graphite-800)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)] sm:inline-flex sm:items-center"
+      >
         Nova obrigação
       </button>
     );
   }
 
   return (
-    <button className="min-h-10 rounded-md bg-[var(--color-gold-500)] px-3 text-sm font-semibold text-[var(--color-graphite-950)] shadow-sm transition hover:bg-[var(--color-gold-400)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]">
+    <button
+      type="button"
+      onClick={onNewPayment}
+      className="min-h-10 rounded-md bg-[var(--color-gold-500)] px-3 text-sm font-semibold text-[var(--color-graphite-950)] shadow-sm transition hover:bg-[var(--color-gold-400)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]"
+    >
       Registrar pagamento
     </button>
+  );
+}
+
+function PaymentDialog({
+  action,
+  customers,
+  invoices,
+  isPending,
+  message,
+  ok,
+  onClose,
+}: {
+  action: (payload: FormData) => void;
+  customers: FinanceWorkspaceData["customers"];
+  invoices: FinanceWorkspaceData["invoiceRecords"];
+  isPending: boolean;
+  message: string;
+  ok: boolean;
+  onClose: () => void;
+}) {
+  const today = new Date().toISOString().slice(0, 10);
+
+  return (
+    <ModalForm action={action} title="Registrar pagamento" onClose={onClose}>
+      <FormField label="Fatura">
+        <select name="invoiceId" required className={fieldClassName}>
+          <option value="">Selecione</option>
+          {invoices.map((invoice) => (
+            <option key={invoice.id} value={invoice.id}>
+              {invoice.invoiceNumber} - {invoice.customerName}
+            </option>
+          ))}
+        </select>
+      </FormField>
+      <FormField label="Cliente">
+        <select name="customerId" required className={fieldClassName}>
+          <option value="">Selecione</option>
+          {customers.map((customer) => (
+            <option key={customer.id} value={customer.id}>{customer.label}</option>
+          ))}
+        </select>
+      </FormField>
+      <FormField label="Data">
+        <input name="paymentDate" type="date" required defaultValue={today} className={fieldClassName} />
+      </FormField>
+      <FormField label="Valor">
+        <input name="amount" inputMode="decimal" required placeholder="12500,00" className={fieldClassName} />
+      </FormField>
+      <FormField label="Forma de pagamento">
+        <select name="method" required className={fieldClassName}>
+          <option value="pix">Pix</option>
+          <option value="ach">ACH</option>
+          <option value="wire">Wire</option>
+          <option value="credit_card">Cartão de crédito</option>
+          <option value="cash">Dinheiro</option>
+          <option value="check">Cheque</option>
+        </select>
+      </FormField>
+      <FormField label="Status">
+        <select name="status" required className={fieldClassName}>
+          <option value="settled">Concluído</option>
+          <option value="pending_deposit">Depósito pendente</option>
+          <option value="credit">Crédito</option>
+        </select>
+      </FormField>
+      <FormField label="Referência">
+        <input name="reference" placeholder="PIX, ACH ou comprovante" className={fieldClassName} />
+      </FormField>
+      <DialogStatus isPending={isPending} message={message} ok={ok} submitLabel="Salvar pagamento" />
+    </ModalForm>
+  );
+}
+
+function PayableDialog({
+  action,
+  isPending,
+  message,
+  ok,
+  onClose,
+  vendors,
+}: {
+  action: (payload: FormData) => void;
+  isPending: boolean;
+  message: string;
+  ok: boolean;
+  onClose: () => void;
+  vendors: FinanceWorkspaceData["vendors"];
+}) {
+  const today = new Date().toISOString().slice(0, 10);
+
+  return (
+    <ModalForm action={action} title="Nova obrigação" onClose={onClose}>
+      <FormField label="Fornecedor">
+        <select name="vendorId" required className={fieldClassName}>
+          <option value="">Selecione</option>
+          {vendors.map((vendor) => (
+            <option key={vendor.id} value={vendor.id}>{vendor.label}</option>
+          ))}
+        </select>
+      </FormField>
+      <FormField label="Categoria">
+        <select name="category" required className={fieldClassName}>
+          <option value="raw_materials">Matéria-prima</option>
+          <option value="components">Componentes</option>
+          <option value="certification">Certificação</option>
+          <option value="services">Serviços</option>
+        </select>
+      </FormField>
+      <FormField label="Data">
+        <input name="payableDate" type="date" required defaultValue={today} className={fieldClassName} />
+      </FormField>
+      <FormField label="Vencimento">
+        <input name="dueDate" type="date" required className={fieldClassName} />
+      </FormField>
+      <FormField label="Valor">
+        <input name="total" inputMode="decimal" required placeholder="22100,00" className={fieldClassName} />
+      </FormField>
+      <FormField label="Status">
+        <select name="status" required className={fieldClassName}>
+          <option value="pending">Pendente</option>
+          <option value="partial">Parcial</option>
+          <option value="paid">Pago</option>
+          <option value="overdue">Em atraso</option>
+        </select>
+      </FormField>
+      <DialogStatus isPending={isPending} message={message} ok={ok} submitLabel="Salvar obrigação" />
+    </ModalForm>
   );
 }
 
@@ -688,6 +886,76 @@ function FilterButtons({ labels }: { labels: string[] }) {
         </button>
       ))}
     </div>
+  );
+}
+
+const fieldClassName =
+  "min-h-11 rounded-md border border-[var(--color-border)] bg-white px-3 text-sm text-[var(--color-graphite-950)] outline-none transition focus:border-[var(--color-gold-500)] focus:ring-2 focus:ring-[var(--color-gold-500)]/20";
+
+function ModalForm({
+  action,
+  children,
+  onClose,
+  title,
+}: {
+  action: (payload: FormData) => void;
+  children: ReactNode;
+  onClose: () => void;
+  title: string;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 px-4">
+      <form action={action} className="w-full max-w-2xl rounded-md border border-[var(--color-border)] bg-white p-5 shadow-2xl">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-gold-700)]">
+              Fluxo financeiro
+            </p>
+            <h2 className="mt-1 text-lg font-semibold text-[var(--color-graphite-950)]">{title}</h2>
+          </div>
+          <button type="button" onClick={onClose} className="rounded-md border border-[var(--color-border)] px-3 py-2 text-sm">
+            Fechar
+          </button>
+        </div>
+        <div className="mt-5 grid gap-4 md:grid-cols-2">{children}</div>
+      </form>
+    </div>
+  );
+}
+
+function DialogStatus({
+  isPending,
+  message,
+  ok,
+  submitLabel,
+}: {
+  isPending: boolean;
+  message: string;
+  ok: boolean;
+  submitLabel: string;
+}) {
+  return (
+    <div className="md:col-span-2">
+      {message ? (
+        <p className={`mb-4 text-sm font-medium ${ok ? "text-emerald-700" : "text-red-700"}`}>
+          {message}
+        </p>
+      ) : null}
+      <div className="flex justify-end">
+        <button type="submit" disabled={isPending} className="min-h-10 rounded-md bg-[var(--color-graphite-900)] px-4 text-sm font-semibold text-white disabled:opacity-60">
+          {isPending ? "Salvando..." : submitLabel}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function FormField({ children, label }: { children: ReactNode; label: string }) {
+  return (
+    <label className="grid gap-2 text-sm font-medium text-[var(--color-graphite-900)]">
+      {label}
+      {children}
+    </label>
   );
 }
 
