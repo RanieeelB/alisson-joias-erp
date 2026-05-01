@@ -192,3 +192,16 @@ export function summarizeAutomations(
     ),
   };
 }
+
+export function calculateLateFeeCents(
+  balanceCents: number,
+  overdueDays: number,
+  graceDays: number,
+  feeRateBasisPoints: number,
+) {
+  if (overdueDays <= graceDays) {
+    return 0;
+  }
+
+  return Math.round((balanceCents * feeRateBasisPoints) / 10_000);
+}

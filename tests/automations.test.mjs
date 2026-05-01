@@ -61,7 +61,10 @@ test("summarizes automation rules, queued jobs, sync failures, and realtime stat
 });
 
 test("automation rules keep manual work owned by the source finance areas", () => {
-  const { automationRules } = loadTsModule("src/features/automations/data.ts");
+  const {
+    automationRules,
+    calculateLateFeeCents,
+  } = loadTsModule("src/features/automations/data.ts");
 
   assert.equal(
     JSON.stringify(automationRules.map((rule) => rule.ownerArea)),
@@ -79,6 +82,8 @@ test("automation rules keep manual work owned by the source finance areas", () =
     automationRules.some((rule) => rule.title.includes("enfileirar PDF/CSV")),
     true,
   );
+  assert.equal(calculateLateFeeCents(250000, 12, 7, 200), 5000);
+  assert.equal(calculateLateFeeCents(250000, 6, 7, 200), 0);
 });
 
 test("automations route wires a protected orchestration cockpit", () => {
