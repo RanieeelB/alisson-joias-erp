@@ -1,4 +1,5 @@
 import { FinancialDashboard } from "@/features/dashboard/components/financial-dashboard";
+import { isInternalFinanceUser } from "@/lib/supabase/authz";
 import type { DashboardViewState } from "@/features/dashboard/components/financial-dashboard";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
@@ -18,13 +19,12 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     data: { user },
     error,
   } = await supabase.auth.getUser();
-  const role = user?.app_metadata?.role;
 
   if (error || !user) {
     redirect("/login?erro=acesso");
   }
 
-  if (role !== "admin" && role !== "staff") {
+  if (!isInternalFinanceUser(user)) {
     redirect("/login?erro=acesso");
   }
 
