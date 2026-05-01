@@ -212,3 +212,12 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - Revisão/adaptação humana: o usuário pediu branch sem prefixo `codex/`, commits curtos e semânticos, e reforçou que queria a implementação completa após a branch inicial.
 - O que mudou após revisão: a rota `/reports` deixou de ler `searchParams`; `ReportsPage` virou componente client apenas para manter a aba ativa com `useState`, preservando o layout e a responsividade existentes.
 - Riscos ou follow-up: como a troca agora é local, o tipo de relatório ativo não fica mais compartilhável por URL; se deep link virar requisito, será necessário reintroduzir sincronização com URL de forma controlada.
+
+## 2026-05-01 - tabs internas em todas as seções
+
+- Ferramentas/skills usadas: Codex, `next-best-practices`, `vercel-react-best-practices`, `building-components`, `test-driven-development`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: estender o padrão de tabs locais para todas as áreas que ainda usavam links ou query string como navegação interna.
+- Saída aceita: filtros de status em Invoices, tabs de Payments/Accounts e tabs de Statements/Reports agora usam estado local sem mudar rota.
+- Revisão/adaptação humana: o usuário pediu explicitamente que a substituição fosse feita em todas as seções após a primeira implementação em Reports.
+- O que mudou após revisão: Invoices deixou de ler `searchParams`; Payments/Accounts e Statements/Reports ganharam workspaces compartilhados com wrappers por rota para manter entrada direta e alternância local.
+- Riscos ou follow-up: as tabs locais não preservam seleção na URL; caso a apresentação precise de links diretos para uma aba específica, sincronizar estado e URL de forma intencional.
