@@ -160,9 +160,9 @@ test("statements and reports routes use protected finance workspaces", () => {
     );
   }
 
-  assert.match(reportsRoute, /searchParams/);
-  assert.match(reportsRoute, /getActiveReportType/);
-  assert.match(reportsRoute, /activeReportType/);
+  assert.doesNotMatch(reportsRoute, /searchParams/);
+  assert.doesNotMatch(reportsRoute, /getActiveReportType/);
+  assert.doesNotMatch(reportsRoute, /activeReportType/);
 
   for (const href of [
     "/reports?tipo=revenue_analysis",
@@ -170,14 +170,20 @@ test("statements and reports routes use protected finance workspaces", () => {
     "/reports?tipo=profit_loss",
     "/reports?tipo=tax_summary",
   ]) {
-    assert.match(
+    assert.doesNotMatch(
       reportsView,
       new RegExp(href.replace("?", "\\?")),
-      `expected report selector to include ${href}`,
+      `expected report selector to avoid route-changing href ${href}`,
     );
   }
 
-  assert.match(reportsView, /activeReportType === type/);
+  assert.match(reportsView, /"use client"/);
+  assert.match(reportsView, /useState<ReportType>\("revenue_analysis"\)/);
+  assert.match(reportsView, /role="tablist"/);
+  assert.match(reportsView, /role="tab"/);
+  assert.match(reportsView, /isActive={activeReportType === type}/);
+  assert.match(reportsView, /aria-selected={isActive}/);
+  assert.match(reportsView, /onClick={\(\) => setActiveReportType\(type\)}/);
   assert.match(reportsView, /renderActiveReport/);
 
   for (const href of ["/statements", "/reports"]) {

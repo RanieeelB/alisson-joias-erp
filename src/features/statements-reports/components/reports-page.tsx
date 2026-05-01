@@ -1,3 +1,5 @@
+"use client";
+
 import { signOut } from "@/app/login/actions";
 import { FinanceShell } from "@/features/finance-shell/components/finance-shell";
 import {
@@ -14,6 +16,7 @@ import {
 import type { MonthlyReportRow, ReportType, TaxQuarterCard } from "@/features/statements-reports/types";
 import { formatMoney } from "@/lib/finance";
 import Link from "next/link";
+import { useState } from "react";
 
 const reportTypes: ReportType[] = [
   "revenue_analysis",
@@ -22,13 +25,6 @@ const reportTypes: ReportType[] = [
   "tax_summary",
 ];
 
-const reportTypeHrefs: Record<ReportType, string> = {
-  revenue_analysis: "/reports?tipo=revenue_analysis",
-  cash_flow: "/reports?tipo=cash_flow",
-  profit_loss: "/reports?tipo=profit_loss",
-  tax_summary: "/reports?tipo=tax_summary",
-};
-
 const taxStatusTone = {
   filed: "bg-emerald-50 text-emerald-700 ring-emerald-200",
   due: "bg-red-50 text-red-700 ring-red-200",
@@ -36,12 +32,11 @@ const taxStatusTone = {
 };
 
 export function ReportsPage({
-  activeReportType,
   userEmail,
 }: {
-  activeReportType: ReportType;
   userEmail?: string;
 }) {
+  const [activeReportType, setActiveReportType] = useState<ReportType>("revenue_analysis");
   const revenue = summarizeRevenueAnalysis(monthlyReportRows);
   const cashFlow = summarizeCashFlow(cashFlowRows);
   const profitLoss = summarizeProfitLoss(profitLossReport);
@@ -78,22 +73,20 @@ export function ReportsPage({
       <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-5 px-4 py-4 sm:px-6 lg:px-8 lg:py-6">
         <section className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 shadow-[var(--shadow-widget)]">
           <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-            <nav aria-label="Report type selector" className="flex flex-wrap gap-2">
-              {reportTypes.map((type) =>
-                activeReportType === type ? (
-                  <ActiveTab key={type} href={reportTypeHrefs[type]}>
-                    {reportTypeLabels[type]}
-                  </ActiveTab>
-                ) : (
-                  <InactiveTab key={type} href={reportTypeHrefs[type]}>
-                    {reportTypeLabels[type]}
-                  </InactiveTab>
-                ),
-              )}
-            </nav>
+            <div role="tablist" aria-label="Report type selector" className="flex flex-wrap gap-2">
+              {reportTypes.map((type) => (
+                <ReportTypeTab
+                  key={type}
+                  isActive={activeReportType === type}
+                  onClick={() => setActiveReportType(type)}
+                >
+                  {reportTypeLabels[type]}
+                </ReportTypeTab>
+              ))}
+            </div>
             <div className="flex flex-wrap gap-2">
-              <InactiveTab href="/statements">Statements</InactiveTab>
-              <ActiveTab href="/reports">Reports</ActiveTab>
+              <InactiveRouteTab href="/statements">Statements</InactiveRouteTab>
+              <ActiveRouteTab href="/reports">Reports</ActiveRouteTab>
             </div>
           </div>
         </section>
@@ -447,7 +440,33 @@ function Legend({ color, label }: { color: string; label: string }) {
   );
 }
 
-function ActiveTab({ href, children }: { href: string; children: string }) {
+function ReportTypeTab({
+  children,
+  isActive,
+  onClick,
+}: {
+  children: string;
+  isActive: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      role="tab"
+      aria-selected={isActive}
+      onClick={onClick}
+      className={
+        isActive
+          ? "inline-flex min-h-10 items-center rounded-md border border-[var(--color-gold-400)] bg-[var(--color-gold-500)] px-3 text-sm font-semibold text-[var(--color-graphite-950)]"
+          : "inline-flex min-h-10 items-center rounded-md border border-[var(--color-border)] bg-white px-3 text-sm font-medium text-[var(--color-graphite-800)] transition hover:border-[var(--color-gold-400)] hover:text-[var(--color-graphite-950)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]"
+      }
+    >
+      {children}
+    </button>
+  );
+}
+
+function ActiveRouteTab({ href, children }: { href: string; children: string }) {
   return (
     <Link
       href={href}
@@ -459,7 +478,7 @@ function ActiveTab({ href, children }: { href: string; children: string }) {
   );
 }
 
-function InactiveTab({ href, children }: { href: string; children: string }) {
+function InactiveRouteTab({ href, children }: { href: string; children: string }) {
   return (
     <Link
       href={href}
