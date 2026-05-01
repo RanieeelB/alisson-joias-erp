@@ -249,6 +249,13 @@ function ReportsTab({
   taxCards: TaxQuarterCard[];
   taxSummary: ReturnType<typeof summarizeTaxSummary>;
 }) {
+  const [hoveredRevenueRow, setHoveredRevenueRow] = useState<MonthlyReportRow | null>(null);
+  const [hoveredCashFlowLabel, setHoveredCashFlowLabel] = useState<{
+    label: string;
+    value: number;
+  } | null>(null);
+  const activeRevenueRow = hoveredRevenueRow ?? monthlyRows.at(-1) ?? null;
+
   return (
     <>
       <section className="grid gap-3 md:grid-cols-4">
@@ -262,10 +269,14 @@ function ReportsTab({
         {renderActiveReport({
           activeReportType,
           cashFlow,
+          hoveredCashFlowLabel,
+          hoveredRevenueRow: activeRevenueRow,
           monthlyRows,
           profitLoss,
           revenueAxis,
           revenueColumns,
+          setHoveredCashFlowLabel,
+          setHoveredRevenueRow,
           taxCards,
           taxSummary,
         })}
@@ -314,19 +325,27 @@ function ReportsTab({
 function renderActiveReport({
   activeReportType,
   cashFlow,
+  hoveredCashFlowLabel,
+  hoveredRevenueRow,
   monthlyRows,
   profitLoss,
   revenueAxis,
   revenueColumns,
+  setHoveredCashFlowLabel,
+  setHoveredRevenueRow,
   taxCards,
   taxSummary,
 }: {
   activeReportType: ReportType;
   cashFlow: ReturnType<typeof summarizeCashFlow>;
+  hoveredCashFlowLabel: { label: string; value: number } | null;
+  hoveredRevenueRow: MonthlyReportRow | null;
   monthlyRows: MonthlyReportRow[];
   profitLoss: ReturnType<typeof summarizeProfitLoss>;
   revenueAxis: ReturnType<typeof buildRevenueChartAxis>;
   revenueColumns: ReturnType<typeof buildRevenueChartColumns>;
+  setHoveredCashFlowLabel: (value: { label: string; value: number } | null) => void;
+  setHoveredRevenueRow: (value: MonthlyReportRow | null) => void;
   taxCards: TaxQuarterCard[];
   taxSummary: ReturnType<typeof summarizeTaxSummary>;
 }) {
@@ -346,8 +365,25 @@ function renderActiveReport({
             <MetricCard label="Fluxo líquido" value={formatMoney(cashFlow.netCashFlowCents)} detail="Fluxo líquido" />
           </div>
           <div className="mt-6 grid min-h-64 grid-cols-2 items-end gap-8 border-l border-b border-[var(--color-border)] px-8 pt-4">
-            <CashFlowBar label="Entradas" value={cashFlow.inflowsCents} max={cashFlow.inflowsCents} tone="bg-emerald-600" />
-            <CashFlowBar label="Saídas" value={cashFlow.outflowsCents} max={cashFlow.inflowsCents} tone="bg-red-500" />
+            <CashFlowBar
+              label="Entradas"
+              value={cashFlow.inflowsCents}
+              max={cashFlow.inflowsCents}
+              onHover={setHoveredCashFlowLabel}
+              tone="bg-emerald-600"
+            />
+            <CashFlowBar
+              label="Saídas"
+              value={cashFlow.outflowsCents}
+              max={cashFlow.inflowsCents}
+              onHover={setHoveredCashFlowLabel}
+              tone="bg-red-500"
+            />
+          </div>
+          <div className="mt-4 rounded-md border border-[var(--color-border)] bg-[var(--color-graphite-50)] px-3 py-2 font-mono text-xs text-[var(--color-graphite-800)]">
+            {hoveredCashFlowLabel
+              ? `${hoveredCashFlowLabel.label}: ${formatMoney(hoveredCashFlowLabel.value)}`
+              : "Passe o mouse sobre as barras"}
           </div>
         </article>
       </div>
@@ -433,9 +469,19 @@ function renderActiveReport({
           </div>
           <div className="grid min-h-64 grid-cols-6 items-end gap-3 border-l border-b border-[var(--color-border)] px-3 pt-4">
             {monthlyRows.map((row, index) => (
-              <ChartColumn key={row.month} row={row} scale={revenueColumns[index]} />
+              <ChartColumn
+                key={row.month}
+                row={row}
+                scale={revenueColumns[index]}
+                onHover={setHoveredRevenueRow}
+              />
             ))}
           </div>
+        </div>
+        <div className="mt-4 rounded-md border border-[var(--color-border)] bg-[var(--color-graphite-50)] px-3 py-2 font-mono text-xs text-[var(--color-graphite-800)]">
+          {hoveredRevenueRow
+            ? `${hoveredRevenueRow.month} · Receita ${formatMoney(hoveredRevenueRow.revenueCents)} · Despesas ${formatMoney(hoveredRevenueRow.expensesCents)} · Lucro ${formatMoney(hoveredRevenueRow.profitCents)}`
+            : "Passe o mouse sobre as colunas"}
         </div>
       </article>
 
@@ -538,24 +584,28 @@ function PreviewMetric({ label, value }: { label: string; value: string }) {
 function CashFlowBar({
   label,
   max,
+  onHover,
   tone,
   value,
 }: {
   label: string;
   max: number;
+  onHover: (value: { label: string; value: number } | null) => void;
   tone: string;
   value: number;
 }) {
   const height = Math.max(14, Math.round((value / max) * 100));
-  const tooltip = `${label}: ${formatMoney(value)}`;
 
   return (
-    <div className="flex h-full min-h-56 flex-col justify-end gap-2">
+    <div
+      className="flex h-full min-h-56 flex-col justify-end gap-2"
+      onMouseEnter={() => onHover({ label, value })}
+      onMouseLeave={() => onHover(null)}
+    >
       <div className="flex h-44 items-end justify-center">
         <span
           className={`w-16 rounded-t ${tone}`}
           style={{ height: `${height}%` }}
-          title={tooltip}
         />
       </div>
       <p className="text-center text-xs font-semibold text-[var(--color-muted)]">{label}</p>
@@ -567,9 +617,11 @@ function CashFlowBar({
 }
 
 function ChartColumn({
+  onHover,
   row,
   scale,
 }: {
+  onHover: (value: MonthlyReportRow | null) => void;
   row: MonthlyReportRow;
   scale?: ReturnType<typeof buildRevenueChartColumns>[number];
 }) {
@@ -578,22 +630,23 @@ function ChartColumn({
   const profitHeight = scale?.profitHeightPercent ?? 0;
 
   return (
-    <div className="flex h-full min-h-56 flex-col justify-end gap-2">
+    <div
+      className="flex h-full min-h-56 flex-col justify-end gap-2"
+      onMouseEnter={() => onHover(row)}
+      onMouseLeave={() => onHover(null)}
+    >
       <div className="flex h-44 items-end justify-center gap-1">
         <span
           className="w-3 rounded-t bg-blue-500"
           style={{ height: revenueHeight > 0 ? `${revenueHeight}%` : "0%" }}
-          title={formatMoney(row.revenueCents)}
         />
         <span
           className="w-3 rounded-t bg-red-500"
           style={{ height: expensesHeight > 0 ? `${expensesHeight}%` : "0%" }}
-          title={formatMoney(row.expensesCents)}
         />
         <span
           className="w-3 rounded-t bg-emerald-600"
           style={{ height: profitHeight > 0 ? `${profitHeight}%` : "0%" }}
-          title={formatMoney(row.profitCents)}
         />
       </div>
       <p className="truncate text-center font-mono text-xs text-[var(--color-muted)]">{row.month}</p>

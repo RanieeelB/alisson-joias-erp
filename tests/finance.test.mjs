@@ -157,8 +157,10 @@ test("dashboard labels accumulated profit as an estimate", () => {
   );
 
   assert.match(source, /Lucro acumulado estimado/);
-  assert.match(source, /<title>\{`\$\{point\.month\} · Receita: /);
-  assert.match(source, /<title>\{`\$\{item\.label\}: /);
+  assert.match(source, /onMouseEnter=\{\(\) => setHoveredPoint\(point\)\}/);
+  assert.match(source, /Passe o mouse sobre os pontos/);
+  assert.match(source, /onMouseEnter=\{\(\) => setHoveredCategory\(item\)\}/);
+  assert.match(source, /Passe o mouse sobre o gráfico/);
 });
 
 test("builds dashboard KPI details from real invoice data", () => {

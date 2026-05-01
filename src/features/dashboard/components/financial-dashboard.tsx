@@ -542,6 +542,9 @@ function RevenueProfitChart({
   data: RevenuePoint[];
   state: WidgetState;
 }) {
+  const [hoveredPoint, setHoveredPoint] = useState<RevenuePoint | null>(null);
+  const activePoint = hoveredPoint ?? data.at(-1) ?? null;
+
   if (state !== "ready") {
     return (
       <Widget
@@ -615,8 +618,11 @@ function RevenueProfitChart({
           <path d={pathFor("revenueCents")} fill="none" stroke="#d2a84f" strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" />
           <path d={pathFor("profitCents")} fill="none" stroke="#3b82f6" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" />
           {data.map((point, index) => (
-            <g key={point.month}>
-              <title>{`${point.month} · Receita: ${formatMoney(point.revenueCents)} · Lucro: ${formatMoney(point.profitCents)}`}</title>
+            <g
+              key={point.month}
+              onMouseEnter={() => setHoveredPoint(point)}
+              onMouseLeave={() => setHoveredPoint(null)}
+            >
               <circle cx={xFor(index)} cy={yFor(point.revenueCents)} fill="#d2a84f" r="5" />
               <circle cx={xFor(index)} cy={yFor(point.profitCents)} fill="#3b82f6" r="4" />
               <text x={xFor(index)} y="218" fill="#6f6a60" fontSize="13" textAnchor="middle">
@@ -632,6 +638,11 @@ function RevenueProfitChart({
         <span className="font-mono text-[var(--color-graphite-800)]">
           Lucro acumulado estimado {formatMoney(totalFrom(data, "profitCents"))}
         </span>
+        <span className="rounded-md border border-[var(--color-border)] bg-[var(--color-graphite-50)] px-2.5 py-1 font-mono text-xs text-[var(--color-graphite-800)]">
+          {activePoint
+            ? `${activePoint.month} · Receita ${formatMoney(activePoint.revenueCents)} · Lucro ${formatMoney(activePoint.profitCents)}`
+            : "Passe o mouse sobre os pontos"}
+        </span>
       </div>
     </Widget>
   );
@@ -644,6 +655,9 @@ function CategoryDonut({
   data: CategoryRevenue[];
   state: WidgetState;
 }) {
+  const [hoveredCategory, setHoveredCategory] = useState<CategoryRevenue | null>(null);
+  const activeCategory = hoveredCategory ?? data[0] ?? null;
+
   if (state !== "ready") {
     return (
       <Widget
@@ -687,10 +701,14 @@ function CategoryDonut({
           <circle cx="60" cy="60" fill="none" r="42" stroke="#ece7dd" strokeWidth="18" />
           {segments.map((item) => {
             const strokeDasharray = `${item.segment} ${100 - item.segment}`;
+            const category = data.find((entry) => entry.label === item.label);
 
             return (
-              <g key={item.label}>
-                <title>{`${item.label}: ${formatMoney(item.valueCents)}`}</title>
+              <g
+                key={item.label}
+                onMouseEnter={() => setHoveredCategory(category ?? null)}
+                onMouseLeave={() => setHoveredCategory(null)}
+              >
                 <circle
                   cx="60"
                   cy="60"
@@ -716,13 +734,23 @@ function CategoryDonut({
         </svg>
         <div className="space-y-3">
           {data.map((item) => (
-            <div key={item.label} className="flex items-center justify-between gap-3 text-sm">
+            <div
+              key={item.label}
+              className="flex items-center justify-between gap-3 text-sm"
+              onMouseEnter={() => setHoveredCategory(item)}
+              onMouseLeave={() => setHoveredCategory(null)}
+            >
               <LegendSwatch color={item.color}>{item.label}</LegendSwatch>
               <span className="font-mono font-medium text-[var(--color-graphite-900)]">
                 {formatMoney(item.valueCents)}
               </span>
             </div>
           ))}
+          <div className="rounded-md border border-[var(--color-border)] bg-[var(--color-graphite-50)] px-3 py-2 font-mono text-xs text-[var(--color-graphite-800)]">
+            {activeCategory
+              ? `${activeCategory.label}: ${formatMoney(activeCategory.valueCents)}`
+              : "Passe o mouse sobre o gráfico"}
+          </div>
         </div>
       </div>
     </Widget>
@@ -808,6 +836,9 @@ function TopCustomers({
   data: CustomerBalance[];
   state: WidgetState;
 }) {
+  const [hoveredCustomer, setHoveredCustomer] = useState<CustomerBalance | null>(null);
+  const activeCustomer = hoveredCustomer ?? data[0] ?? null;
+
   if (state !== "ready") {
     return (
       <Widget
@@ -828,7 +859,12 @@ function TopCustomers({
       ) : (
         <div className="space-y-4">
           {data.map((customer) => (
-            <div key={customer.name} className="space-y-2">
+            <div
+              key={customer.name}
+              className="space-y-2"
+              onMouseEnter={() => setHoveredCustomer(customer)}
+              onMouseLeave={() => setHoveredCustomer(null)}
+            >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-[var(--color-graphite-900)]">
@@ -845,8 +881,13 @@ function TopCustomers({
                   tone={customer.overdueCents > 0 ? "warning" : "success"}
                   title={`${customer.name}: ${formatMoney(customer.balanceCents)}`}
                 />
-            </div>
+              </div>
           ))}
+          <div className="rounded-md border border-[var(--color-border)] bg-[var(--color-graphite-50)] px-3 py-2 font-mono text-xs text-[var(--color-graphite-800)]">
+            {activeCustomer
+              ? `${activeCustomer.name} · Saldo ${formatMoney(activeCustomer.balanceCents)} · Em atraso ${formatMoney(activeCustomer.overdueCents)}`
+              : "Passe o mouse sobre os clientes"}
+          </div>
         </div>
       )}
     </Widget>
