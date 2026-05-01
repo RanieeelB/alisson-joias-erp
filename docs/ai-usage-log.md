@@ -303,11 +303,11 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - O que mudou após revisão: saíram os divisores fixos herdados do mock; o gráfico agora escala conforme o maior valor do conjunto atual e zera barras sem valor. O resumo analítico também passou a tratar meses sem receita sem quebrar a UI.
 - Riscos ou follow-up: meses com lucro negativo ainda aparecem sem barra negativa; se quisermos representar prejuízo visualmente, o gráfico pode evoluir para eixo central com colunas acima e abaixo de zero.
 
-## 2026-05-01 - hover e escala visual nos gráficos
+## 2026-05-01 - hover visível e escala visual nos gráficos
 
 - Ferramentas/skills usadas: Codex, `test-driven-development`, `verification-before-completion`.
 - Resumo do prompt ou tarefa: adicionar leitura por hover aos gráficos e incluir uma régua de valores no gráfico de análise de receita.
-- Saída aceita: tooltips nativos em pontos, segmentos e barras do Dashboard, Reports e Accounts Receivable, além de eixo vertical com valores no gráfico de receita em `/reports`.
+- Saída aceita: estados de hover visíveis em pontos, segmentos e barras do Dashboard, Reports e Accounts Receivable, além de eixo vertical com valores no gráfico de receita em `/reports`.
 - Revisão/adaptação humana: o usuário pediu valores visíveis no gráfico e hover consistente também nas outras abas.
-- O que mudou após revisão: os elementos gráficos passaram a expor valores via hover sem encher a interface de labels permanentes; o gráfico de receita ganhou eixo vertical para facilitar comparação visual entre meses.
+- O que mudou após revisão: em vez de depender de tooltip nativo do navegador, os gráficos agora mostram resumos visíveis logo abaixo da visualização quando o cursor passa sobre os elementos. O gráfico de receita também ganhou eixo vertical para facilitar comparação visual entre meses.
 - Riscos ou follow-up: em mobile o hover vira informação menos acessível; se isso virar prioridade, vale adicionar versão touch com tap/tooltip fixo.
