@@ -1,7 +1,5 @@
 type InternalFinanceUser = {
-  app_metadata?: {
-    role?: string;
-  };
+  app_metadata?: Record<string, unknown>;
   email?: string | null;
 };
 
