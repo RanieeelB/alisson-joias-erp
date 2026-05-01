@@ -158,3 +158,12 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - Revisão/adaptação humana: o usuário aprovou o protótipo com “ok” antes da implementação.
 - O que mudou após revisão: a implementação separou as telas por rota, manteve a linguagem operacional em português, preservou os labels financeiros em inglês quando são conceitos do teste e adicionou testes automatizados para os cálculos e estrutura das páginas.
 - Riscos ou follow-up: os fluxos de registrar pagamento e enviar reminder ainda são simulados por botões; persistência real no Supabase e ações funcionais podem entrar em uma etapa bônus ou refinamento posterior.
+
+## 2026-04-30 - migração para Supabase hospedado
+
+- Ferramentas/skills usadas: Codex, `supabase`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: remover a dependência de Supabase local via Docker e configurar o projeto para usar um projeto Supabase hospedado com URL pública e publishable key.
+- Saída aceita: `.env` local atualizado com as variáveis públicas fornecidas pelo usuário, `.env.example` com placeholders de projeto hospedado e README revisado para um fluxo de setup sem Docker.
+- Revisão/adaptação humana: o usuário decidiu abandonar o fluxo local do Docker e seguir com Supabase hospedado.
+- O que mudou após revisão: a documentação agora orienta setup por `.env`, explica o papel de `admin`/`staff` no Auth SSR e reforça que service role keys não entram no frontend.
+- Riscos ou follow-up: aplicar a migration de referência no projeto remoto, criar os usuários internos corretos no painel do Supabase e revisar depois como demonstrar Storage real na entrega final.
