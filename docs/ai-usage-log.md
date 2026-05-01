@@ -239,3 +239,12 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - Revisão/adaptação humana: o usuário identificou que a tela de Automações não deve duplicar responsabilidades de Faturas, Relatórios, Payments ou Accounts Receivable.
 - O que mudou após revisão: a tela passou a explicitar que ações manuais ficam nas abas correspondentes; Automações apenas orquestra regras como criar draft de Invoice, agendar reminder, simular late fee, preparar statements em lote e enfileirar PDF/CSV.
 - Riscos ou follow-up: implementar a versão revisada como cockpit de automações, mantendo botões manuais nas telas de origem e exibindo status `mock`, `queued`, `sync pending`, `failed` e `completed`.
+
+## 2026-05-01 - implementação da Etapa 5 Automações
+
+- Ferramentas/skills usadas: Codex, `test-driven-development`, `verification-before-completion`, `jewelry-erp-finance-domain`, `next-best-practices`, `vercel-react-best-practices`, `building-components`, `supabase`.
+- Resumo do prompt ou tarefa: implementar a tela revisada de Automações após aprovação do protótipo v2, mantendo as ações manuais nas abas de origem.
+- Saída aceita: rota protegida `/automations`, navegação lateral atualizada, cockpit de regras, fila de jobs, monitor de integrações, eventos recentes, política de segurança, assinatura Supabase Realtime via broadcast channel e cálculo testável de late fee.
+- Revisão/adaptação humana: o usuário aprovou seguir com a implementação depois da correção de arquitetura de informação.
+- O que mudou após revisão: Automações ficou responsável por orquestrar regras e monitorar jobs; Faturas, Payments, Accounts Receivable, Statements e Reports continuam como donos das ações manuais. O Realtime foi implementado como status client-side com cleanup do canal, e os conceitos de QuickBooks, e-mail, Storage, PDF/CSV e Gold price API foram mantidos como boundaries.
+- Riscos ou follow-up: a maioria das ações continua em modo `mock` para apresentação; para produção seria necessário persistir jobs no Supabase, criar triggers/Edge Functions, configurar Realtime replication quando houver tabela real de eventos e integrar provedores externos com secrets server-side.
