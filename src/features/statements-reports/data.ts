@@ -59,15 +59,40 @@ export function summarizeRevenueAnalysis(rows: MonthlyReportRow[]) {
     revenueCents: latest.revenueCents,
     expensesCents: latest.expensesCents,
     profitCents: latest.profitCents,
-    marginPercent: roundOne((latest.profitCents / latest.revenueCents) * 100),
+    marginPercent:
+      latest.revenueCents > 0
+        ? roundOne((latest.profitCents / latest.revenueCents) * 100)
+        : 0,
     revenueTrendPercent: previous
-      ? roundOne(
+      ? previous.revenueCents > 0
+        ? roundOne(
           ((latest.revenueCents - previous.revenueCents) /
             previous.revenueCents) *
             100,
-        )
+          )
+        : latest.revenueCents > 0
+          ? 100
+          : 0
       : 0,
   };
+}
+
+export function buildRevenueChartColumns(rows: MonthlyReportRow[]) {
+  const maxValue = rows.reduce((currentMax, row) => {
+    return Math.max(
+      currentMax,
+      row.revenueCents,
+      row.expensesCents,
+      row.profitCents,
+    );
+  }, 0);
+
+  return rows.map((row) => ({
+    month: row.month,
+    revenueHeightPercent: scalePercent(row.revenueCents, maxValue),
+    expensesHeightPercent: scalePercent(row.expensesCents, maxValue),
+    profitHeightPercent: scalePercent(row.profitCents, maxValue),
+  }));
 }
 
 export function summarizeCashFlow(rows: CashFlowRow[]) {
@@ -116,4 +141,10 @@ export function summarizeTaxSummary(cards: TaxQuarterCard[]) {
 
 function roundOne(value: number) {
   return Math.round(value * 10) / 10;
+}
+
+function scalePercent(value: number, maxValue: number) {
+  if (maxValue <= 0 || value <= 0) return 0;
+
+  return Math.round((value / maxValue) * 100);
 }

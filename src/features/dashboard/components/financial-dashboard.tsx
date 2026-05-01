@@ -7,10 +7,12 @@ import {
   buildRevenueChartScale,
 } from "@/features/dashboard/chart-math";
 import {
+  buildDashboardKpiDetails,
   type Activity,
   type AgingSummary,
   type CategoryRevenue,
   type CustomerBalance,
+  type QuickBooksSyncSummary,
   type RevenuePoint,
 } from "@/features/dashboard/data";
 import {
@@ -78,6 +80,7 @@ export function FinancialDashboard({
   const visibleTopCustomers = isEmpty ? [] : data.topCustomers;
   const visibleActivity = isEmpty ? [] : data.recentActivity;
   const summary = summarizeDashboard(visibleInvoices, data.dashboardAsOf);
+  const kpiDetails = buildDashboardKpiDetails(dashboardInvoices, data.dashboardAsOf);
 
   return (
     <FinanceShell
@@ -121,7 +124,7 @@ export function FinancialDashboard({
         <div className="rounded-md bg-white/8 p-3 text-xs leading-5 text-white/72">
           Dados persistidos no Supabase
           <div className="mt-2 font-medium text-[var(--color-gold-200)]">
-            Limite da integração QuickBooks visível
+            Status de sincronização refletido pelas faturas salvas
           </div>
         </div>
       }
@@ -146,7 +149,10 @@ export function FinancialDashboard({
         />
       ) : null}
       <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-5 px-4 py-4 sm:px-6 lg:px-8 lg:py-6">
-        <HeaderActions viewState={viewState} />
+        <HeaderActions
+          syncSummary={data.quickBooksSyncSummary}
+          viewState={viewState}
+        />
         <section
           aria-label="Resumo de KPIs financeiros"
           className="grid gap-3 md:grid-cols-2 xl:grid-cols-4"
@@ -170,29 +176,27 @@ export function FinancialDashboard({
               <KpiCard
                 label="Receita Total"
                 value={formatMoney(summary.totalRevenueCents)}
-                detail={isEmpty ? "Sem faturamento no período" : "+14,8% vs mês anterior"}
+                detail={isEmpty ? "Sem faturamento no período" : kpiDetails.revenueDetail}
                 tone="positive"
               />
               <KpiCard
                 label="Contas a Receber"
                 value={formatMoney(summary.arOutstandingCents)}
-                detail={isEmpty ? "Nenhuma fatura em aberto" : "5 faturas em aberto"}
+                detail={isEmpty ? "Nenhuma fatura em aberto" : kpiDetails.openInvoicesDetail}
                 tone="warning"
               />
               <KpiCard
                 label="Faturas do Mês"
                 value={summary.invoicesThisMonth.toString()}
-                detail={isEmpty ? "Nenhuma fatura emitida" : "Pedidos personalizados lideram o volume"}
+                detail={
+                  isEmpty ? "Nenhuma fatura emitida" : kpiDetails.invoicesThisMonthDetail
+                }
                 tone="neutral"
               />
               <KpiCard
                 label="Faturas em Atraso"
                 value={summary.overdueInvoices.toString()}
-                detail={formatMoney(
-                  (visibleAgingSummary[1]?.balanceCents ?? 0) +
-                    (visibleAgingSummary[2]?.balanceCents ?? 0) +
-                    (visibleAgingSummary[3]?.balanceCents ?? 0),
-                )}
+                detail={formatMoney(kpiDetails.overdueBalanceCents)}
                 tone="danger"
               />
             </>
@@ -209,7 +213,10 @@ export function FinancialDashboard({
           </div>
           <aside className="grid content-start gap-5">
             <TopCustomers data={visibleTopCustomers} state={widgetState} />
-            <QuickBooksPanel state={widgetState} />
+            <QuickBooksPanel
+              summary={data.quickBooksSyncSummary}
+              state={widgetState}
+            />
             <ActivityFeed items={visibleActivity} state={widgetState} />
           </aside>
         </section>
@@ -218,7 +225,13 @@ export function FinancialDashboard({
   );
 }
 
-function HeaderActions({ viewState }: { viewState: DashboardViewState }) {
+function HeaderActions({
+  syncSummary,
+  viewState,
+}: {
+  syncSummary: QuickBooksSyncSummary;
+  viewState: DashboardViewState;
+}) {
   const statePill =
     viewState === "loading"
       ? { tone: "warning" as const, label: "Carregando dados" }
@@ -235,12 +248,16 @@ function HeaderActions({ viewState }: { viewState: DashboardViewState }) {
           Fechamento de abril em acompanhamento
         </p>
         <p className="mt-1 text-sm text-[var(--color-muted)]">
-          Receita, aging de contas a receber e fila de sincronização QuickBooks em 30 de abril de 2026.
+          Receita, aging de contas a receber e status de sincronização QuickBooks em 30 de abril de 2026.
         </p>
       </div>
       <div className="flex flex-wrap gap-2">
         <StatusPill tone={statePill.tone}>{statePill.label}</StatusPill>
-        <StatusPill tone="warning">3 sincronizações pendentes</StatusPill>
+        <StatusPill
+          tone={syncSummary.requiresAttentionCount > 0 ? "warning" : "success"}
+        >
+          {syncSummary.requiresAttentionCount} sincronizações em acompanhamento
+        </StatusPill>
         <StatusPill tone="info">Dados reais</StatusPill>
       </div>
     </div>
@@ -612,7 +629,7 @@ function RevenueProfitChart({
         <LegendSwatch color="#d2a84f">Receita</LegendSwatch>
         <LegendSwatch color="#3b82f6">Lucro</LegendSwatch>
         <span className="font-mono text-[var(--color-graphite-800)]">
-          Lucro acumulado {formatMoney(totalFrom(data, "profitCents"))}
+          Lucro acumulado estimado {formatMoney(totalFrom(data, "profitCents"))}
         </span>
       </div>
     </Widget>
@@ -828,7 +845,24 @@ function TopCustomers({
   );
 }
 
-function QuickBooksPanel({ state }: { state: WidgetState }) {
+function QuickBooksPanel({
+  summary,
+  state,
+}: {
+  summary: QuickBooksSyncSummary;
+  state: WidgetState;
+}) {
+  const alertTone =
+    summary.failedCount > 0
+      ? "border-red-200 bg-red-50 text-red-800"
+      : summary.requiresAttentionCount > 0
+        ? "border-amber-200 bg-amber-50 text-amber-800"
+        : "border-emerald-200 bg-emerald-50 text-emerald-800";
+  const queueMessage =
+    summary.requiresAttentionCount > 0
+      ? `${summary.requiresAttentionCount} faturas exigem acompanhamento de sincronização`
+      : "Nenhuma fatura exige acompanhamento de sincronização";
+
   return (
     <Widget
       title="Sincronização QuickBooks"
@@ -837,13 +871,25 @@ function QuickBooksPanel({ state }: { state: WidgetState }) {
       loadingHeightClass="h-36"
     >
       <div className="grid gap-3">
-        <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
-          3 faturas na fila para revisão de sincronização
+        <div className={`rounded-md border p-3 text-sm ${alertTone}`}>
+          {queueMessage}
         </div>
         <div className="grid grid-cols-3 gap-2 text-center">
-          <MetricMini label="Sincronizadas" value="18" tone="success" />
-          <MetricMini label="Pendentes" value="3" tone="warning" />
-          <MetricMini label="Falhas" value="0" tone="danger" />
+          <MetricMini
+            label="Sincronizadas"
+            value={summary.syncedCount.toString()}
+            tone="success"
+          />
+          <MetricMini
+            label="Pendentes"
+            value={summary.pendingCount.toString()}
+            tone="warning"
+          />
+          <MetricMini
+            label="Falhas"
+            value={summary.failedCount.toString()}
+            tone="danger"
+          />
         </div>
       </div>
     </Widget>

@@ -36,6 +36,35 @@ function loadFinanceModule() {
   return sandbox.module.exports;
 }
 
+function loadDashboardDataModule() {
+  const sourcePath = "src/features/dashboard/data.ts";
+
+  assert.equal(
+    existsSync(sourcePath),
+    true,
+    "expected src/features/dashboard/data.ts to exist",
+  );
+
+  const source = readFileSync(sourcePath, "utf8");
+  const output = ts.transpileModule(source, {
+    compilerOptions: {
+      esModuleInterop: true,
+      module: ts.ModuleKind.CommonJS,
+      target: ts.ScriptTarget.ES2022,
+    },
+  }).outputText;
+
+  const sandbox = {
+    module: { exports: {} },
+    require: testRequire,
+  };
+  sandbox.exports = sandbox.module.exports;
+
+  vm.runInNewContext(output, sandbox, { filename: sourcePath });
+
+  return sandbox.module.exports;
+}
+
 test("formats integer cents as Brazilian real values", () => {
   const { formatMoney } = loadFinanceModule();
 
@@ -97,4 +126,82 @@ test("summarizes dashboard metrics from jewelry invoices", () => {
   assert.equal(summary.arOutstandingCents, 1170000);
   assert.equal(summary.invoicesThisMonth, 2);
   assert.equal(summary.overdueInvoices, 1);
+});
+
+test("summarizes QuickBooks sync status from Supabase invoice records", () => {
+  const { summarizeQuickBooksSync } = loadDashboardDataModule();
+
+  const summary = summarizeQuickBooksSync([
+    { quickbooksSyncStatus: "synced" },
+    { quickbooksSyncStatus: "pending" },
+    { quickbooksSyncStatus: "failed" },
+    { quickbooksSyncStatus: "not_synced" },
+    { quickbooksSyncStatus: "synced" },
+  ]);
+
+  assert.equal(
+    JSON.stringify(summary),
+    JSON.stringify({
+      syncedCount: 2,
+      pendingCount: 2,
+      failedCount: 1,
+      requiresAttentionCount: 3,
+    }),
+  );
+});
+
+test("dashboard labels accumulated profit as an estimate", () => {
+  const source = readFileSync(
+    "src/features/dashboard/components/financial-dashboard.tsx",
+    "utf8",
+  );
+
+  assert.match(source, /Lucro acumulado estimado/);
+});
+
+test("builds dashboard KPI details from real invoice data", () => {
+  const { buildDashboardKpiDetails } = loadDashboardDataModule();
+
+  const details = buildDashboardKpiDetails(
+    [
+      {
+        totalCents: 150000,
+        balanceCents: 0,
+        date: "2026-04-01",
+        dueDate: "2026-04-10",
+        status: "paid",
+        orderType: "Pedido Personalizado",
+      },
+      {
+        totalCents: 50000,
+        balanceCents: 15000,
+        date: "2026-04-10",
+        dueDate: "2026-04-20",
+        status: "partial",
+        orderType: "Atacado",
+      },
+      {
+        totalCents: 100000,
+        balanceCents: 100000,
+        date: "2026-03-08",
+        dueDate: "2026-03-20",
+        status: "overdue",
+        orderType: "Atacado",
+      },
+      {
+        totalCents: 60000,
+        balanceCents: 60000,
+        date: "2026-03-15",
+        dueDate: "2026-03-25",
+        status: "overdue",
+        orderType: "Atacado",
+      },
+    ],
+    new Date("2026-04-30T12:00:00.000Z"),
+  );
+
+  assert.equal(details.revenueDetail, "+25,0% vs mês anterior");
+  assert.equal(details.openInvoicesDetail, "3 faturas em aberto");
+  assert.equal(details.invoicesThisMonthDetail, "2 no mês anterior");
+  assert.equal(details.overdueBalanceCents, 160000);
 });
