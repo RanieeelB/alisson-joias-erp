@@ -1,19 +1,11 @@
-import { InvoicesPage } from "@/features/invoices/components/invoices-page";
+import { PaymentsPage } from "@/features/payments-accounts/components/payments-page";
 import { isInternalFinanceUser } from "@/lib/supabase/authz";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
-type InvoicesRouteProps = {
-  searchParams: Promise<{
-    status?: string;
-    busca?: string;
-  }>;
-};
-
-export default async function InvoicesRoute({ searchParams }: InvoicesRouteProps) {
-  const params = await searchParams;
+export default async function PaymentsRoute() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -28,10 +20,5 @@ export default async function InvoicesRoute({ searchParams }: InvoicesRouteProps
     redirect("/login?erro=acesso");
   }
 
-  return (
-    <InvoicesPage
-      searchParams={params}
-      userEmail={user.email ?? "usuario interno"}
-    />
-  );
+  return <PaymentsPage userEmail={user.email ?? "usuario interno"} />;
 }
