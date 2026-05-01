@@ -230,3 +230,12 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - Revisão/adaptação humana: pendente de aprovação do usuário antes de implementar a rota e os componentes da Etapa 5.
 - O que mudou após revisão: ainda não houve implementação; a escolha inicial prioriza uma tela operacional única de automações para demonstrar proatividade sem abrir integrações reais demais para o prazo.
 - Riscos ou follow-up: ajustar o escopo caso o usuário prefira persistência real no Supabase ou uma automação específica acima dos conceitos visuais de e-mail, PDF/CSV e API de ouro.
+
+## 2026-05-01 - revisão do protótipo de Automações
+
+- Ferramentas/skills usadas: Codex, `jewelry-erp-finance-domain`, `imagegen`.
+- Resumo do prompt ou tarefa: corrigir a arquitetura de informação do protótipo da Etapa 5 após o usuário apontar que gerar relatórios, adicionar faturas e cobrança manual pertencem às outras abas.
+- Saída aceita: protótipo revisado salvo em `docs/assets/prototypes/automations-prototype-v2.png`, com foco em regras, filas, jobs, integrações e monitoramento.
+- Revisão/adaptação humana: o usuário identificou que a tela de Automações não deve duplicar responsabilidades de Faturas, Relatórios, Payments ou Accounts Receivable.
+- O que mudou após revisão: a tela passou a explicitar que ações manuais ficam nas abas correspondentes; Automações apenas orquestra regras como criar draft de Invoice, agendar reminder, simular late fee, preparar statements em lote e enfileirar PDF/CSV.
+- Riscos ou follow-up: implementar a versão revisada como cockpit de automações, mantendo botões manuais nas telas de origem e exibindo status `mock`, `queued`, `sync pending`, `failed` e `completed`.
