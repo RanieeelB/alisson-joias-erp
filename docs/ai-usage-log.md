@@ -221,3 +221,12 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - Revisão/adaptação humana: o usuário pediu explicitamente que a substituição fosse feita em todas as seções após a primeira implementação em Reports.
 - O que mudou após revisão: Invoices deixou de ler `searchParams`; Payments/Accounts e Statements/Reports ganharam workspaces compartilhados com wrappers por rota para manter entrada direta e alternância local.
 - Riscos ou follow-up: as tabs locais não preservam seleção na URL; caso a apresentação precise de links diretos para uma aba específica, sincronizar estado e URL de forma intencional.
+
+## 2026-05-01 - início da Etapa 5 Bonus e Automações
+
+- Ferramentas/skills usadas: Codex, `brainstorming`, `imagegen`, `jewelry-erp-finance-domain`, `next-best-practices`.
+- Resumo do prompt ou tarefa: iniciar a branch `feat/automations` sem prefixo `codex/`, escolher os bônus viáveis da Etapa 5 e prototipar a nova tela de automações antes de escrever código de produto.
+- Saída aceita: protótipo visual inicial salvo em `docs/assets/prototypes/automations-prototype.png`, cobrindo workflow de pedido finalizado para Invoice, fila de automações, overdue reminders, late fees, Supabase Realtime, scheduled statements, export queue e Gold price API como integração conceitual.
+- Revisão/adaptação humana: pendente de aprovação do usuário antes de implementar a rota e os componentes da Etapa 5.
+- O que mudou após revisão: ainda não houve implementação; a escolha inicial prioriza uma tela operacional única de automações para demonstrar proatividade sem abrir integrações reais demais para o prazo.
+- Riscos ou follow-up: ajustar o escopo caso o usuário prefira persistência real no Supabase ou uma automação específica acima dos conceitos visuais de e-mail, PDF/CSV e API de ouro.

@@ -71,7 +71,7 @@
 
 ## Step 5 - Bonus and Automations
 
-- [ ] Choose bonus features based on remaining time.
+- [x] Choose bonus features based on remaining time.
 - [ ] Add automatic invoice generation from finalized order.
 - [ ] Add overdue reminders.
 - [ ] Add late fee calculation.
