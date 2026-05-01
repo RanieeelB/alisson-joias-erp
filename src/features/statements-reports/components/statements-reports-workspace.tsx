@@ -4,6 +4,7 @@ import { signOut } from "@/app/login/actions";
 import type { FinanceWorkspaceData } from "@/features/finance/data";
 import { FinanceShell } from "@/features/finance-shell/components/finance-shell";
 import {
+  buildRevenueChartAxis,
   buildRevenueChartColumns,
   reportTypeLabels,
   statementPeriod,
@@ -70,6 +71,7 @@ export function StatementsReportsWorkspace({
   const statementsSummary = summarizeStatements(data.customerStatements);
   const revenue = summarizeRevenueAnalysis(data.monthlyReportRows);
   const revenueColumns = buildRevenueChartColumns(data.monthlyReportRows);
+  const revenueAxis = buildRevenueChartAxis(data.monthlyReportRows);
   const cashFlow = summarizeCashFlow(data.cashFlowRows);
   const profitLoss = summarizeProfitLoss(data.profitLossReport);
   const taxSummary = summarizeTaxSummary(data.taxQuarterCards);
@@ -174,6 +176,7 @@ export function StatementsReportsWorkspace({
             monthlyRows={data.monthlyReportRows}
             profitLoss={profitLoss}
             revenue={revenue}
+            revenueAxis={revenueAxis}
             revenueColumns={revenueColumns}
             taxCards={data.taxQuarterCards}
             taxSummary={taxSummary}
@@ -231,6 +234,7 @@ function ReportsTab({
   monthlyRows,
   profitLoss,
   revenue,
+  revenueAxis,
   revenueColumns,
   taxCards,
   taxSummary,
@@ -240,6 +244,7 @@ function ReportsTab({
   monthlyRows: MonthlyReportRow[];
   profitLoss: ReturnType<typeof summarizeProfitLoss>;
   revenue: ReturnType<typeof summarizeRevenueAnalysis>;
+  revenueAxis: ReturnType<typeof buildRevenueChartAxis>;
   revenueColumns: ReturnType<typeof buildRevenueChartColumns>;
   taxCards: TaxQuarterCard[];
   taxSummary: ReturnType<typeof summarizeTaxSummary>;
@@ -259,6 +264,7 @@ function ReportsTab({
           cashFlow,
           monthlyRows,
           profitLoss,
+          revenueAxis,
           revenueColumns,
           taxCards,
           taxSummary,
@@ -310,6 +316,7 @@ function renderActiveReport({
   cashFlow,
   monthlyRows,
   profitLoss,
+  revenueAxis,
   revenueColumns,
   taxCards,
   taxSummary,
@@ -318,6 +325,7 @@ function renderActiveReport({
   cashFlow: ReturnType<typeof summarizeCashFlow>;
   monthlyRows: MonthlyReportRow[];
   profitLoss: ReturnType<typeof summarizeProfitLoss>;
+  revenueAxis: ReturnType<typeof buildRevenueChartAxis>;
   revenueColumns: ReturnType<typeof buildRevenueChartColumns>;
   taxCards: TaxQuarterCard[];
   taxSummary: ReturnType<typeof summarizeTaxSummary>;
@@ -409,10 +417,25 @@ function renderActiveReport({
             <Legend color="bg-emerald-600" label="Lucro" />
           </div>
         </div>
-        <div className="grid min-h-64 grid-cols-6 items-end gap-3 border-l border-b border-[var(--color-border)] px-3 pt-4">
-          {monthlyRows.map((row, index) => (
-            <ChartColumn key={row.month} row={row} scale={revenueColumns[index]} />
-          ))}
+        <div className="grid min-h-64 grid-cols-[4rem_minmax(0,1fr)] gap-3">
+          <div className="relative min-h-64">
+            {revenueAxis.map(({ ratio, value }) => (
+              <div
+                key={`${value}-${ratio}`}
+                className="absolute left-0 right-0 flex -translate-y-1/2 items-center justify-end pr-2 text-right"
+                style={{ top: `${ratio * 100}%` }}
+              >
+                <span className="text-[11px] font-mono text-[var(--color-muted)]">
+                  {formatMoney(value)}
+                </span>
+              </div>
+            ))}
+          </div>
+          <div className="grid min-h-64 grid-cols-6 items-end gap-3 border-l border-b border-[var(--color-border)] px-3 pt-4">
+            {monthlyRows.map((row, index) => (
+              <ChartColumn key={row.month} row={row} scale={revenueColumns[index]} />
+            ))}
+          </div>
         </div>
       </article>
 
@@ -524,11 +547,16 @@ function CashFlowBar({
   value: number;
 }) {
   const height = Math.max(14, Math.round((value / max) * 100));
+  const tooltip = `${label}: ${formatMoney(value)}`;
 
   return (
     <div className="flex h-full min-h-56 flex-col justify-end gap-2">
       <div className="flex h-44 items-end justify-center">
-        <span className={`w-16 rounded-t ${tone}`} style={{ height: `${height}%` }} />
+        <span
+          className={`w-16 rounded-t ${tone}`}
+          style={{ height: `${height}%` }}
+          title={tooltip}
+        />
       </div>
       <p className="text-center text-xs font-semibold text-[var(--color-muted)]">{label}</p>
       <p className="text-center font-mono text-sm font-semibold text-[var(--color-graphite-950)]">
@@ -552,9 +580,21 @@ function ChartColumn({
   return (
     <div className="flex h-full min-h-56 flex-col justify-end gap-2">
       <div className="flex h-44 items-end justify-center gap-1">
-        <span className="w-3 rounded-t bg-blue-500" style={{ height: revenueHeight > 0 ? `${revenueHeight}%` : "0%" }} />
-        <span className="w-3 rounded-t bg-red-500" style={{ height: expensesHeight > 0 ? `${expensesHeight}%` : "0%" }} />
-        <span className="w-3 rounded-t bg-emerald-600" style={{ height: profitHeight > 0 ? `${profitHeight}%` : "0%" }} />
+        <span
+          className="w-3 rounded-t bg-blue-500"
+          style={{ height: revenueHeight > 0 ? `${revenueHeight}%` : "0%" }}
+          title={formatMoney(row.revenueCents)}
+        />
+        <span
+          className="w-3 rounded-t bg-red-500"
+          style={{ height: expensesHeight > 0 ? `${expensesHeight}%` : "0%" }}
+          title={formatMoney(row.expensesCents)}
+        />
+        <span
+          className="w-3 rounded-t bg-emerald-600"
+          style={{ height: profitHeight > 0 ? `${profitHeight}%` : "0%" }}
+          title={formatMoney(row.profitCents)}
+        />
       </div>
       <p className="truncate text-center font-mono text-xs text-[var(--color-muted)]">{row.month}</p>
     </div>

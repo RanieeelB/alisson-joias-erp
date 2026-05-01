@@ -261,6 +261,8 @@ test("payments and accounts routes use protected finance workspaces", () => {
   assert.match(workspaceView, /role="tab"/);
   assert.match(workspaceView, /aria-selected={isActive}/);
   assert.match(workspaceView, /onClick={\(\) => setActiveTab\(tab\)}/);
+  assert.match(workspaceView, /title=\{formatMoney\(value\)\}/);
+  assert.match(workspaceView, /title=\{formatMoney\(balance\.currentCents \+ balance\.overdueCents\)\}/);
 
   assert.match(paymentsView, /PaymentsAccountsWorkspace/);
   assert.match(receivableView, /PaymentsAccountsWorkspace/);
