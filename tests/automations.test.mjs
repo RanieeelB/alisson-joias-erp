@@ -129,3 +129,16 @@ test("automations route wires a protected orchestration cockpit", () => {
   assert.match(shell, /\/automations/);
   assert.match(shell, /Automações/);
 });
+
+test("automations cockpit subscribes to Supabase Realtime broadcast updates", () => {
+  const realtimeStatus = readProjectFile(
+    "src/features/automations/components/realtime-status.tsx",
+  );
+
+  assert.match(realtimeStatus, /"use client"/);
+  assert.match(realtimeStatus, /createClient/);
+  assert.match(realtimeStatus, /channel\("finance-automations"\)/);
+  assert.match(realtimeStatus, /on\("broadcast", \{ event: "automation_event" \}/);
+  assert.match(realtimeStatus, /subscribe/);
+  assert.match(realtimeStatus, /removeChannel/);
+});

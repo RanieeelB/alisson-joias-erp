@@ -15,6 +15,7 @@ import type {
   AutomationStatus,
 } from "@/features/automations/types";
 import { FinanceShell } from "@/features/finance-shell/components/finance-shell";
+import { RealtimeStatus } from "./realtime-status";
 
 const ownerTone: Record<AutomationOwnerArea | "Pedidos" | "Email service" | "Contabilidade" | "QuickBooks" | "Storage export", string> = {
   "Accounts Receivable": "bg-blue-50 text-blue-700 ring-blue-200",
@@ -88,9 +89,7 @@ export function AutomationsPage({ userEmail }: { userEmail?: string }) {
                 Ações manuais devem ser feitas nas abas correspondentes: Faturas, Pagamentos, Contas a Receber, Relatórios e Extratos.
               </p>
             </div>
-            <span className="w-fit rounded bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 ring-1 ring-blue-200">
-              Supabase Realtime monitorado
-            </span>
+            <RealtimeStatus />
           </div>
         </section>
 
