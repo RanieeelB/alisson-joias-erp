@@ -1,5 +1,5 @@
 import { InvoiceDetailPage } from "@/features/invoices/components/invoice-detail-page";
-import { getInvoiceById } from "@/features/invoices/data";
+import { loadInvoiceById } from "@/features/finance/data";
 import { isInternalFinanceUser } from "@/lib/supabase/authz";
 import { createClient } from "@/lib/supabase/server";
 import { notFound, redirect } from "next/navigation";
@@ -30,7 +30,7 @@ export default async function InvoiceDetailRoute({
     redirect("/login?erro=acesso");
   }
 
-  const invoice = getInvoiceById(id);
+  const invoice = await loadInvoiceById(supabase, id);
 
   if (!invoice) {
     notFound();

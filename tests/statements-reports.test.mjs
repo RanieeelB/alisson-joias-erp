@@ -40,11 +40,46 @@ function readProjectFile(path) {
   return readFileSync(fullPath, "utf8");
 }
 
+const customerStatements = [
+  { invoiceCount: 12, balanceCents: 12584000 },
+  { invoiceCount: 8, balanceCents: 4832000 },
+  { invoiceCount: 15, balanceCents: 21056000 },
+  { invoiceCount: 10, balanceCents: -2245000 },
+  { invoiceCount: 7, balanceCents: 1678000 },
+];
+
+const monthlyReportRows = [
+  { revenueCents: 198245000, expensesCents: 82340000, profitCents: 115905000 },
+  { revenueCents: 213430000, expensesCents: 87612000, profitCents: 125818000 },
+  { revenueCents: 232180000, expensesCents: 101245000, profitCents: 130935000 },
+  { revenueCents: 245890000, expensesCents: 107723000, profitCents: 138167000 },
+  { revenueCents: 239875000, expensesCents: 106490000, profitCents: 133385000 },
+  { revenueCents: 284245000, expensesCents: 116523000, profitCents: 167722000 },
+];
+
+const cashFlowRows = [
+  {
+    inflowsCents: 128540000,
+    outflowsCents: 29978000,
+  },
+];
+
+const profitLossReport = {
+  revenueCents: 284245000,
+  cogsCents: 72430000,
+  operatingExpensesCents: 44093000,
+};
+
+const taxQuarterCards = [
+  { collectedCents: 7184500, payableCents: 0 },
+  { collectedCents: 9356000, payableCents: 3124500 },
+  { collectedCents: 0, payableCents: 0 },
+];
+
 test("summarizes customer statements for the selected period", () => {
-  const {
-    customerStatements,
-    summarizeStatements,
-  } = loadTsModule("src/features/statements-reports/data.ts");
+  const { summarizeStatements } = loadTsModule(
+    "src/features/statements-reports/data.ts",
+  );
 
   const summary = summarizeStatements(customerStatements);
 
@@ -56,10 +91,9 @@ test("summarizes customer statements for the selected period", () => {
 });
 
 test("summarizes revenue analysis for the active report period", () => {
-  const {
-    monthlyReportRows,
-    summarizeRevenueAnalysis,
-  } = loadTsModule("src/features/statements-reports/data.ts");
+  const { summarizeRevenueAnalysis } = loadTsModule(
+    "src/features/statements-reports/data.ts",
+  );
 
   const summary = summarizeRevenueAnalysis(monthlyReportRows);
 
@@ -72,9 +106,6 @@ test("summarizes revenue analysis for the active report period", () => {
 
 test("summarizes cash flow, profit and loss, and tax reports", () => {
   const {
-    cashFlowRows,
-    profitLossReport,
-    taxQuarterCards,
     summarizeCashFlow,
     summarizeProfitLoss,
     summarizeTaxSummary,
@@ -123,14 +154,14 @@ test("statements and reports routes use protected finance workspaces", () => {
   );
 
   for (const text of [
-    "Statements",
+    "Extratos",
     "Período",
-    "Email All Statements",
-    "Bulk Download",
-    "View",
-    "Print",
-    "Email",
-    "Balance",
+    "Enviar extratos",
+    "Baixar em lote",
+    "Visualizar",
+    "Imprimir",
+    "E-mail",
+    "Saldo",
     "Faturas",
   ]) {
     assert.match(
@@ -141,16 +172,16 @@ test("statements and reports routes use protected finance workspaces", () => {
   }
 
   for (const text of [
-    "Reports",
-    "Export Report",
-    "Revenue Analysis",
-    "Cash Flow",
-    "Profit & Loss",
-    "Tax Summary",
-    "Inflows",
-    "Outflows",
-    "COGS",
-    "Operating Expenses",
+    "Relatórios",
+    "Exportar relatório",
+    "Análise de Receita",
+    "Fluxo de Caixa",
+    "Lucros e Perdas",
+    "Resumo de Impostos",
+    "Entradas",
+    "Saídas",
+    "Custos",
+    "Despesas operacionais",
     "Receita",
     "Despesas",
     "Lucro",

@@ -1,6 +1,12 @@
 import type { AgingBucket, InvoiceStatus } from "@/lib/finance";
 
-export type PaymentMethod = "ACH" | "Wire" | "Credit Card" | "Pix" | "Check";
+export type PaymentMethod =
+  | "ACH"
+  | "Transferência"
+  | "Cartão de crédito"
+  | "Pix"
+  | "Check"
+  | "Dinheiro";
 
 export type PaymentStatus = "settled" | "pending_deposit" | "credit";
 
@@ -46,10 +52,10 @@ export type CustomerReceivableBalanceScale = CustomerReceivableBalance & {
 };
 
 export type PayableCategory =
-  | "Raw Materials"
-  | "Components"
-  | "Certification"
-  | "Services";
+  | "Matéria-prima"
+  | "Componentes"
+  | "Certificação"
+  | "Serviços";
 
 export type PayableStatus = "pending" | "partial" | "paid" | "overdue";
 

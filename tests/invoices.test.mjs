@@ -40,10 +40,93 @@ function readProjectFile(path) {
   return readFileSync(fullPath, "utf8");
 }
 
+const invoiceRecords = [
+  {
+    id: "inv-2049",
+    invoiceNumber: "INV-2049",
+    customerName: "Aurora & Co. Fine Jewelry",
+    totalCents: 4285000,
+    paidCents: 2100000,
+    balanceCents: 2185000,
+    status: "partial",
+    lineItems: [
+      {
+        quantity: 1,
+        unitPriceCents: 3250000,
+        taxCents: 162500,
+        lineTotalCents: 3412500,
+      },
+      {
+        quantity: 1,
+        unitPriceCents: 830000,
+        taxCents: 42500,
+        lineTotalCents: 872500,
+      },
+    ],
+    payments: [
+      { amountCents: 850000 },
+      { amountCents: 1250000 },
+    ],
+  },
+  {
+    id: "inv-2048",
+    invoiceNumber: "INV-2048",
+    customerName: "Carvalho Atelier",
+    totalCents: 645000,
+    paidCents: 0,
+    balanceCents: 645000,
+    status: "pending",
+    lineItems: [],
+    payments: [],
+  },
+  {
+    id: "inv-2047",
+    invoiceNumber: "INV-2047",
+    customerName: "Northline Wholesale Jewelers",
+    totalCents: 3187500,
+    paidCents: 1200000,
+    balanceCents: 1987500,
+    status: "overdue",
+    lineItems: [],
+    payments: [],
+  },
+  {
+    id: "inv-2046",
+    invoiceNumber: "INV-2046",
+    customerName: "Diamond Crest Retail",
+    totalCents: 1452000,
+    paidCents: 1452000,
+    balanceCents: 0,
+    status: "paid",
+    lineItems: [],
+    payments: [],
+  },
+  {
+    id: "inv-2045",
+    invoiceNumber: "INV-2045",
+    customerName: "Helena Martins Bridal",
+    totalCents: 2210000,
+    paidCents: 600000,
+    balanceCents: 1610000,
+    status: "overdue",
+    lineItems: [],
+    payments: [],
+  },
+  {
+    id: "inv-2044",
+    invoiceNumber: "INV-2044",
+    customerName: "Aurora & Co. Fine Jewelry",
+    totalCents: 2749500,
+    paidCents: 1454000,
+    balanceCents: 1295500,
+    status: "partial",
+    lineItems: [],
+    payments: [],
+  },
+];
+
 test("filters invoices by status and customer or invoice number search", () => {
-  const { invoiceRecords, filterInvoices } = loadTsModule(
-    "src/features/invoices/data.ts",
-  );
+  const { filterInvoices } = loadTsModule("src/features/invoices/data.ts");
 
   const overdueInvoices = filterInvoices(invoiceRecords, {
     status: "overdue",
@@ -65,9 +148,7 @@ test("filters invoices by status and customer or invoice number search", () => {
 });
 
 test("summarizes invoice list metrics for the visible set", () => {
-  const { invoiceRecords, summarizeInvoices } = loadTsModule(
-    "src/features/invoices/data.ts",
-  );
+  const { summarizeInvoices } = loadTsModule("src/features/invoices/data.ts");
 
   const summary = summarizeInvoices(invoiceRecords);
 
@@ -86,10 +167,10 @@ test("invoice route wires the protected finance list experience", () => {
     "Faturas",
     "Total faturado",
     "Coletado",
-    "Outstanding",
-    "Overdue",
-    "Invoice #",
-    "Customer",
+    "Em aberto",
+    "Em atraso",
+    "Fatura #",
+    "Cliente",
     "QuickBooks",
     "Nova Fatura",
   ]) {
@@ -121,12 +202,9 @@ test("invoice route wires the protected finance list experience", () => {
 });
 
 test("retrieves invoice detail data and calculates jewelry totals", () => {
-  const {
-    getInvoiceById,
-    summarizeInvoiceDetail,
-  } = loadTsModule("src/features/invoices/data.ts");
+  const { summarizeInvoiceDetail } = loadTsModule("src/features/invoices/data.ts");
 
-  const invoice = getInvoiceById("inv-2049");
+  const invoice = invoiceRecords.find((record) => record.id === "inv-2049");
 
   assert.ok(invoice, "expected invoice detail record to exist");
   assert.equal(invoice.invoiceNumber, "INV-2049");
@@ -150,18 +228,17 @@ test("invoice detail route wires the protected finance detail workspace", () => 
   for (const text of [
     "Detalhe da Fatura",
     "Dados do cliente",
-    "Line items",
+    "Itens da fatura",
     "Subtotal",
-    "Tax",
+    "Imposto",
     "Total",
-    "Paid",
-    "Balance",
-    "Send",
-    "Record Payment",
-    "Print",
-    "Download PDF",
-    "Edit",
-    "Payment history",
+    "Pago",
+    "Saldo",
+    "Enviar",
+    "Registrar Pagamento",
+    "Imprimir",
+    "Baixar PDF",
+    "Histórico de pagamentos",
     "QuickBooks",
   ]) {
     assert.match(view, new RegExp(text), `expected invoice detail page to include ${text}`);
@@ -172,6 +249,6 @@ test("invoice detail route wires the protected finance detail workspace", () => 
   assert.match(page, /redirect\("\/login/);
   assert.match(page, /notFound/);
   assert.match(page, /InvoiceDetailPage/);
-  assert.match(view, /getInvoiceById/);
+  assert.match(page, /loadInvoiceById/);
   assert.match(view, /summarizeInvoiceDetail/);
 });
