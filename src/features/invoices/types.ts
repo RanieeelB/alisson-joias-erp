@@ -21,10 +21,10 @@ export type InvoiceLineItem = {
 
 export type InvoicePaymentMethod =
   | "ACH"
-  | "Wire"
-  | "Credit Card"
+  | "Transferência"
+  | "Cartão de crédito"
   | "Pix"
-  | "Cash"
+  | "Dinheiro"
   | "Check";
 
 export type InvoicePayment = {

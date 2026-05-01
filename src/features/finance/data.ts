@@ -160,18 +160,18 @@ const categoryColors = {
 
 const paymentMethodLabels = {
   ach: "ACH",
-  wire: "Wire",
-  credit_card: "Credit Card",
-  cash: "Cash",
+  wire: "Transferência",
+  credit_card: "Cartão de crédito",
+  cash: "Dinheiro",
   check: "Check",
   pix: "Pix",
 } as const;
 
 const payableCategoryLabels: Record<AccountsPayableRow["category"], PayableCategory> = {
-  certification: "Certification",
-  components: "Components",
-  raw_materials: "Raw Materials",
-  services: "Services",
+  certification: "Certificação",
+  components: "Componentes",
+  raw_materials: "Matéria-prima",
+  services: "Serviços",
 };
 
 export async function loadFinanceWorkspace(
@@ -587,7 +587,7 @@ function buildProfitLoss(
     payables.filter(
       (payable) =>
         payable.date.startsWith(currentMonth) &&
-        (payable.category === "Raw Materials" || payable.category === "Components"),
+        (payable.category === "Matéria-prima" || payable.category === "Componentes"),
     ),
     "totalCents",
   );
@@ -595,7 +595,7 @@ function buildProfitLoss(
     payables.filter(
       (payable) =>
         payable.date.startsWith(currentMonth) &&
-        (payable.category === "Certification" || payable.category === "Services"),
+        (payable.category === "Certificação" || payable.category === "Serviços"),
     ),
     "totalCents",
   );

@@ -215,42 +215,42 @@ test("payments and accounts routes use protected finance workspaces", () => {
   );
 
   for (const text of [
-    "Payments and Accounts",
+    "Pagamentos e Contas",
     "Coletado no mês",
     "Depósitos pendentes",
     "Créditos",
     "Registrar pagamento",
-    "Payment #",
-    "Invoice",
-    "Customer",
-    "Method",
-    "Reference",
+    "Pagamento #",
+    "Fatura",
+    "Cliente",
+    "Forma",
+    "Referência",
   ]) {
     assert.match(workspaceView, new RegExp(text), `expected payments workspace to include ${text}`);
   }
 
   for (const text of [
-    "Accounts Receivable",
-    "Aging Analysis",
+    "Contas a receber",
+    "Análise de vencimentos",
     "Saldos por cliente",
     "Faturas abertas",
-    "Enviar reminder",
+    "Enviar lembrete",
   ]) {
     assert.match(workspaceView, new RegExp(text), `expected AR tab to include ${text}`);
   }
 
   for (const text of [
-    "Accounts Payable",
-    "Total Payable",
-    "Paid This Month",
-    "Overdue",
+    "Contas a pagar",
+    "Total a pagar",
+    "Pago no mês",
+    "Em atraso",
     "AP #",
-    "Vendor",
-    "Category",
-    "Raw Materials",
-    "Components",
-    "Certification",
-    "Services",
+    "Fornecedor",
+    "Categoria",
+    "Matéria-prima",
+    "Componentes",
+    "Certificação",
+    "Serviços",
   ]) {
     assert.match(workspaceView, new RegExp(text), `expected AP tab to include ${text}`);
   }
