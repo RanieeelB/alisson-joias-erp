@@ -275,3 +275,30 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - Revisão/adaptação humana: o usuário apontou a lacuna ao navegar pela aplicação persistida.
 - O que mudou após revisão: os formulários passaram a salvar dados básicos financeiros, revalidar as rotas e registrar atividade recente.
 - Riscos ou follow-up: os cadastros são mínimos para o teste; uma tela completa de CRM/vendor master poderia adicionar edição, duplicidade por email/CNPJ e endereço completo.
+
+## 2026-05-01 - QuickBooks no Dashboard com dados do Supabase
+
+- Ferramentas/skills usadas: Codex, `systematic-debugging`, `supabase`, `test-driven-development`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: trocar o card estático de sincronização QuickBooks do Dashboard para dados reais vindos do Supabase e esclarecer a leitura de lucro acumulado no gráfico Receita e Lucro.
+- Saída aceita: resumo `quickBooksSyncSummary` derivado de `invoiceRecords`, card do Dashboard alimentado por status reais de `quickbooks_sync_status` e rótulo de `Lucro acumulado estimado`.
+- Revisão/adaptação humana: o usuário questionou os números exibidos no painel e pediu a substituição por dados persistidos.
+- O que mudou após revisão: o Dashboard deixou de exibir `18 / 3 / 0` fixos; agora conta faturas `synced`, `pending`, `failed` e `not_synced` carregadas do banco, agrupando pendências e itens que exigem acompanhamento. O texto de lucro acumulado ficou explícito como estimativa para evitar leitura enganosa.
+- Riscos ou follow-up: o lucro do gráfico ainda é estimado em `42%` da receita mensal em `buildRevenueSeries`; para virar lucro real, o cálculo precisa usar COGS e despesas operacionais por mês.
+
+## 2026-05-01 - KPIs do Dashboard com detalhes reais
+
+- Ferramentas/skills usadas: Codex, `systematic-debugging`, `test-driven-development`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: substituir os detalhes estáticos dos KPIs do Dashboard por comparações e contagens reais derivadas das faturas persistidas.
+- Saída aceita: helper `buildDashboardKpiDetails` com comparação real de receita mês contra mês, contagem real de faturas em aberto, volume do mês anterior e saldo vencido real para o card de atraso.
+- Revisão/adaptação humana: o usuário apontou que frases como `+14,8% vs mês anterior` e `5 faturas em aberto` ainda estavam hardcoded.
+- O que mudou após revisão: os detalhes agora são calculados a partir de `invoiceRecords`; o card de atraso também passou a usar todo o saldo `overdue`, sem omitir buckets mais antigos.
+- Riscos ou follow-up: a comparação de receita usa meses UTC baseados em data de emissão; se o produto precisar fechamento contábil por timezone local ou competência, vale revisar essa regra.
+
+## 2026-05-01 - correção do gráfico de análise de receita em Reports
+
+- Ferramentas/skills usadas: Codex, `systematic-debugging`, `test-driven-development`, `verification-before-completion`.
+- Resumo do prompt ou tarefa: investigar por que o gráfico de análise de receita em `/reports` não acompanhava corretamente os dados reais e corrigir a visualização.
+- Saída aceita: escala dinâmica para colunas de receita, despesas e lucro, além de guards para evitar `NaN` em margem e tendência quando houver mês com receita zero.
+- Revisão/adaptação humana: o usuário suspeitou que o gráfico deixou de funcionar depois da troca de mocks para dados persistidos.
+- O que mudou após revisão: saíram os divisores fixos herdados do mock; o gráfico agora escala conforme o maior valor do conjunto atual e zera barras sem valor. O resumo analítico também passou a tratar meses sem receita sem quebrar a UI.
+- Riscos ou follow-up: meses com lucro negativo ainda aparecem sem barra negativa; se quisermos representar prejuízo visualmente, o gráfico pode evoluir para eixo central com colunas acima e abaixo de zero.
