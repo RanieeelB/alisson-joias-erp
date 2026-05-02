@@ -7,11 +7,29 @@ import type {
   TaxQuarterCard,
 } from "./types";
 
-export const statementPeriod = {
-  label: "01/05/2026 - 31/05/2026",
-  startDate: "2026-05-01",
-  endDate: "2026-05-31",
-};
+/**
+ * Returns the default date range for statements: first day of current month
+ * through today (or end of month if we can't determine).
+ */
+export function getDefaultDateRange(): { startDate: string; endDate: string } {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  const d = String(now.getDate()).padStart(2, "0");
+  return { startDate: `${y}-${m}-01`, endDate: `${y}-${m}-${d}` };
+}
+
+/**
+ * Filters statements whose `lastInvoiceDate` falls within the given
+ * [startDate, endDate] range (inclusive, ISO date strings).
+ */
+export function filterStatementsByDateRange(
+  statements: CustomerStatement[],
+  startDate: string,
+  endDate: string,
+): CustomerStatement[] {
+  return statements.filter((s) => s.lastInvoiceDate >= startDate && s.lastInvoiceDate <= endDate);
+}
 
 export const reportTypeLabels: Record<ReportType, string> = {
   revenue_analysis: "Análise de Receita",
