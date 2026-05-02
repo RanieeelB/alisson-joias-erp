@@ -22,6 +22,8 @@ import type {
   TaxQuarterCard,
 } from "@/features/statements-reports/types";
 import { getAgingBucket } from "@/lib/finance";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { hasSupabaseServiceEnv } from "@/lib/supabase/env";
 import type { createClient } from "@/lib/supabase/server";
 
 type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
@@ -364,7 +366,8 @@ async function loadDeclarationExports(
   supabase: SupabaseClient,
   declarations: DeclarationRecord[],
 ) {
-  const storagePaths = await collectStorageFiles(supabase, "declarations");
+  const storageClient = hasSupabaseServiceEnv() ? createAdminClient() : supabase;
+  const storagePaths = await collectStorageFiles(storageClient, "declarations");
   if (storagePaths.length === 0) {
     return [] satisfies DeclarationExportRecord[];
   }
@@ -373,7 +376,9 @@ async function loadDeclarationExports(
   const signedUrlResults = await Promise.all(
     storagePaths.map(async (storagePath) => ({
       storagePath,
-      result: await supabase.storage.from("finance-exports").createSignedUrl(storagePath, 60 * 60),
+      result: await storageClient.storage
+        .from("finance-exports")
+        .createSignedUrl(storagePath, 60 * 60),
     })),
   );
 
@@ -407,7 +412,7 @@ async function loadDeclarationExports(
 }
 
 async function collectStorageFiles(
-  supabase: SupabaseClient,
+  supabase: Pick<SupabaseClient, "storage">,
   path: string,
 ): Promise<string[]> {
   const { data, error } = await supabase.storage.from("finance-exports").list(path, {
