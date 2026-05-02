@@ -54,6 +54,7 @@ export type InvoiceRecord = {
   status: InvoiceStatus;
   quickbooksSyncStatus: QuickbooksSyncStatus;
   paymentTerms: string;
+  notes: string | null;
   lineItems: InvoiceLineItem[];
   payments: InvoicePayment[];
 };
