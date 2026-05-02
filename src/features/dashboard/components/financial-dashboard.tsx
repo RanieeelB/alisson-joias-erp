@@ -1,7 +1,7 @@
 "use client";
 
 import type { CSSProperties, ReactNode } from "react";
-import { useActionState, useState } from "react";
+import { useActionState, useCallback, useMemo, useState } from "react";
 import {
   buildCategoryDonutSegments,
   buildRevenueChartScale,
@@ -54,6 +54,10 @@ export function FinancialDashboard({
 }) {
   const [isCreatingCustomer, setIsCreatingCustomer] = useState(false);
   const [isCreatingInvoice, setIsCreatingInvoice] = useState(false);
+  const openCustomerForm = useCallback(() => setIsCreatingCustomer(true), []);
+  const closeCustomerForm = useCallback(() => setIsCreatingCustomer(false), []);
+  const openInvoiceForm = useCallback(() => setIsCreatingInvoice(true), []);
+  const closeInvoiceForm = useCallback(() => setIsCreatingInvoice(false), []);
   const [customerState, customerAction, isCustomerPending] = useActionState(
     createCustomerAction,
     { ok: false, message: "" },
@@ -70,17 +74,27 @@ export function FinancialDashboard({
     : hasError
       ? "error"
       : "ready";
-  const dashboardInvoices = buildDashboardInvoices(data.invoiceRecords);
+  const dashboardInvoices = useMemo(
+    () => buildDashboardInvoices(data.invoiceRecords),
+    [data.invoiceRecords],
+  );
   const visibleInvoices = isEmpty ? [] : dashboardInvoices;
-  const visibleAgingSummary = isEmpty
-    ? []
-    : buildAgingSummary(data.invoiceRecords, data.dashboardAsOf);
+  const visibleAgingSummary = useMemo(
+    () => (isEmpty ? [] : buildAgingSummary(data.invoiceRecords, data.dashboardAsOf)),
+    [isEmpty, data.invoiceRecords, data.dashboardAsOf],
+  );
   const visibleRevenueSeries = isEmpty ? [] : data.revenueSeries;
   const visibleCategoryRevenue = isEmpty ? [] : data.categoryRevenue;
   const visibleTopCustomers = isEmpty ? [] : data.topCustomers;
   const visibleActivity = isEmpty ? [] : data.recentActivity;
-  const summary = summarizeDashboard(visibleInvoices, data.dashboardAsOf);
-  const kpiDetails = buildDashboardKpiDetails(dashboardInvoices, data.dashboardAsOf);
+  const summary = useMemo(
+    () => summarizeDashboard(visibleInvoices, data.dashboardAsOf),
+    [visibleInvoices, data.dashboardAsOf],
+  );
+  const kpiDetails = useMemo(
+    () => buildDashboardKpiDetails(dashboardInvoices, data.dashboardAsOf),
+    [dashboardInvoices, data.dashboardAsOf],
+  );
 
   return (
     <FinanceShell
@@ -101,14 +115,14 @@ export function FinancialDashboard({
         <>
           <button
             type="button"
-            onClick={() => setIsCreatingCustomer(true)}
+            onClick={openCustomerForm}
             className="min-h-10 rounded-md border border-[var(--color-border)] bg-white px-3 text-sm font-medium text-[var(--color-graphite-800)] shadow-sm transition hover:border-[var(--color-gold-400)] hover:text-[var(--color-graphite-950)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]"
           >
             Novo Cliente
           </button>
           <button
             type="button"
-            onClick={() => setIsCreatingInvoice(true)}
+            onClick={openInvoiceForm}
             className="min-h-10 rounded-md bg-[var(--color-graphite-900)] px-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--color-graphite-800)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]"
           >
             Nova Fatura
@@ -135,7 +149,7 @@ export function FinancialDashboard({
           isPending={isCustomerPending}
           message={customerState.message}
           ok={customerState.ok}
-          onClose={() => setIsCreatingCustomer(false)}
+          onClose={closeCustomerForm}
         />
       ) : null}
       {isCreatingInvoice ? (
@@ -145,7 +159,7 @@ export function FinancialDashboard({
           isPending={isInvoicePending}
           message={invoiceState.message}
           ok={invoiceState.ok}
-          onClose={() => setIsCreatingInvoice(false)}
+          onClose={closeInvoiceForm}
         />
       ) : null}
       <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-5 px-4 py-4 sm:px-6 lg:px-8 lg:py-6">
