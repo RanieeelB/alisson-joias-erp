@@ -4,6 +4,7 @@ import {
   loadInvoiceById,
   type DeclarationRecord,
 } from "@/features/finance/data";
+import type { CustomerStatement } from "@/features/statements-reports/types";
 import type { InvoiceRecord } from "@/features/invoices/types";
 import { formatMoney } from "@/lib/finance";
 import { createFinancePdf, pdfResponse, type PdfSection } from "@/lib/pdf";
@@ -245,14 +246,55 @@ export async function statementPdfResponse(id?: string) {
   });
 
   const filename = id ? "extrato-cliente.pdf" : "extratos-em-lote.pdf";
-  await uploadToStorage(
-    result.supabase,
-    id ? `statements/${id}` : "statements/bulk",
-    filename,
-    bytes,
-  );
+  await uploadToStorage(result.supabase, id ? `statements/${id}` : "statements/bulk", filename, bytes);
+
+  if (id) {
+    const statement = statements[0];
+    if (statement) {
+      await persistStatementAsDeclaration(result.supabase, id, statement, bytes);
+    }
+  }
 
   return pdfResponse(bytes, filename);
+}
+
+async function persistStatementAsDeclaration(
+  supabase: SupabaseClient,
+  invoiceId: string,
+  statement: CustomerStatement,
+  bytes: Uint8Array,
+): Promise<void> {
+  const { data: invoiceRow } = await supabase
+    .from("invoices")
+    .select("customer_id")
+    .eq("id", invoiceId)
+    .single();
+
+  if (!invoiceRow?.customer_id) return;
+
+  const today = new Date().toISOString().slice(0, 10);
+  const declarationNumber = statement.statementNumber.replace(/^STM-/, "EXT-");
+  const monthLabel = statement.lastInvoiceDate.slice(0, 7);
+
+  const { data: declaration } = await supabase
+    .from("declarations")
+    .upsert(
+      {
+        declaration_number: declarationNumber,
+        customer_id: invoiceRow.customer_id,
+        title: `Extrato de Conta — ${statement.customerName}`,
+        reference_period: monthLabel,
+        body: `Extrato ${statement.statementNumber} com ${statement.invoiceCount} fatura(s). Saldo: ${formatMoney(statement.balanceCents)}.`,
+        issued_on: today,
+      },
+      { onConflict: "declaration_number" },
+    )
+    .select("id")
+    .single();
+
+  if (!declaration?.id) return;
+
+  await uploadToStorage(supabase, `declarations/${declaration.id}`, "extrato-cliente.pdf", bytes);
 }
 
 export async function invoicePdfResponse(id: string) {
