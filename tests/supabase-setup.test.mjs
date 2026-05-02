@@ -143,7 +143,7 @@ test("adds Supabase SSR clients and request proxy", () => {
   assert.match(readProjectFile("src/proxy.ts"), /export async function proxy/);
 });
 
-test("adds persistent finance seed and printable declaration documents", () => {
+test("adds declarations table and structural changes in migration", () => {
   const migrationsDir = join(projectRoot, "supabase", "migrations");
   const migrationFile = readdirSync(migrationsDir).find((file) =>
     file.endsWith("_persist_finance_seed_and_documents.sql"),
@@ -165,6 +165,13 @@ test("adds persistent finance seed and printable declaration documents", () => {
       `expected RLS enabled for ${tableName}`,
     );
   }
+});
+
+test("seed.sql contains demo data with idempotent upserts", () => {
+  const seedPath = join(projectRoot, "supabase", "seed.sql");
+  assert.equal(existsSync(seedPath), true, "expected supabase/seed.sql");
+
+  const seed = readFileSync(seedPath, "utf8");
 
   for (const token of [
     "insert into public.customers",
@@ -177,8 +184,23 @@ test("adds persistent finance seed and printable declaration documents", () => {
     "insert into public.declarations",
     "on conflict",
   ]) {
-    assert.match(migration, new RegExp(token));
+    assert.match(seed, new RegExp(token), `expected "${token}" in seed.sql`);
   }
+});
+
+test("finance-exports storage bucket migration exists", () => {
+  const migrationsDir = join(projectRoot, "supabase", "migrations");
+  const migrationFile = readdirSync(migrationsDir).find((file) =>
+    file.includes("finance_exports_storage"),
+  );
+
+  assert.ok(migrationFile, "expected finance-exports storage migration");
+
+  const migration = readFileSync(join(migrationsDir, migrationFile), "utf8");
+  assert.match(migration, /finance-exports/);
+  assert.match(migration, /storage\.buckets/);
+  assert.match(migration, /finance_exports_select/);
+  assert.match(migration, /finance_exports_insert/);
 });
 
 test("finance exports use admin storage client and fail loudly on upload errors", () => {
