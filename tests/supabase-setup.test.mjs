@@ -39,6 +39,7 @@ test("documents the public Supabase environment variables", () => {
 
   assert.match(envExample, /^NEXT_PUBLIC_SUPABASE_URL=/m);
   assert.match(envExample, /^NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=/m);
+  assert.match(envExample, /^SUPABASE_SERVICE_ROLE_KEY=/m);
 });
 
 test("creates the initial finance schema with constraints and indexes", () => {
@@ -117,6 +118,7 @@ test("enables RLS with internal and customer ownership policies", () => {
 
 test("adds Supabase SSR clients and request proxy", () => {
   for (const path of [
+    "src/lib/supabase/admin.ts",
     "src/lib/supabase/client.ts",
     "src/lib/supabase/server.ts",
     "src/lib/supabase/proxy.ts",
@@ -125,6 +127,10 @@ test("adds Supabase SSR clients and request proxy", () => {
     assert.equal(existsSync(join(projectRoot, path)), true, `expected ${path}`);
   }
 
+  assert.match(
+    readProjectFile("src/lib/supabase/admin.ts"),
+    /createClient\(url, serviceRoleKey/,
+  );
   assert.match(
     readProjectFile("src/lib/supabase/client.ts"),
     /createBrowserClient/,
@@ -173,4 +179,14 @@ test("adds persistent finance seed and printable declaration documents", () => {
   ]) {
     assert.match(migration, new RegExp(token));
   }
+});
+
+test("finance exports use admin storage client and fail loudly on upload errors", () => {
+  const helpers = readProjectFile("src/features/finance/export-helpers.ts");
+
+  assert.match(helpers, /createAdminClient/);
+  assert.match(helpers, /hasSupabaseServiceEnv/);
+  assert.match(helpers, /storage\.getBucket\(STORAGE_BUCKET\)/);
+  assert.match(helpers, /storage\.createBucket\(STORAGE_BUCKET/);
+  assert.match(helpers, /Falha ao salvar PDF no Supabase Storage/);
 });

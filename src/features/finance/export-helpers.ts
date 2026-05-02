@@ -7,8 +7,14 @@ import {
 import type { InvoiceRecord } from "@/features/invoices/types";
 import { formatMoney } from "@/lib/finance";
 import { createFinancePdf, pdfResponse, type PdfSection } from "@/lib/pdf";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { isInternalFinanceUser } from "@/lib/supabase/authz";
+import { hasSupabaseServiceEnv } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
+
+type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
+
+const STORAGE_BUCKET = "finance-exports";
 
 export async function requireFinanceWorkspace() {
   const supabase = await createClient();
@@ -22,6 +28,62 @@ export async function requireFinanceWorkspace() {
   }
 
   return { supabase, workspace: await loadFinanceWorkspace(supabase) };
+}
+
+async function uploadToStorage(
+  supabase: SupabaseClient,
+  folder: string,
+  filename: string,
+  bytes: Uint8Array,
+): Promise<string> {
+  const date = new Date().toISOString().slice(0, 10);
+  const storagePath = `${folder}/${date}/${filename}`;
+  const storageClient = hasSupabaseServiceEnv() ? createAdminClient() : supabase;
+
+  if (hasSupabaseServiceEnv()) {
+    await ensureStorageBucket(storageClient);
+  }
+
+  const { error } = await storageClient.storage
+    .from(STORAGE_BUCKET)
+    .upload(storagePath, bytes, {
+      contentType: "application/pdf",
+      upsert: true,
+    });
+
+  if (error) {
+    throw new Error(
+      `Falha ao salvar PDF no Supabase Storage (${storagePath}): ${error.message}`,
+    );
+  }
+
+  return storagePath;
+}
+
+async function ensureStorageBucket(storageClient: ReturnType<typeof createAdminClient>) {
+  const { error } = await storageClient.storage.getBucket(STORAGE_BUCKET);
+
+  if (!error) {
+    return;
+  }
+
+  const message = error.message.toLowerCase();
+  const bucketMissing =
+    message.includes("not found") || message.includes("does not exist");
+
+  if (!bucketMissing) {
+    throw new Error(`Falha ao consultar bucket ${STORAGE_BUCKET}: ${error.message}`);
+  }
+
+  const { error: createError } = await storageClient.storage.createBucket(STORAGE_BUCKET, {
+    public: false,
+    allowedMimeTypes: ["application/pdf"],
+    fileSizeLimit: "20MB",
+  });
+
+  if (createError) {
+    throw new Error(`Falha ao criar bucket ${STORAGE_BUCKET}: ${createError.message}`);
+  }
 }
 
 export async function dashboardPdfResponse() {
@@ -73,6 +135,8 @@ export async function dashboardPdfResponse() {
     ],
   });
 
+  await uploadToStorage(result.supabase, "reports", "painel-financeiro.pdf", bytes);
+
   return pdfResponse(bytes, "painel-financeiro.pdf");
 }
 
@@ -107,6 +171,8 @@ export async function paymentsPdfResponse() {
       },
     ],
   });
+
+  await uploadToStorage(result.supabase, "reports", "pagamentos-e-obrigacoes.pdf", bytes);
 
   return pdfResponse(bytes, "pagamentos-e-obrigacoes.pdf");
 }
@@ -148,6 +214,8 @@ export async function reportPdfResponse() {
     ],
   });
 
+  await uploadToStorage(result.supabase, "reports", "relatorio-financeiro.pdf", bytes);
+
   return pdfResponse(bytes, "relatorio-financeiro.pdf");
 }
 
@@ -176,7 +244,15 @@ export async function statementPdfResponse(id?: string) {
     })),
   });
 
-  return pdfResponse(bytes, id ? "extrato-cliente.pdf" : "extratos-em-lote.pdf");
+  const filename = id ? "extrato-cliente.pdf" : "extratos-em-lote.pdf";
+  await uploadToStorage(
+    result.supabase,
+    id ? `statements/${id}` : "statements/bulk",
+    filename,
+    bytes,
+  );
+
+  return pdfResponse(bytes, filename);
 }
 
 export async function invoicePdfResponse(id: string) {
@@ -192,7 +268,10 @@ export async function invoicePdfResponse(id: string) {
     sections: invoiceSections(invoice),
   });
 
-  return pdfResponse(bytes, `${invoice.invoiceNumber.toLowerCase()}.pdf`);
+  const filename = `${invoice.invoiceNumber.toLowerCase()}.pdf`;
+  await uploadToStorage(result.supabase, `invoices/${id}`, filename, bytes);
+
+  return pdfResponse(bytes, filename);
 }
 
 export async function declarationPdfResponse(id: string) {
@@ -208,7 +287,10 @@ export async function declarationPdfResponse(id: string) {
     sections: declarationSections(declaration),
   });
 
-  return pdfResponse(bytes, `${declaration.declarationNumber.toLowerCase()}.pdf`);
+  const filename = `${declaration.declarationNumber.toLowerCase()}.pdf`;
+  await uploadToStorage(result.supabase, `declarations/${id}`, filename, bytes);
+
+  return pdfResponse(bytes, filename);
 }
 
 function invoiceSections(invoice: InvoiceRecord): PdfSection[] {
