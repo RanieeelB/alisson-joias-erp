@@ -163,6 +163,16 @@ test("dashboard labels accumulated profit as an estimate", () => {
   assert.match(source, /Passe o mouse sobre o gráfico/);
 });
 
+test("dashboard keeps the revenue line visually prominent", () => {
+  const source = readFileSync(
+    "src/features/dashboard/components/financial-dashboard.tsx",
+    "utf8",
+  );
+
+  assert.match(source, /stroke="#8f6c22"/);
+  assert.match(source, /vectorEffect="non-scaling-stroke"/);
+});
+
 test("builds dashboard KPI details from real invoice data", () => {
   const { buildDashboardKpiDetails } = loadDashboardDataModule();
 

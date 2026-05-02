@@ -22,6 +22,8 @@ import type {
   TaxQuarterCard,
 } from "@/features/statements-reports/types";
 import { getAgingBucket } from "@/lib/finance";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { hasSupabaseServiceEnv } from "@/lib/supabase/env";
 import type { createClient } from "@/lib/supabase/server";
 
 type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
@@ -106,6 +108,18 @@ export type DeclarationRecord = {
   issuedOn: string;
 };
 
+export type DeclarationExportRecord = {
+  id: string;
+  declarationId?: string;
+  title: string;
+  customerName: string;
+  referencePeriod: string;
+  issuedOn: string;
+  fileName: string;
+  storagePath: string;
+  downloadUrl: string;
+};
+
 export type FinanceSelectOption = {
   id: string;
   label: string;
@@ -120,6 +134,7 @@ export type FinanceWorkspaceData = {
   customers: FinanceSelectOption[];
   dashboardAsOf: Date;
   declarations: DeclarationRecord[];
+  declarationExports: DeclarationExportRecord[];
   invoiceRecords: InvoiceRecord[];
   monthlyReportRows: MonthlyReportRow[];
   openReceivableInvoices: ReceivableInvoice[];
@@ -226,11 +241,29 @@ export async function loadFinanceWorkspace(
   const payableRows = (payableResult.data ?? []) as AccountsPayableRow[];
   const customerRows = (customerResult.data ?? []) as CustomerRow[];
   const vendorRows = (vendorResult.data ?? []) as Array<{ id: string; name: string }>;
+  const declarations = ((declarationResult.data ?? []) as Array<{
+    id: string;
+    declaration_number: string;
+    title: string;
+    reference_period: string;
+    body: string;
+    issued_on: string;
+    customers: { name: string } | null;
+  }>).map((declaration) => ({
+    id: declaration.id,
+    declarationNumber: declaration.declaration_number,
+    title: declaration.title,
+    customerName: declaration.customers?.name ?? "Cliente não informado",
+    referencePeriod: declaration.reference_period,
+    body: declaration.body,
+    issuedOn: declaration.issued_on,
+  }));
 
   const invoiceRecords = invoiceRows.map(mapInvoice);
   const paymentRecords = paymentRows.map(mapPayment);
   const accountsPayableRecords = payableRows.map(mapPayable);
   const dashboardAsOf = new Date();
+  const declarationExports = await loadDeclarationExports(supabase, declarations);
   const openReceivableInvoices = invoiceRecords
     .filter((invoice) => invoice.balanceCents > 0)
     .map<ReceivableInvoice>((invoice) => ({
@@ -253,23 +286,8 @@ export async function loadFinanceWorkspace(
       label: customer.name,
     })),
     dashboardAsOf,
-    declarations: ((declarationResult.data ?? []) as Array<{
-      id: string;
-      declaration_number: string;
-      title: string;
-      reference_period: string;
-      body: string;
-      issued_on: string;
-      customers: { name: string } | null;
-    }>).map((declaration) => ({
-      id: declaration.id,
-      declarationNumber: declaration.declaration_number,
-      title: declaration.title,
-      customerName: declaration.customers?.name ?? "Cliente não informado",
-      referencePeriod: declaration.reference_period,
-      body: declaration.body,
-      issuedOn: declaration.issued_on,
-    })),
+    declarations,
+    declarationExports,
     invoiceRecords,
     monthlyReportRows: buildMonthlyReportRows(invoiceRecords, accountsPayableRecords),
     openReceivableInvoices,
@@ -291,7 +309,7 @@ export async function loadFinanceWorkspace(
       tone: activity.tone,
       time: formatRelativeTime(activity.occurred_at),
     })),
-    revenueSeries: buildRevenueSeries(invoiceRecords),
+    revenueSeries: buildRevenueSeries(invoiceRecords, accountsPayableRecords),
     taxQuarterCards: buildTaxCards(invoiceRecords),
     topCustomers: buildTopCustomers(invoiceRecords),
     vendors: vendorRows.map((vendor) => ({ id: vendor.id, label: vendor.name })),
@@ -344,6 +362,94 @@ export async function loadDeclarationById(supabase: SupabaseClient, id: string) 
   } satisfies DeclarationRecord;
 }
 
+async function loadDeclarationExports(
+  supabase: SupabaseClient,
+  declarations: DeclarationRecord[],
+) {
+  const storageClient = hasSupabaseServiceEnv() ? createAdminClient() : supabase;
+  const storagePaths = await collectStorageFiles(storageClient, "declarations");
+  if (storagePaths.length === 0) {
+    return [] satisfies DeclarationExportRecord[];
+  }
+
+  const declarationById = new Map(declarations.map((declaration) => [declaration.id, declaration]));
+  const signedUrlResults = await Promise.all(
+    storagePaths.map(async (storagePath) => ({
+      storagePath,
+      result: await storageClient.storage
+        .from("finance-exports")
+        .createSignedUrl(storagePath, 60 * 60),
+    })),
+  );
+
+  return signedUrlResults
+    .flatMap(({ storagePath, result }) => {
+      if (result.error || !result.data?.signedUrl) {
+        return [];
+      }
+
+      const segments = storagePath.split("/");
+      const declarationId = segments[1];
+      const issuedOn = segments[2] ?? "";
+      const fileName = segments.at(-1) ?? "declaracao.pdf";
+      const declaration = declarationId ? declarationById.get(declarationId) : undefined;
+
+      return [
+        {
+          id: storagePath,
+          declarationId,
+          title: declaration?.title ?? formatExportTitle(fileName),
+          customerName: declaration?.customerName ?? "Cliente não informado",
+          referencePeriod: declaration?.referencePeriod ?? "PDF gerado",
+          issuedOn,
+          fileName,
+          storagePath,
+          downloadUrl: result.data.signedUrl,
+        } satisfies DeclarationExportRecord,
+      ];
+    })
+    .sort((a, b) => b.issuedOn.localeCompare(a.issuedOn));
+}
+
+async function collectStorageFiles(
+  supabase: Pick<SupabaseClient, "storage">,
+  path: string,
+): Promise<string[]> {
+  const { data, error } = await supabase.storage.from("finance-exports").list(path, {
+    limit: 100,
+    sortBy: { column: "name", order: "desc" },
+  });
+
+  if (error || !data) {
+    return [];
+  }
+
+  const nested = await Promise.all(
+    data.map(async (entry) => {
+      const nextPath = `${path}/${entry.name}`;
+
+      if (entry.name.toLowerCase().endsWith(".pdf")) {
+        return [nextPath];
+      }
+
+      return collectStorageFiles(supabase, nextPath);
+    }),
+  );
+
+  return nested.flat();
+}
+
+function formatExportTitle(fileName: string) {
+  const baseName = fileName.replace(/\.pdf$/i, "");
+  const humanized = baseName.replace(/[-_]+/g, " ").trim();
+
+  if (humanized.length === 0) {
+    return "PDF gerado";
+  }
+
+  return humanized.charAt(0).toUpperCase() + humanized.slice(1);
+}
+
 function mapInvoice(row: InvoiceRow): InvoiceRecord {
   const customer = row.customers;
   const address = [
@@ -374,6 +480,7 @@ function mapInvoice(row: InvoiceRow): InvoiceRecord {
     status: row.status,
     quickbooksSyncStatus: row.quickbooks_sync_status,
     paymentTerms: getPaymentTerms(row.invoice_date, row.due_date),
+    notes: row.notes ?? null,
     lineItems: [...(row.invoice_line_items ?? [])]
       .sort((a, b) => a.description.localeCompare(b.description, "pt-BR"))
       .map((item) => ({
@@ -428,15 +535,22 @@ function mapPayable(row: AccountsPayableRow): AccountsPayableRecord {
   };
 }
 
-function buildRevenueSeries(invoices: InvoiceRecord[]): RevenuePoint[] {
+function buildRevenueSeries(
+  invoices: InvoiceRecord[],
+  payables: AccountsPayableRecord[] = [],
+): RevenuePoint[] {
   return monthKeys(6).map(({ key, label }) => {
     const monthInvoices = invoices.filter((invoice) => invoice.issuedOn.startsWith(key));
     const revenueCents = sum(monthInvoices, "totalCents");
+    const expensesCents = sum(
+      payables.filter((payable) => payable.date.startsWith(key)),
+      "totalCents",
+    );
 
     return {
       month: label,
       revenueCents,
-      profitCents: Math.round(revenueCents * 0.42),
+      profitCents: revenueCents - expensesCents,
     };
   });
 }
@@ -565,7 +679,7 @@ function buildCashFlowRows(
   payments: PaymentRecord[],
   payables: AccountsPayableRecord[],
 ): CashFlowRow[] {
-  return monthKeys(1).map(({ key, label }) => ({
+  return monthKeys(6).map(({ key, label }) => ({
     month: label,
     inflowsCents: sum(
       payments.filter((payment) => payment.date.startsWith(key)),

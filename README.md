@@ -38,12 +38,16 @@ A aplicação atua como um hub centralizado para o departamento financeiro, perm
 
 ## Stack
 
-- React 19
-- TypeScript
-- Tailwind CSS
-- Supabase
+- Next.js 16 App Router (Server Components + Server Actions)
+- React 19 com `useActionState`
+- TypeScript (Strict mode)
+- Tailwind CSS 4 com CSS variables (tema Graphite Ledger)
+- ESLint 9
+- Supabase (Auth SSR, Storage, RLS, Realtime broadcast)
 - PostgreSQL
-- Vercel
+- pdf-lib para geração de PDFs server-side
+- npm
+- Vercel (Deploy e Hosting)
 
 ---
 
@@ -74,15 +78,19 @@ A aplicação atua como um hub centralizado para o departamento financeiro, perm
    ```
    Preencha o arquivo `.env` com suas credenciais do projeto no Supabase (não exponha keys confidenciais em repositórios públicos).
 
-4. **Banco de Dados (Migrations/Seed)**
-   As configurações e migrations base do banco encontram-se em `supabase/migrations/`. Execute-as no painel do Supabase ou utilizando a CLI oficial (ex: `supabase db push`), dependendo do seu fluxo de desenvolvimento.
+3. **Aplicar seed data (opcional)**
+   Para popular o banco com dados de demonstração:
+   ```bash
+   psql "$DATABASE_URL" -f supabase/seed.sql
+   ```
+   O seed usa `ON CONFLICT DO UPDATE` e pode ser reaplicado sem duplicar registros.
 
-5. **Iniciar o ambiente de desenvolvimento local**
+4. **Iniciar o ambiente de desenvolvimento local**
    ```bash
    npm run dev
    ```
 
-6. **Acessar a aplicação**
+5. **Acessar a aplicação**
    Abra no seu navegador o endereço:
    [http://localhost:3000](http://localhost:3000)
 
@@ -149,26 +157,25 @@ A IA foi utilizada como ferramenta de apoio técnico e produtividade, enquanto a
 - **Skills personalizadas:**
   - Foram criadas "skills" e instruções específicas na pasta `.agents/skills` para guiar os modelos ao longo das decisões arquiteturais.
   - Exemplos incluem: leitura correta de requisitos de negócio, geração padronizada de documentação técnica, revisão de código visando boas práticas do Next.js e Supabase, revisão de bugs e a própria elaboração deste README.
-  - O objetivo das skills foi atuar como camadas de contexto que elevam a qualidade da entrega, reduzindo o viés probabilístico e aumentando a rastreabilidade do raciocínio.
-
----
-
-## Decisões Técnicas
-
-- **Next.js App Router**: Adoção do App Router visando facilitar as transições visuais, colocation de rotas e para obter vantagens expressivas de performance utilizando Server Components (RSC) nas consultas de dados, delegando o cliente apenas à interatividade real.
-- **Supabase**: Adotado como Backend as a Service e principal infraestrutura de persistência de dados. A combinação entre banco relacional PostgreSQL e Auth via SSR fornece segurança escalável.
-- **Isolamento por "Features"**: Em vez de concentrar todos os componentes sob a pasta `components/`, o código está quebrado dentro de `src/features/`. Isso melhora o isolamento das regras de domínio financeiro, evitando que módulos como "dashboard" e "invoices" se misturem e criem dependências circulares ocultas.
+- **Arquitetura de Banco e Migrations**: O projeto utiliza um sistema de migrations versionado:
+  - Schema inicial: `supabase/migrations/20260430120000_init_finance_schema.sql`
+  - Estrutura de documentos e constraints: `supabase/migrations/20260501120000_persist_finance_seed_and_documents.sql`
+  - Configuração de Storage (bucket `finance-exports`): `supabase/migrations/20260501130000_create_finance_exports_storage.sql`
+- **Segurança e RLS**: PDFs exportados são salvos em um bucket privado no Supabase Storage com políticas de Row Level Security (RLS) rigorosas.
+- **Autenticação SSR**: Uso do `@supabase/ssr` para gerenciar sessões no lado do servidor, garantindo que o middleware e os Server Components protejam as rotas financeiras de forma nativa.
+- **Controle de Acesso**: Além das roles de banco, o sistema valida acessos internos via lista autorizada (`INTERNAL_FINANCE_ALLOWED_EMAILS`).
 
 ## Boas Práticas Adotadas
 
 - **Componentização**: Criação de pequenas partes de UI fáceis de reutilizar, compostas e organizadas para facilitar a manutenção visual.
-- **Tipagem com TypeScript**: Segurança na definição de entidades e objetos trafegados para evitar os clássicos erros de "undefined" em runtime e garantir integridade das transações financeiras.
-- **Separação de Responsabilidades**: A manipulação de regras de acesso ao banco (Supabase queries) ocorre preferencialmente do lado do servidor, passando apenas as estruturas necessárias e serializadas para os Client Components.
-- **Organização de rotas**: O Next.js possibilita roteamento explícito em `app/` sem vazamento de lógica de negócio em arquivos publicamente acessíveis.
-- **Uso de Variáveis de Ambiente**: Arquivos como `.env` e acesso via configuração padrão asseguram proteção aos dados sensíveis do projeto.
-- **Integração com banco**: Comunicação simplificada e assíncrona por meio de serviços bem encapsulados.
-- **Lint e Build**: Configuração rigorosa de ESLint e checagem forte de TypeScript.
+- **Tipagem com TypeScript**: Segurança na definição de entidades e objetos trafegados para garantir integridade das transações financeiras.
+- **Separação de Responsabilidades**: A manipulação de regras de acesso ao banco ocorre preferencialmente do lado do servidor (RSC/Actions).
 - **Versionamento com Git**: Histórico consistente de commits guiando todo o fluxo evolutivo e semântico.
+- **Deploy**: O projeto é totalmente compatível com a Vercel, bastando configurar as variáveis de ambiente e garantir a aplicação das migrations no Supabase.
+
+## Registro de Uso de IA
+
+O registro detalhado de todas as sessões assistidas por IA, incluindo prompts, decisões técnicas e revisões humanas, está disponível em [docs/ai-usage-log.md](./docs/ai-usage-log.md).
 
 ## Próximos Passos
 

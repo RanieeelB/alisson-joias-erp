@@ -14,7 +14,7 @@ import type { InvoiceRecord, InvoiceStatusFilter } from "@/features/invoices/typ
 import { formatMoney } from "@/lib/finance";
 import Link from "next/link";
 import type { FormEvent, ReactNode } from "react";
-import { useActionState, useState } from "react";
+import { useActionState, useCallback, useMemo, useState } from "react";
 
 const statusOrder: InvoiceStatusFilter[] = [
   "all",
@@ -51,11 +51,14 @@ export function InvoicesPage({ data, userEmail }: InvoicesPageProps) {
     createInvoiceAction,
     { ok: false, message: "" },
   );
-  const visibleInvoices = filterInvoices(data.invoiceRecords, {
-    status: activeStatus,
-    query,
-  });
-  const summary = summarizeInvoices(visibleInvoices);
+  const visibleInvoices = useMemo(
+    () => filterInvoices(data.invoiceRecords, { status: activeStatus, query }),
+    [data.invoiceRecords, activeStatus, query],
+  );
+  const summary = useMemo(
+    () => summarizeInvoices(visibleInvoices),
+    [visibleInvoices],
+  );
 
   return (
     <FinanceShell

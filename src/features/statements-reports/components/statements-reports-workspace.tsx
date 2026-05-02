@@ -3,11 +3,13 @@
 import { signOut } from "@/app/login/actions";
 import type { FinanceWorkspaceData } from "@/features/finance/data";
 import { FinanceShell } from "@/features/finance-shell/components/finance-shell";
+import { logStatementActivityAction } from "@/features/finance/actions";
 import {
   buildRevenueChartAxis,
   buildRevenueChartColumns,
+  filterStatementsByDateRange,
+  getDefaultDateRange,
   reportTypeLabels,
-  statementPeriod,
   summarizeCashFlow,
   summarizeProfitLoss,
   summarizeRevenueAnalysis,
@@ -15,13 +17,14 @@ import {
   summarizeTaxSummary,
 } from "@/features/statements-reports/data";
 import type {
+  CashFlowRow,
   CustomerStatement,
   MonthlyReportRow,
   ReportType,
   TaxQuarterCard,
 } from "@/features/statements-reports/types";
 import { formatMoney } from "@/lib/finance";
-import { useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 
 export type StatementsReportsTab = "statements" | "reports";
 
@@ -68,7 +71,27 @@ export function StatementsReportsWorkspace({
 }) {
   const [activeTab, setActiveTab] = useState<StatementsReportsTab>(initialTab);
   const [activeReportType, setActiveReportType] = useState<ReportType>("revenue_analysis");
-  const statementsSummary = summarizeStatements(data.customerStatements);
+
+  const defaultRange = useMemo(() => getDefaultDateRange(), []);
+  const [startDate, setStartDate] = useState(defaultRange.startDate);
+  const [endDate, setEndDate] = useState(defaultRange.endDate);
+
+  const filteredStatements = useMemo(
+    () => filterStatementsByDateRange(data.customerStatements, startDate, endDate),
+    [data.customerStatements, startDate, endDate],
+  );
+  const statementsSummary = useMemo(
+    () => summarizeStatements(filteredStatements),
+    [filteredStatements],
+  );
+
+  const handleStartDateChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setStartDate(e.target.value);
+  }, []);
+  const handleEndDateChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setEndDate(e.target.value);
+  }, []);
+
   const revenue = summarizeRevenueAnalysis(data.monthlyReportRows);
   const revenueColumns = buildRevenueChartColumns(data.monthlyReportRows);
   const revenueAxis = buildRevenueChartAxis(data.monthlyReportRows);
@@ -136,8 +159,22 @@ export function StatementsReportsWorkspace({
                 {activeTab === "statements" ? "Período" : "Tipo de relatório"}
               </p>
               {activeTab === "statements" ? (
-                <div className="mt-2 inline-flex min-h-10 items-center rounded-md border border-[var(--color-border)] bg-white px-3 font-mono text-sm text-[var(--color-graphite-900)]">
-                  {statementPeriod.label}
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <input
+                    type="date"
+                    aria-label="Data inicial"
+                    value={startDate}
+                    onChange={handleStartDateChange}
+                    className="min-h-10 rounded-md border border-[var(--color-border)] bg-white px-3 font-mono text-sm text-[var(--color-graphite-900)] focus:border-[var(--color-gold-400)] focus:outline-none focus:ring-1 focus:ring-[var(--color-gold-400)]"
+                  />
+                  <span className="text-sm text-[var(--color-muted)]">até</span>
+                  <input
+                    type="date"
+                    aria-label="Data final"
+                    value={endDate}
+                    onChange={handleEndDateChange}
+                    className="min-h-10 rounded-md border border-[var(--color-border)] bg-white px-3 font-mono text-sm text-[var(--color-graphite-900)] focus:border-[var(--color-gold-400)] focus:outline-none focus:ring-1 focus:ring-[var(--color-gold-400)]"
+                  />
                 </div>
               ) : (
                 <div role="tablist" aria-label="Report type selector" className="mt-2 flex flex-wrap gap-2">
@@ -168,11 +205,12 @@ export function StatementsReportsWorkspace({
         </section>
 
         {activeTab === "statements" ? (
-          <StatementsTab statements={data.customerStatements} summary={statementsSummary} />
+          <StatementsTab statements={filteredStatements} summary={statementsSummary} />
         ) : (
           <ReportsTab
             activeReportType={activeReportType}
             cashFlow={cashFlow}
+            cashFlowRows={data.cashFlowRows}
             monthlyRows={data.monthlyReportRows}
             profitLoss={profitLoss}
             revenue={revenue}
@@ -205,9 +243,20 @@ function StatementsTab({
 
       <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="grid gap-3">
-          {statements.map((statement) => (
-            <StatementCard key={statement.id} statement={statement} />
-          ))}
+          {statements.length === 0 ? (
+            <div className="flex flex-col items-center justify-center rounded-md border border-dashed border-[var(--color-border)] bg-[var(--color-graphite-50)] px-6 py-12 text-center">
+              <p className="text-sm font-semibold text-[var(--color-graphite-800)]">
+                Nenhum extrato encontrado
+              </p>
+              <p className="mt-2 text-sm text-[var(--color-muted)]">
+                Ajuste o período para visualizar extratos de clientes.
+              </p>
+            </div>
+          ) : (
+            statements.map((statement) => (
+              <StatementCard key={statement.id} statement={statement} />
+            ))
+          )}
         </div>
 
         <aside className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-widget)]">
@@ -231,6 +280,7 @@ function StatementsTab({
 function ReportsTab({
   activeReportType,
   cashFlow,
+  cashFlowRows,
   monthlyRows,
   profitLoss,
   revenue,
@@ -241,6 +291,7 @@ function ReportsTab({
 }: {
   activeReportType: ReportType;
   cashFlow: ReturnType<typeof summarizeCashFlow>;
+  cashFlowRows: CashFlowRow[];
   monthlyRows: MonthlyReportRow[];
   profitLoss: ReturnType<typeof summarizeProfitLoss>;
   revenue: ReturnType<typeof summarizeRevenueAnalysis>;
@@ -269,6 +320,7 @@ function ReportsTab({
         {renderActiveReport({
           activeReportType,
           cashFlow,
+          cashFlowRows,
           hoveredCashFlowLabel,
           hoveredRevenueRow: activeRevenueRow,
           monthlyRows,
@@ -325,6 +377,7 @@ function ReportsTab({
 function renderActiveReport({
   activeReportType,
   cashFlow,
+  cashFlowRows,
   hoveredCashFlowLabel,
   hoveredRevenueRow,
   monthlyRows,
@@ -338,6 +391,7 @@ function renderActiveReport({
 }: {
   activeReportType: ReportType;
   cashFlow: ReturnType<typeof summarizeCashFlow>;
+  cashFlowRows: CashFlowRow[];
   hoveredCashFlowLabel: { label: string; value: number } | null;
   hoveredRevenueRow: MonthlyReportRow | null;
   monthlyRows: MonthlyReportRow[];
@@ -351,42 +405,12 @@ function renderActiveReport({
 }) {
   if (activeReportType === "cash_flow") {
     return (
-      <div className="grid gap-4">
-        <article className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-widget)]">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-gold-700)]">
-            Fluxo de Caixa
-          </p>
-          <h2 className="mt-1 text-base font-semibold tracking-normal text-[var(--color-graphite-950)]">
-            Entradas versus saídas
-          </h2>
-          <div className="mt-5 grid gap-3 md:grid-cols-3">
-            <MetricCard label="Entradas" value={formatMoney(cashFlow.inflowsCents)} detail="Recebimentos e entradas" />
-            <MetricCard label="Saídas" value={formatMoney(cashFlow.outflowsCents)} detail="Pagamentos e saídas" />
-            <MetricCard label="Fluxo líquido" value={formatMoney(cashFlow.netCashFlowCents)} detail="Fluxo líquido" />
-          </div>
-          <div className="mt-6 grid min-h-64 grid-cols-2 items-end gap-8 border-l border-b border-[var(--color-border)] px-8 pt-4">
-            <CashFlowBar
-              label="Entradas"
-              value={cashFlow.inflowsCents}
-              max={cashFlow.inflowsCents}
-              onHover={setHoveredCashFlowLabel}
-              tone="bg-emerald-600"
-            />
-            <CashFlowBar
-              label="Saídas"
-              value={cashFlow.outflowsCents}
-              max={cashFlow.inflowsCents}
-              onHover={setHoveredCashFlowLabel}
-              tone="bg-red-500"
-            />
-          </div>
-          <div className="mt-4 rounded-md border border-[var(--color-border)] bg-[var(--color-graphite-50)] px-3 py-2 font-mono text-xs text-[var(--color-graphite-800)]">
-            {hoveredCashFlowLabel
-              ? `${hoveredCashFlowLabel.label}: ${formatMoney(hoveredCashFlowLabel.value)}`
-              : "Passe o mouse sobre as barras"}
-          </div>
-        </article>
-      </div>
+      <CashFlowLineChart
+        cashFlow={cashFlow}
+        rows={cashFlowRows}
+        hoveredCashFlowLabel={hoveredCashFlowLabel}
+        setHoveredCashFlowLabel={setHoveredCashFlowLabel}
+      />
     );
   }
 
@@ -497,15 +521,104 @@ function renderActiveReport({
                 <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Receita</th>
                 <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Despesas</th>
                 <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Lucro</th>
+                <th className="border-b border-[var(--color-border)] pb-3 pr-4 font-semibold">Margem</th>
                 <th className="border-b border-[var(--color-border)] pb-3 font-semibold">Trend</th>
               </tr>
             </thead>
             <tbody>
-              {monthlyRows.map((row) => (
-                <ReportRow key={row.month} row={row} />
+              {monthlyRows.map((row, index) => (
+                <ReportRow key={row.month} row={row} previousRow={monthlyRows[index - 1]} />
               ))}
             </tbody>
           </table>
+        </div>
+      </article>
+    </div>
+  );
+}
+
+function CashFlowLineChart({
+  cashFlow,
+  rows,
+  hoveredCashFlowLabel,
+  setHoveredCashFlowLabel,
+}: {
+  cashFlow: ReturnType<typeof summarizeCashFlow>;
+  rows: CashFlowRow[];
+  hoveredCashFlowLabel: { label: string; value: number } | null;
+  setHoveredCashFlowLabel: (value: { label: string; value: number } | null) => void;
+}) {
+  const maxValue = Math.max(
+    ...rows.map((r) => Math.max(r.inflowsCents, r.outflowsCents)),
+    1,
+  );
+  const plotWidth = 500;
+  const plotHeight = 180;
+  const padLeft = 10;
+  const padRight = 10;
+  const padTop = 10;
+  const padBottom = 30;
+  const chartW = plotWidth - padLeft - padRight;
+  const chartH = plotHeight - padTop - padBottom;
+
+  const xFor = (i: number) =>
+    padLeft + (rows.length > 1 ? (i / (rows.length - 1)) * chartW : chartW / 2);
+  const yFor = (v: number) =>
+    padTop + chartH - (maxValue > 0 ? (v / maxValue) * chartH : 0);
+
+  const buildPath = (key: "inflowsCents" | "outflowsCents") =>
+    rows
+      .map((r, i) => `${i === 0 ? "M" : "L"} ${xFor(i)} ${yFor(r[key])}`)
+      .join(" ");
+
+  return (
+    <div className="grid gap-4">
+      <article className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-widget)]">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-gold-700)]">
+          Fluxo de Caixa
+        </p>
+        <h2 className="mt-1 text-base font-semibold tracking-normal text-[var(--color-graphite-950)]">
+          Entradas versus saídas — últimos 6 meses
+        </h2>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          <MetricCard label="Entradas" value={formatMoney(cashFlow.inflowsCents)} detail="Recebimentos e entradas" />
+          <MetricCard label="Saídas" value={formatMoney(cashFlow.outflowsCents)} detail="Pagamentos e saídas" />
+          <MetricCard label="Fluxo líquido" value={formatMoney(cashFlow.netCashFlowCents)} detail="Fluxo líquido" />
+        </div>
+        {rows.length > 0 ? (
+          <div className="mt-6 min-h-52">
+            <svg
+              aria-label="Gráfico de linhas: Fluxo de Caixa mensal"
+              className="h-full w-full overflow-visible"
+              viewBox={`0 0 ${plotWidth} ${plotHeight}`}
+              role="img"
+            >
+              <path d={buildPath("inflowsCents")} fill="none" stroke="#10b981" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+              <path d={buildPath("outflowsCents")} fill="none" stroke="#ef4444" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+              {rows.map((r, i) => (
+                <g
+                  key={r.month}
+                  onMouseEnter={() => setHoveredCashFlowLabel({ label: `${r.month} Entradas`, value: r.inflowsCents })}
+                  onMouseLeave={() => setHoveredCashFlowLabel(null)}
+                >
+                  <circle cx={xFor(i)} cy={yFor(r.inflowsCents)} r="5" fill="#10b981" />
+                  <circle cx={xFor(i)} cy={yFor(r.outflowsCents)} r="4" fill="#ef4444" />
+                  <text x={xFor(i)} y={plotHeight - 5} fill="#6f6a60" fontSize="11" textAnchor="middle">
+                    {r.month}
+                  </text>
+                </g>
+              ))}
+            </svg>
+          </div>
+        ) : null}
+        <div className="mt-3 flex flex-wrap gap-3 text-sm text-[var(--color-muted)]">
+          <Legend color="bg-emerald-500" label="Entradas" />
+          <Legend color="bg-red-500" label="Saídas" />
+        </div>
+        <div className="mt-2 rounded-md border border-[var(--color-border)] bg-[var(--color-graphite-50)] px-3 py-2 font-mono text-xs text-[var(--color-graphite-800)]">
+          {hoveredCashFlowLabel
+            ? `${hoveredCashFlowLabel.label}: ${formatMoney(hoveredCashFlowLabel.value)}`
+            : "Passe o mouse sobre os pontos"}
         </div>
       </article>
     </div>
@@ -549,6 +662,7 @@ function StatementCard({ statement }: { statement: CustomerStatement }) {
               key={action}
               href={action === "email" ? `mailto:?subject=${statement.statementNumber}` : `/api/exports/statements/${statement.id}`}
               target={action === "email" ? undefined : "_blank"}
+              onClick={() => logStatementActivityAction(statement.statementNumber, action)}
               className="min-h-9 rounded-md border border-[var(--color-border)] bg-white px-3 text-xs font-semibold text-[var(--color-graphite-800)] transition hover:border-[var(--color-gold-400)] hover:text-[var(--color-graphite-950)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold-500)]"
             >
               {getActionLabel(action)}
@@ -654,11 +768,26 @@ function ChartColumn({
   );
 }
 
-function ReportRow({ row }: { row: MonthlyReportRow }) {
+function ReportRow({ row, previousRow }: { row: MonthlyReportRow; previousRow?: MonthlyReportRow }) {
   const margin =
     row.revenueCents > 0
       ? Math.round((row.profitCents / row.revenueCents) * 1000) / 10
       : 0;
+
+  let trendLabel = "—";
+  let trendClass = "text-[var(--color-muted)]";
+  if (previousRow && previousRow.revenueCents > 0) {
+    const change = Math.round(((row.revenueCents - previousRow.revenueCents) / previousRow.revenueCents) * 1000) / 10;
+    if (change > 0) {
+      trendLabel = `+${change}%`;
+      trendClass = "text-emerald-700";
+    } else if (change < 0) {
+      trendLabel = `${change}%`;
+      trendClass = "text-red-700";
+    } else {
+      trendLabel = "Flat";
+    }
+  }
 
   return (
     <tr className="transition hover:bg-[var(--color-graphite-50)]">
@@ -666,7 +795,8 @@ function ReportRow({ row }: { row: MonthlyReportRow }) {
       <td className="border-b border-[var(--color-border)] py-3 pr-4 font-mono">{formatMoney(row.revenueCents)}</td>
       <td className="border-b border-[var(--color-border)] py-3 pr-4 font-mono">{formatMoney(row.expensesCents)}</td>
       <td className="border-b border-[var(--color-border)] py-3 pr-4 font-mono font-semibold text-emerald-700">{formatMoney(row.profitCents)}</td>
-      <td className="border-b border-[var(--color-border)] py-3 font-mono text-[var(--color-graphite-900)]">{margin}%</td>
+      <td className="border-b border-[var(--color-border)] py-3 pr-4 font-mono text-[var(--color-graphite-900)]">{margin}%</td>
+      <td className={`border-b border-[var(--color-border)] py-3 font-mono ${trendClass}`}>{trendLabel}</td>
     </tr>
   );
 }
