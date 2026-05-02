@@ -615,8 +615,33 @@ function RevenueProfitChart({
               </g>
             );
           })}
-          <path d={pathFor("revenueCents")} fill="none" stroke="#d2a84f" strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" />
-          <path d={pathFor("profitCents")} fill="none" stroke="#3b82f6" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" />
+          <path
+            d={pathFor("revenueCents")}
+            fill="none"
+            stroke="#f2d98d"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="8"
+            vectorEffect="non-scaling-stroke"
+          />
+          <path
+            d={pathFor("revenueCents")}
+            fill="none"
+            stroke="#8f6c22"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="4.5"
+            vectorEffect="non-scaling-stroke"
+          />
+          <path
+            d={pathFor("profitCents")}
+            fill="none"
+            stroke="#3b82f6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="3"
+            vectorEffect="non-scaling-stroke"
+          />
           {data.map((point, index) => (
             <g
               key={point.month}
