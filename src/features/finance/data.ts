@@ -309,7 +309,7 @@ export async function loadFinanceWorkspace(
       tone: activity.tone,
       time: formatRelativeTime(activity.occurred_at),
     })),
-    revenueSeries: buildRevenueSeries(invoiceRecords),
+    revenueSeries: buildRevenueSeries(invoiceRecords, accountsPayableRecords),
     taxQuarterCards: buildTaxCards(invoiceRecords),
     topCustomers: buildTopCustomers(invoiceRecords),
     vendors: vendorRows.map((vendor) => ({ id: vendor.id, label: vendor.name })),
@@ -480,6 +480,7 @@ function mapInvoice(row: InvoiceRow): InvoiceRecord {
     status: row.status,
     quickbooksSyncStatus: row.quickbooks_sync_status,
     paymentTerms: getPaymentTerms(row.invoice_date, row.due_date),
+    notes: row.notes ?? null,
     lineItems: [...(row.invoice_line_items ?? [])]
       .sort((a, b) => a.description.localeCompare(b.description, "pt-BR"))
       .map((item) => ({
@@ -534,15 +535,22 @@ function mapPayable(row: AccountsPayableRow): AccountsPayableRecord {
   };
 }
 
-function buildRevenueSeries(invoices: InvoiceRecord[]): RevenuePoint[] {
+function buildRevenueSeries(
+  invoices: InvoiceRecord[],
+  payables: AccountsPayableRecord[] = [],
+): RevenuePoint[] {
   return monthKeys(6).map(({ key, label }) => {
     const monthInvoices = invoices.filter((invoice) => invoice.issuedOn.startsWith(key));
     const revenueCents = sum(monthInvoices, "totalCents");
+    const expensesCents = sum(
+      payables.filter((payable) => payable.date.startsWith(key)),
+      "totalCents",
+    );
 
     return {
       month: label,
       revenueCents,
-      profitCents: Math.round(revenueCents * 0.42),
+      profitCents: revenueCents - expensesCents,
     };
   });
 }
@@ -671,7 +679,7 @@ function buildCashFlowRows(
   payments: PaymentRecord[],
   payables: AccountsPayableRecord[],
 ): CashFlowRow[] {
-  return monthKeys(1).map(({ key, label }) => ({
+  return monthKeys(6).map(({ key, label }) => ({
     month: label,
     inflowsCents: sum(
       payments.filter((payment) => payment.date.startsWith(key)),
