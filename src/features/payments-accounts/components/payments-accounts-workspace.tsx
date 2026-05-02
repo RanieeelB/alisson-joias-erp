@@ -26,7 +26,7 @@ import type {
 } from "@/features/payments-accounts/types";
 import { formatMoney } from "@/lib/finance";
 import type { ReactNode } from "react";
-import { useActionState, useState } from "react";
+import { useActionState, useCallback, useMemo, useState } from "react";
 
 export type PaymentsAccountsTab = "payments" | "receivable" | "payable";
 
@@ -131,10 +131,22 @@ export function PaymentsAccountsWorkspace({
     createVendorAction,
     { ok: false, message: "" },
   );
-  const paymentSummary = summarizePayments(data.paymentRecords, asOf);
-  const payableSummary = summarizeAccountsPayable(data.accountsPayableRecords, asOf);
-  const aging = summarizeReceivableAging(data.openReceivableInvoices, asOf);
-  const totalAgingCents = agingOrder.reduce((sum, bucket) => sum + aging[bucket], 0);
+  const paymentSummary = useMemo(
+    () => summarizePayments(data.paymentRecords, asOf),
+    [data.paymentRecords, asOf],
+  );
+  const payableSummary = useMemo(
+    () => summarizeAccountsPayable(data.accountsPayableRecords, asOf),
+    [data.accountsPayableRecords, asOf],
+  );
+  const aging = useMemo(
+    () => summarizeReceivableAging(data.openReceivableInvoices, asOf),
+    [data.openReceivableInvoices, asOf],
+  );
+  const totalAgingCents = useMemo(
+    () => agingOrder.reduce((sum, bucket) => sum + aging[bucket], 0),
+    [aging],
+  );
 
   return (
     <FinanceShell

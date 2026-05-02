@@ -311,3 +311,26 @@ Use este arquivo para registrar ajuda relevante de IA durante o projeto. Isso se
 - Revisão/adaptação humana: o usuário pediu valores visíveis no gráfico e hover consistente também nas outras abas.
 - O que mudou após revisão: em vez de depender de tooltip nativo do navegador, os gráficos agora mostram resumos visíveis logo abaixo da visualização quando o cursor passa sobre os elementos. O gráfico de receita também ganhou eixo vertical para facilitar comparação visual entre meses.
 - Riscos ou follow-up: em mobile o hover vira informação menos acessível; se isso virar prioridade, vale adicionar versão touch com tap/tooltip fixo.
+
+## 2026-05-01 - fix/pdf-adherence-corrections
+
+- Ferramentas/skills usadas: Claude Opus (Cowork mode), análise de conformidade contra PDF do teste técnico.
+- Resumo do prompt ou tarefa: corrigir todas as lacunas de conformidade (itens vermelhos e amarelos) identificadas na comparação entre a aplicação e o teste técnico confidencial.
+- Saída aceita:
+  - Seed data extraído das migrations estruturais para `supabase/seed.sql` com upserts idempotentes e dados históricos adicionais (6 meses).
+  - Bucket privado `finance-exports` no Supabase Storage com 4 políticas RLS e upload gracioso em todos os 6 endpoints de PDF.
+  - Cash Flow substituído de gráfico de barras por gráfico SVG de linhas com série de 6 meses (entradas vs saídas).
+  - Lucro derivado de despesas reais (AP) em vez de margem fixa de 42%.
+  - Colunas separadas de Margem e Trend na tabela de Revenue Analysis.
+  - Seletor de período funcional em Statements com `useMemo` para filtragem e estado vazio.
+  - Ação Editar na fatura (5ª ação obrigatória) com `editInvoiceAction`, painel inline e campos de vencimento/status/observações.
+  - Validação de `customer_id` em `recordPaymentAction`.
+  - Aceitação de `paid_amount` parcial em `createPayableAction`.
+  - `useMemo`/`useCallback` em Dashboard, Invoices, Payments e Statements.
+  - Navegação mobile com drawer hamburger no `FinanceShell`.
+  - Registro de atividade para ações de extrato (view/print/email) em `financial_activities`.
+  - Script `npm test` corrigido para `node --test tests/*.test.mjs`.
+  - Testes atualizados para verificar seed.sql e bucket de storage.
+- Revisão/adaptação humana: o usuário forneceu a lista completa de gaps por prioridade (P0/P1/P2) e orientou a ordem de execução.
+- O que mudou após revisão: a implementação seguiu estritamente a priorização fornecida, com commits semânticos curtos por feature.
+- Riscos ou follow-up: testes que importam do package (automations, dashboard-chart-math, etc.) falham com "Invalid package config" — problema pré-existente não relacionado a estas mudanças. Late fee, Realtime e CSV export ficaram como P2 documentado.

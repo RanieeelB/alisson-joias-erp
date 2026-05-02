@@ -157,12 +157,16 @@ export async function recordPaymentAction(
   const supabase = await createClient();
   const { data: invoice, error: invoiceError } = await supabase
     .from("invoices")
-    .select("id,total_cents,paid_cents")
+    .select("id,customer_id,total_cents,paid_cents")
     .eq("id", invoiceId)
     .single();
 
   if (invoiceError || !invoice) {
     return fail("Fatura vinculada não encontrada.");
+  }
+
+  if (invoice.customer_id !== customerId) {
+    return fail("O cliente informado não corresponde à fatura selecionada.");
   }
 
   const paymentNumber = nextDocumentNumber("PAY");
@@ -271,7 +275,13 @@ export async function createPayableAction(
   if (isActionState(status)) return status;
   if (totalCents <= 0) return fail("O valor da obrigação deve ser maior que zero.");
 
-  const paidCents = status === "paid" ? totalCents : 0;
+  const paidAmountRaw = optional(formData, "paidAmount");
+  const paidCents =
+    status === "paid"
+      ? totalCents
+      : status === "partial" && paidAmountRaw
+        ? moneyToCents(paidAmountRaw)
+        : 0;
   const balanceCents = totalCents - paidCents;
   const supabase = await createClient();
   const apNumber = nextDocumentNumber("AP");
@@ -302,6 +312,80 @@ export async function createPayableAction(
   revalidateFinance();
 
   return { ok: true, message: `Obrigação ${apNumber} criada com sucesso.` };
+}
+
+export async function editInvoiceAction(
+  _previousState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const invoiceId = required(formData, "invoiceId", "ID da fatura é obrigatório.");
+  const dueDate = required(formData, "dueDate", "Informe o vencimento.");
+  const status = required(formData, "status", "Selecione o status.");
+
+  if (isActionState(invoiceId)) return invoiceId;
+  if (isActionState(dueDate)) return dueDate;
+  if (isActionState(status)) return status;
+
+  const notes = optional(formData, "notes");
+  const supabase = await createClient();
+
+  const { data: invoice, error: fetchError } = await supabase
+    .from("invoices")
+    .select("id,invoice_number")
+    .eq("id", invoiceId)
+    .single();
+
+  if (fetchError || !invoice) {
+    return fail("Fatura não encontrada.");
+  }
+
+  const { error: updateError } = await supabase
+    .from("invoices")
+    .update({
+      due_date: dueDate,
+      status,
+      notes: notes ?? null,
+    })
+    .eq("id", invoiceId);
+
+  if (updateError) {
+    return fail(`Não foi possível atualizar a fatura: ${updateError.message}`);
+  }
+
+  await supabase.from("financial_activities").insert({
+    invoice_id: invoiceId,
+    title: "Fatura editada",
+    detail: `${invoice.invoice_number} atualizada pela equipe financeira`,
+    amount_cents: 0,
+    tone: "info",
+  });
+
+  revalidateFinance();
+
+  return { ok: true, message: `Fatura ${invoice.invoice_number} atualizada com sucesso.` };
+}
+
+/**
+ * Logs a statement-related action (view, print, email) to financial_activities.
+ * Called from client components when users interact with statement cards.
+ */
+export async function logStatementActivityAction(
+  statementNumber: string,
+  action: "view" | "print" | "email",
+): Promise<void> {
+  const labels: Record<string, string> = {
+    view: "Extrato visualizado",
+    print: "Extrato impresso",
+    email: "Extrato enviado por e-mail",
+  };
+
+  const supabase = await createClient();
+  await supabase.from("financial_activities").insert({
+    title: labels[action] ?? "Ação de extrato",
+    detail: `${statementNumber} — ${labels[action]?.toLowerCase() ?? action}`,
+    amount_cents: 0,
+    tone: "info",
+  });
 }
 
 function required(formData: FormData, key: string, message: string) {

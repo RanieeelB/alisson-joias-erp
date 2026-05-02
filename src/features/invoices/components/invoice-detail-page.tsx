@@ -8,6 +8,7 @@ import {
 import type { InvoiceRecord } from "@/features/invoices/types";
 import { formatMoney } from "@/lib/finance";
 import Link from "next/link";
+import { EditInvoicePanel } from "./edit-invoice-panel";
 
 const badgeTone = {
   pending: "bg-amber-50 text-amber-700 ring-amber-200",
@@ -175,6 +176,7 @@ export function InvoiceDetailPage({
                 <ActionButton href="/payments" primary>Registrar Pagamento</ActionButton>
                 <ActionButton href={`/api/exports/invoices/${invoice.id}`}>Imprimir</ActionButton>
                 <ActionButton href={`/api/exports/invoices/${invoice.id}`}>Baixar PDF</ActionButton>
+                <EditInvoicePanel invoice={invoice} />
               </div>
             </section>
 
