@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { MobileNav } from "./mobile-nav";
 
 type FinanceNavItem = {
   label: string;
@@ -63,13 +64,16 @@ export function FinanceShell({
       <main className="min-w-0 lg:pl-[var(--sidebar-width)]">
         <div className="sticky top-0 z-20 border-b border-[var(--color-border)] bg-[var(--color-surface)]/92 px-4 py-3 backdrop-blur sm:px-6 lg:px-8">
           <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-3">
-            <div className="min-w-0">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-gold-700)]">
-                {eyebrow}
-              </p>
+            <div className="flex min-w-0 items-center gap-3">
+              <MobileNav items={navItems} currentPath={currentPath} />
+              <div className="min-w-0">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-gold-700)]">
+                  {eyebrow}
+                </p>
               <h1 className="truncate text-xl font-semibold tracking-normal text-[var(--color-graphite-950)] sm:text-2xl">
                 {title}
               </h1>
+              </div>
             </div>
             <div className="flex items-center gap-2">
               {userEmail ? (
